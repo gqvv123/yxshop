@@ -1,0 +1,86 @@
+<view class="cp-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">招商合作</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <!-- 标语 -->
+    <view class="hero-slogan">
+      <mp-icon name="briefcase" size="32" color="#fff"></mp-icon>
+      <view class="slogan-text">
+        <text class="slogan-title">携手共赢 · 共创未来</text>
+        <text class="slogan-sub">加入我们，开启企业集采新篇章</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优势卡片 -->
+  <view class="advantage-section">
+    <view class="adv-card" wx:for="{{advantages}}" wx:key="title">
+      <view class="adv-icon-wrap adv-icon-{{index + 1}}">
+        <mp-icon name="{{item.icon}}" size="24" color="#fff"></mp-icon>
+      </view>
+      <view class="adv-info">
+        <text class="adv-title">{{item.title}}</text>
+        <text class="adv-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 合作模式 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="layers" size="18" color="#2563eb"></mp-icon>
+      <text>合作模式</text>
+    </view>
+    <view class="mode-grid">
+      <view class="mode-item" wx:for="{{modes}}" wx:key="title">
+        <view class="mode-icon">
+          <mp-icon name="{{item.icon}}" size="24" color="{{item.color}}"></mp-icon>
+        </view>
+        <text class="mode-title">{{item.title}}</text>
+        <text class="mode-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 流程 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="check-circle" size="18" color="#2563eb"></mp-icon>
+      <text>入驻流程</text>
+    </view>
+    <view class="step-list">
+      <view class="step-item" wx:for="{{steps}}" wx:key="step">
+        <view class="step-num">{{item.step}}</view>
+        <view class="step-content">
+          <text class="step-title">{{item.title}}</text>
+          <text class="step-desc">{{item.desc}}</text>
+        </view>
+        <view wx:if="{{index < steps.length - 1}}" class="step-line"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系方式 -->
+  <view class="contact-section">
+    <view class="contact-card">
+      <mp-icon name="headphones" size="20" color="#2563eb"></mp-icon>
+      <view class="contact-info">
+        <text class="contact-title">招商热线</text>
+        <text class="contact-phone">{{hotline}}</text>
+      </view>
+      <view class="contact-call" bindtap="onCallHotline">
+        <mp-icon name="headphones" size="18" color="#fff"></mp-icon>
+        <text>立即拨打</text>
+      </view>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

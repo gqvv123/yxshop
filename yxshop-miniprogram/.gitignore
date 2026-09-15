@@ -1,0 +1,33 @@
+# 编辑器/系统
+.DS_Store
+.idea/
+.vscode/
+.deveco/
+.claude/
+.opencode/
+.codeartsdoer/
+.spec/
+*.swp
+*.swo
+*~
+
+# 微信开发者工具
+project.private.config.json
+.miniprogram/
+miniprogram_npm/
+
+# 日志/缓存
+*.log
+node_modules/
+
+# ========== 商业版代码已拆分为独立仓库 yxshop-miniprogram-commercial ==========
+/pages/commercial/
+/components/commercial/
+/app.commercial.json
+
+# 商业版 API 模块
+/api/live.js
+/api/membership.js
+
+# 商业版页面
+/pages/profile/invoice/

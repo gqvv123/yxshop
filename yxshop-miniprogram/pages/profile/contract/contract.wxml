@@ -1,0 +1,156 @@
+<view class="ct-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">合同管理</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 统计 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.total}}</text>
+        <text class="stat-label">总合同</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.signed}}</text>
+        <text class="stat-label">已签署</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.pending}}</text>
+        <text class="stat-label">待签署</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.expired}}</text>
+        <text class="stat-label">已过期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 合同列表 -->
+  <view class="content-area">
+    <view wx:if="{{contracts.length}}" class="contract-list">
+      <view class="contract-card" wx:for="{{contracts}}" wx:key="id" data-id="{{item.id}}" bindtap="onViewContract">
+        <view class="cc-top">
+          <view class="cc-name">{{item.contract_name}}</view>
+          <view class="cc-status cc-status-{{item.status}}">{{item.status_text}}</view>
+        </view>
+        <view class="cc-no">合同编号: {{item.contract_no}}</view>
+        <view class="cc-info">
+          <view class="cc-row">
+            <text class="cc-label">类型</text>
+            <text class="cc-value">{{item.type_text}}</text>
+          </view>
+          <view class="cc-row">
+            <text class="cc-label">甲方</text>
+            <text class="cc-value">{{item.party_a}}</text>
+          </view>
+          <view class="cc-row">
+            <text class="cc-label">乙方</text>
+            <text class="cc-value">{{item.party_b}}</text>
+          </view>
+          <view class="cc-row">
+            <text class="cc-label">金额</text>
+            <text class="cc-value cc-amount">¥{{item.amount}}</text>
+          </view>
+          <view class="cc-row">
+            <text class="cc-label">期限</text>
+            <text class="cc-value">{{item.start_text}} ~ {{item.end_text}}</text>
+          </view>
+        </view>
+        <view class="cc-bottom">
+          <view wx:if="{{item.file_url}}" class="cc-file-tag">
+            <mp-icon name="file-text" size="16" color="#2563eb"></mp-icon>
+            <text>合同文件</text>
+          </view>
+          <view wx:else class="cc-file-tag no-file">
+            <text>暂无文件</text>
+          </view>
+          <mp-icon name="chevron-right" size="18" color="#cbd5e1"></mp-icon>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!loading && !contracts.length}}" class="empty-wrap">
+      <empty text="暂无合同记录"></empty>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <view style="height: 60rpx;"></view>
+  </view>
+</view>
+
+<!-- ===== 合同详情弹层 ===== -->
+<view wx:if="{{showDetail}}" class="detail-mask" catchtap="hideDetail">
+  <view class="detail-panel" catchtap="noop">
+    <view class="detail-header">
+      <text class="detail-title">合同详情</text>
+      <text class="detail-close" catchtap="hideDetail">×</text>
+    </view>
+
+    <scroll-view class="detail-body" scroll-y>
+      <view class="detail-name-section">
+        <text class="detail-name">{{current.contract_name}}</text>
+        <view class="detail-status detail-status-{{current.status}}">{{current.status_text}}</view>
+      </view>
+
+      <view class="detail-grid">
+        <view class="detail-row">
+          <text class="detail-label">合同编号</text>
+          <text class="detail-value">{{current.contract_no || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">合同类型</text>
+          <text class="detail-value">{{current.type_text}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">甲方</text>
+          <text class="detail-value">{{current.party_a || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">乙方</text>
+          <text class="detail-value">{{current.party_b || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">合同金额</text>
+          <text class="detail-value detail-amount">¥{{current.amount}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">开始日期</text>
+          <text class="detail-value">{{current.start_text || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">结束日期</text>
+          <text class="detail-value">{{current.end_text || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">签署时间</text>
+          <text class="detail-value">{{current.signed_text || '-'}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{current.remark}}" class="detail-remark">
+        <text class="remark-title">备注</text>
+        <text class="remark-content">{{current.remark}}</text>
+      </view>
+
+      <view wx:if="{{current.file_url}}" class="detail-file" catchtap="onPreviewFile">
+        <mp-icon name="file-text" size="20" color="#2563eb"></mp-icon>
+        <text class="file-text">查看合同文件</text>
+        <mp-icon name="chevron-right" size="18" color="#2563eb"></mp-icon>
+      </view>
+    </scroll-view>
+
+    <view class="detail-actions">
+      <view class="detail-btn-back" catchtap="hideDetail">关闭</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,55 @@
+/* notice-bar — 企业级公告条 */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  margin: 12rpx 24rpx 0;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  overflow: hidden;
+}
+
+/* Hero 模式：半透明白色背景 + 模糊 */
+.notice-bar.hero {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* hero 区组件无 .mp-block 包裹，需自带 bottom 间距 */
+  margin-bottom: 12rpx;
+}
+.notice-bar.hero .notice-tag {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+.notice-bar.hero .notice-content {
+  color: rgba(255,255,255,0.92) !important;
+}
+.notice-bar mp-icon {
+  flex-shrink: 0;
+}
+.notice-tag {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  flex-shrink: 0;
+  margin-right: 12rpx;
+}
+.notice-content-wrap {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.notice-content {
+  display: inline-block;
+  font-weight: 500;
+}
+.notice-content.scrollable {
+  animation: notice-scroll 16s linear infinite;
+}
+@keyframes notice-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}

@@ -1,0 +1,28 @@
+<view class="coupon-receive" wx:if="{{coupons.length}}">
+  <view class="cr-header">
+    <view class="cr-title-wrap">
+      <mp-icon name="gift" size="16" color="#2563eb"></mp-icon>
+      <text class="cr-title">领券中心</text>
+      <view class="cr-tag">免费领取</view>
+    </view>
+  </view>
+  <view class="cr-list">
+    <view
+      wx:for="{{coupons}}"
+      wx:key="id"
+      class="cr-card cr-card-{{index % 3}}"
+    >
+      <view class="cr-left">
+        <view class="cr-amount">
+          <text class="cr-symbol">¥</text>
+          <text class="cr-value">{{item.discount || item.amount || '0'}}</text>
+        </view>
+        <text class="cr-condition">{{item.min_amount ? '满' + item.min_amount + '可用' : '无门槛'}}</text>
+      </view>
+      <view class="cr-right">
+        <text class="cr-name ellipsis">{{item.name || item.coupon_name || '优惠券'}}</text>
+        <view class="cr-btn" bindtap="onReceiveTap" data-id="{{item.id}}">立即领取</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,176 @@
+<view class="sec-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">账号安全</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 安全评分 -->
+    <view class="score-area">
+      <view class="score-ring" style="background: conic-gradient(rgba(255,255,255,0.3) {{securityInfo.score * 3.6}}deg, rgba(255,255,255,0.1) 0deg);">
+        <view class="score-ring-inner">
+          <text class="score-num">{{securityInfo.score}}</text>
+          <text class="score-unit">分</text>
+        </view>
+      </view>
+      <view class="score-info">
+        <text class="score-level">安全等级：{{securityInfo.level}}</text>
+        <text class="score-tip">{{scoreTip}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 安全项列表 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="shield" size="18" color="#2563eb"></mp-icon>
+      <text>安全设置</text>
+    </view>
+    <view class="sec-list">
+      <view class="sec-item" wx:for="{{securityInfo.items}}" wx:key="key" data-key="{{item.key}}" catchtap="onItemAction">
+        <view class="si-icon si-icon-{{index + 1}}">
+          <mp-icon name="{{iconMap[item.key]}}" size="18" color="#fff"></mp-icon>
+        </view>
+        <view class="si-info">
+          <text class="si-title">{{item.title}}</text>
+          <text class="si-desc {{item.bound ? '' : 'si-desc-warn'}}">{{item.desc}}</text>
+        </view>
+        <view class="si-right">
+          <text class="si-action {{item.bound ? 'si-action-bound' : 'si-action-unbound'}}">{{item.action}}</text>
+          <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 登录信息 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="clock" size="18" color="#2563eb"></mp-icon>
+      <text>登录信息</text>
+    </view>
+    <view class="info-list">
+      <view class="info-row">
+        <text class="ir-label">最近登录</text>
+        <text class="ir-value">{{securityInfo.last_login_at || '暂无记录'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">登录IP</text>
+        <text class="ir-value">{{securityInfo.last_login_ip || '-'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">登录次数</text>
+        <text class="ir-value">{{securityInfo.login_count}} 次</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">注册时间</text>
+        <text class="ir-value">{{securityInfo.created_at || '-'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 危险操作 -->
+  <view class="section-card danger-section">
+    <view class="card-header">
+      <mp-icon name="alert-circle" size="18" color="#dc2626"></mp-icon>
+      <text>危险操作</text>
+    </view>
+    <view class="danger-item" catchtap="onShowDeactivate">
+      <view class="di-info">
+        <text class="di-title">注销账号</text>
+        <text class="di-desc">注销后账号将无法登录，数据将被清除</text>
+      </view>
+      <mp-icon name="chevron-right" size="14" color="#dc2626"></mp-icon>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>
+
+<!-- ===== 修改密码弹层 ===== -->
+<view wx:if="{{showPasswordModal}}" class="modal-mask" catchtap="hidePasswordModal">
+  <view class="modal-panel" catchtap="noop">
+    <view class="modal-header">
+      <text class="modal-title">修改密码</text>
+      <text class="modal-close" catchtap="hidePasswordModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-row">
+        <text class="form-label">原密码 <text class="required">*</text></text>
+        <view class="form-input-wrap">
+          <input class="form-input" password="{{!showOldPwd}}" placeholder="请输入原密码" value="{{pwdForm.old_password}}" bindinput="onPwdInput" data-field="old_password" />
+          <view class="pwd-toggle" catchtap="onTogglePwd" data-field="showOldPwd">
+            <mp-icon name="{{showOldPwd ? 'eye-off' : 'eye'}}" size="18" color="#94a3b8"></mp-icon>
+          </view>
+        </view>
+      </view>
+      <view class="form-row">
+        <text class="form-label">新密码 <text class="required">*</text></text>
+        <view class="form-input-wrap">
+          <input class="form-input" password="{{!showNewPwd}}" placeholder="6-20位字符" value="{{pwdForm.new_password}}" bindinput="onPwdInput" data-field="new_password" />
+          <view class="pwd-toggle" catchtap="onTogglePwd" data-field="showNewPwd">
+            <mp-icon name="{{showNewPwd ? 'eye-off' : 'eye'}}" size="18" color="#94a3b8"></mp-icon>
+          </view>
+        </view>
+      </view>
+      <view class="form-row">
+        <text class="form-label">确认密码 <text class="required">*</text></text>
+        <view class="form-input-wrap">
+          <input class="form-input" password="{{!showConfirmPwd}}" placeholder="请再次输入新密码" value="{{pwdForm.confirm_password}}" bindinput="onPwdInput" data-field="confirm_password" />
+          <view class="pwd-toggle" catchtap="onTogglePwd" data-field="showConfirmPwd">
+            <mp-icon name="{{showConfirmPwd ? 'eye-off' : 'eye'}}" size="18" color="#94a3b8"></mp-icon>
+          </view>
+        </view>
+      </view>
+      <view class="form-tip">
+        <mp-icon name="alert-circle" size="14" color="#94a3b8"></mp-icon>
+        <text>密码长度至少6位，建议字母与数字组合</text>
+      </view>
+    </view>
+    <view class="modal-save {{saving ? 'disabled' : ''}}" catchtap="onSavePassword">
+      <text>{{saving ? '保存中...' : '确认修改'}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 注销账号弹层 ===== -->
+<view wx:if="{{showDeactivateModal}}" class="modal-mask" catchtap="hideDeactivateModal">
+  <view class="modal-panel" catchtap="noop">
+    <view class="modal-header">
+      <text class="modal-title modal-title-danger">注销账号</text>
+      <text class="modal-close" catchtap="hideDeactivateModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="deactivate-warn">
+        <mp-icon name="alert-circle" size="24" color="#dc2626"></mp-icon>
+        <text class="deactivate-warn-title">警告：此操作不可逆</text>
+      </view>
+      <view class="deactivate-desc">
+        <text>注销后您将：</text>
+        <text>• 无法登录此账号</text>
+        <text>• 账号信息将被清除</text>
+        <text>• 订单、余额等数据将无法恢复</text>
+      </view>
+      <view class="form-row">
+        <text class="form-label">请输入密码以确认身份 <text class="required">*</text></text>
+        <view class="form-input-wrap">
+          <input class="form-input" password="{{!showDeactPwd}}" placeholder="请输入登录密码" value="{{deactivatePwd}}" bindinput="onDeactPwdInput" />
+          <view class="pwd-toggle" catchtap="onTogglePwd" data-field="showDeactPwd">
+            <mp-icon name="{{showDeactPwd ? 'eye-off' : 'eye'}}" size="18" color="#94a3b8"></mp-icon>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <view class="modal-btn modal-btn-cancel" catchtap="hideDeactivateModal">取消</view>
+      <view class="modal-btn modal-btn-danger {{deactivating ? 'disabled' : ''}}" catchtap="onConfirmDeactivate">
+        <text>{{deactivating ? '注销中...' : '确认注销'}}</text>
+      </view>
+    </view>
+  </view>
+</view>

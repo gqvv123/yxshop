@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "招商合作",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "empty": "/components/empty/index"
+  }
+}

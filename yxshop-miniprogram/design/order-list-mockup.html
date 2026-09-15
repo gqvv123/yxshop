@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>远讯商城 · 订单列表设计稿</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    :root {
+      --primary: #2563eb; --primary-dark: #1e3a8a; --primary-light: #3b82f6;
+      --accent: #f59e0b; --danger: #dc2626; --success: #10b981; --purple: #8b5cf6;
+      --text-1: #0f172a; --text-2: #475569; --text-3: #94a3b8;
+      --bg-page: #f5f7fa; --bg-card: #ffffff; --bg-soft: #f1f5f9; --border: #f0f2f5;
+    }
+    body { background: #e8ecf2; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 16px 0 0 0; }
+    .app-container { max-width: 390px; width: 100%; background: var(--bg-page); border-radius: 36px 36px 0 0; box-shadow: 0 24px 48px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06); overflow: hidden; position: relative; padding-bottom: 64px; }
+
+    /* ========== 状态栏 ========== */
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 6px 20px; color: #fff; font-size: 14px; font-weight: 600; background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 45%, #3b82f6 100%); position: relative; z-index: 2; }
+    .status-bar .time { letter-spacing: 0.5px; }
+    .status-icons { display: flex; gap: 7px; align-items: center; font-size: 16px; }
+    .status-icons .signal-bars { display: flex; gap: 2px; align-items: flex-end; }
+    .status-icons .signal-bars span { width: 3px; background: #fff; border-radius: 2px; }
+    .status-icons .signal-bars span:nth-child(1){ height: 5px; } .status-icons .signal-bars span:nth-child(2){ height: 7px; }
+    .status-icons .signal-bars span:nth-child(3){ height: 9px; } .status-icons .signal-bars span:nth-child(4){ height: 11px; }
+    .battery { width: 24px; height: 12px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 3px; position: relative; display: flex; align-items: center; padding: 1px; }
+    .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 6px; background: rgba(255,255,255,0.6); border-radius: 0 2px 2px 0; }
+    .battery .fill { width: 80%; height: 100%; background: #fff; border-radius: 1px; }
+
+    /* ========== 顶部导航 ========== */
+    .top-bar { background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 45%, #3b82f6 100%); padding: 0 20px 14px 20px; position: relative; overflow: hidden; }
+    .top-bar::before { content: ''; position: absolute; top: -40px; right: -30px; width: 200px; height: 200px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+    .nav-row { display: flex; align-items: center; gap: 14px; position: relative; z-index: 2; }
+    .nav-back { color: #fff; font-size: 20px; width: 24px; }
+    .nav-title { color: #fff; font-size: 18px; font-weight: 700; flex: 1; }
+    .nav-search { color: rgba(255,255,255,0.9); font-size: 18px; }
+
+    /* ========== Tab 切换 ========== */
+    .tab-bar { display: flex; background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative; z-index: 5; }
+    .tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; color: var(--text-2); font-weight: 500; position: relative; white-space: nowrap; }
+    .tab-item.active { color: var(--primary); font-weight: 700; }
+    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--primary); border-radius: 3px; }
+    .tab-item .tab-badge { display: inline-block; background: var(--danger); color: #fff; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 10px; min-width: 14px; text-align: center; margin-left: 3px; vertical-align: top; }
+
+    /* ========== 订单列表 ========== */
+    .order-list { padding: 12px; }
+    .order-card { background: var(--bg-card); border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); margin-bottom: 12px; overflow: hidden; }
+    .oc-header { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .oc-store { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .oc-store i { color: var(--primary); font-size: 14px; }
+    .oc-status { font-size: 12px; font-weight: 600; }
+    .oc-status.pay { color: var(--danger); }
+    .oc-status.ship { color: var(--accent); }
+    .oc-status.recv { color: var(--primary); }
+    .oc-status.done { color: var(--success); }
+    .oc-status.refund { color: var(--purple); }
+
+    .oc-items { padding: 12px 14px; }
+    .oc-item { display: flex; gap: 12px; margin-bottom: 10px; }
+    .oc-item:last-child { margin-bottom: 0; }
+    .oc-img { width: 64px; height: 64px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .oc-info { flex: 1; min-width: 0; }
+    .oc-name { font-size: 13px; font-weight: 600; color: var(--text-1); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+    .oc-sku { display: flex; gap: 6px; margin-top: 4px; }
+    .oc-sku span { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--bg-soft); color: var(--text-2); }
+    .oc-price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+    .oc-price { font-size: 14px; font-weight: 700; color: var(--text-1); }
+    .oc-qty { font-size: 11px; color: var(--text-3); }
+
+    .oc-footer { padding: 10px 14px; border-top: 1px solid var(--border); }
+    .oc-total { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
+    .oc-total .amount { font-size: 16px; font-weight: 700; color: var(--danger); }
+    .oc-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .oc-btn { font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 18px; border: 1.5px solid var(--border); color: var(--text-2); background: var(--bg-card); }
+    .oc-btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+    .oc-btn.danger { color: var(--danger); border-color: rgba(220,38,38,0.2); }
+    .oc-btn.accent { color: var(--accent); border-color: rgba(245,158,11,0.2); }
+
+    /* ========== 底部导航 ========== */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; height: 56px; background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; padding: 0; z-index: 1000; box-shadow: 0 -2px 16px rgba(0,0,0,0.04); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 56px; flex: 1; font-size: 10px; color: var(--text-3); font-weight: 500; transition: 0.15s; position: relative; cursor: pointer; }
+    .nav-item i { font-size: 20px; color: var(--text-3); transition: transform 0.2s; }
+    .nav-item.active i { transform: scale(1.1); }
+    .nav-item.active i, .nav-item.active span { color: var(--primary); }
+    .nav-item.active i { filter: drop-shadow(0 2px 6px rgba(37,99,235,0.2)); }
+    .nav-item .badge-dot { position: absolute; top: 4px; right: 50%; transform: translateX(18px); background: var(--danger); color: #fff; border-radius: 30px; font-size: 9px; font-weight: 700; padding: 1px 5px; min-width: 16px; text-align: center; line-height: 1.3; border: 1.5px solid #fff; box-shadow: 0 2px 6px rgba(220,38,38,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap { width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -2px; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap i { color: #fff; font-size: 19px; filter: none; }
+    .nav-item.nav-cart span { margin-top: 1px; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- ===== 状态栏 ===== -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="status-icons">
+      <span class="signal-bars"><span></span><span></span><span></span><span></span></span>
+      <span style="font-size:13px;">5G</span>
+      <span class="battery"><span class="fill"></span></span>
+    </span>
+  </div>
+
+  <!-- ===== 顶部导航 ===== -->
+  <div class="top-bar">
+    <div class="nav-row">
+      <i class="fas fa-chevron-left nav-back"></i>
+      <span class="nav-title">我的订单</span>
+      <i class="fas fa-search nav-search"></i>
+    </div>
+  </div>
+
+  <!-- ===== Tab 切换 ===== -->
+  <div class="tab-bar">
+    <div class="tab-item">全部</div>
+    <div class="tab-item">待付款<span class="tab-badge">2</span></div>
+    <div class="tab-item">待发货<span class="tab-badge">1</span></div>
+    <div class="tab-item">待收货</div>
+    <div class="tab-item active">待评价<span class="tab-badge">3</span></div>
+    <div class="tab-item">退款/售后</div>
+  </div>
+
+  <!-- ===== 订单列表 ===== -->
+  <div class="order-list">
+    <!-- 订单 1: 待评价 -->
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-store"><i class="fas fa-store"></i> 远讯数码旗舰店</span>
+        <span class="oc-status done">交易成功</span>
+      </div>
+      <div class="oc-items">
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #dbeafe, #93c5fd); color: #1e3a8a;"><i class="fas fa-laptop"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">ThinkPad X1 Carbon 企业版 i7/16G/512G</div>
+            <div class="oc-sku"><span>i7/16G/512G</span><span>企业黑</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥9,999</span><span class="oc-qty">x1</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-footer">
+        <div class="oc-total">共1件 实付款 <span class="amount">¥9,999</span></div>
+        <div class="oc-actions">
+          <button class="oc-btn">查看详情</button>
+          <button class="oc-btn danger">申请售后</button>
+          <button class="oc-btn primary"><i class="fas fa-star" style="margin-right:4px;"></i>评价</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单 2: 待付款 -->
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-store"><i class="fas fa-store"></i> 家居生活馆</span>
+        <span class="oc-status pay">待付款</span>
+      </div>
+      <div class="oc-items">
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #e2e9e0, #c8d4c0); color: #5f4b3a;"><i class="fas fa-couch"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">北欧风头层牛皮沙发 企业定制 三人位</div>
+            <div class="oc-sku"><span>三人位</span><span>棕色</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥7,280</span><span class="oc-qty">x1</span></div>
+          </div>
+        </div>
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); color: #0f766e;"><i class="fas fa-chair"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">实木餐椅 北欧简约风格 一对装</div>
+            <div class="oc-sku"><span>一对装</span><span>原木色</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥860</span><span class="oc-qty">x2</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-footer">
+        <div class="oc-total">共3件 实付款 <span class="amount">¥9,000</span></div>
+        <div class="oc-actions">
+          <button class="oc-btn">取消订单</button>
+          <button class="oc-btn primary"><i class="fas fa-wallet" style="margin-right:4px;"></i>立即付款</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单 3: 待发货 -->
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-store"><i class="fas fa-store"></i> 远讯数码旗舰店</span>
+        <span class="oc-status ship">待发货</span>
+      </div>
+      <div class="oc-items">
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #f7e8d5, #f0d5b8); color: #1f2a36;"><i class="fas fa-headphones"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">旗舰降噪耳机 Pro 40dB 自适应降噪</div>
+            <div class="oc-sku"><span>标准版</span><span>深空灰</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥1,899</span><span class="oc-qty">x2</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-footer">
+        <div class="oc-total">共2件 实付款 <span class="amount">¥3,798</span></div>
+        <div class="oc-actions">
+          <button class="oc-btn">提醒发货</button>
+          <button class="oc-btn">查看详情</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单 4: 已完成 -->
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-store"><i class="fas fa-store"></i> 办公文具直供</span>
+        <span class="oc-status done">交易成功</span>
+      </div>
+      <div class="oc-items">
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); color: #0f766e;"><i class="fas fa-keyboard"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">机械键盘 RGB背光 青轴 有线电竞办公</div>
+            <div class="oc-sku"><span>青轴</span><span>黑色</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥159</span><span class="oc-qty">x3</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-footer">
+        <div class="oc-total">共3件 实付款 <span class="amount">¥477</span></div>
+        <div class="oc-actions">
+          <button class="oc-btn">查看详情</button>
+          <button class="oc-btn accent"><i class="fas fa-star" style="margin-right:4px;"></i>评价</button>
+          <button class="oc-btn primary">再次购买</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单 5: 退款 -->
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-store"><i class="fas fa-store"></i> 食品生鲜超市</span>
+        <span class="oc-status refund">退款中</span>
+      </div>
+      <div class="oc-items">
+        <div class="oc-item">
+          <div class="oc-img" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;"><i class="fas fa-mug-hot"></i></div>
+          <div class="oc-info">
+            <div class="oc-name">智能保温杯 316不锈钢 温度显示</div>
+            <div class="oc-sku"><span>500ml</span><span>白色</span></div>
+            <div class="oc-price-row"><span class="oc-price">¥49</span><span class="oc-qty">x1</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-footer">
+        <div class="oc-total">退款金额 <span class="amount">¥49</span></div>
+        <div class="oc-actions">
+          <button class="oc-btn">退款详情</button>
+          <button class="oc-btn danger">撤销申请</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 底部导航 ===== -->
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="fas fa-house"></i><span>首页</span></div>
+    <div class="nav-item"><i class="fas fa-th-large"></i><span>分类</span></div>
+    <div class="nav-item nav-cart"><div class="cart-icon-wrap"><i class="fas fa-shopping-cart"></i></div><span>购物车</span><span class="badge-dot">3</span></div>
+    <div class="nav-item"><i class="fas fa-star"></i><span>收藏</span></div>
+    <div class="nav-item active"><i class="fas fa-user-circle"></i><span>我的</span></div>
+  </div>
+
+</div>
+</body>
+</html>

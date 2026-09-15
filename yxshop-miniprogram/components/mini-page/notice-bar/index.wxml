@@ -1,0 +1,7 @@
+<view class="notice-bar {{hero ? 'hero' : ''}}" wx:if="{{content}}" style="background-color: {{backgroundColor}};">
+  <mp-icon name="{{icon}}" size="14" color="{{textColor}}"></mp-icon>
+  <view class="notice-tag">公告</view>
+  <view class="notice-content-wrap">
+    <text class="notice-content {{scrollable ? 'scrollable' : ''}}" style="color: {{textColor}};">{{content}}</text>
+  </view>
+</view>

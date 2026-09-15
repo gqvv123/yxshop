@@ -1,0 +1,127 @@
+<view class="coupon-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">优惠券</text>
+      <view class="nav-rule" bindtap="onShowRules">使用规则</view>
+    </view>
+    <!-- 统计卡片 -->
+    <view class="stats-banner">
+      <view class="sb-left">
+        <view class="sb-num">{{stats.unused || 0}} <text class="sb-unit">张可用</text></view>
+        <view class="sb-label">最高可省 ¥{{maxSavings}}</view>
+      </view>
+      <view class="sb-btn" bindtap="onGoClaim">
+        <mp-icon name="plus" size="14" color="#fff"></mp-icon>
+        <text>领券</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Tab 切换 ===== -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" data-idx="0" bindtap="onTabChange">
+      可使用<text wx:if="{{stats.unused > 0}}" class="tab-count">{{stats.unused}}</text>
+    </view>
+    <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" data-idx="1" bindtap="onTabChange">
+      已使用<text wx:if="{{stats.used > 0}}" class="tab-count">{{stats.used}}</text>
+    </view>
+    <view class="tab-item {{activeTab === 2 ? 'active' : ''}}" data-idx="2" bindtap="onTabChange">
+      已过期<text wx:if="{{stats.expired > 0}}" class="tab-count">{{stats.expired}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 优惠券列表 ===== -->
+  <view class="coupon-list" wx:if="{{list.length}}">
+    <view
+      class="coupon-card color-{{item.colorClass}} {{item.status !== 0 ? 'disabled' : ''}}"
+      wx:for="{{list}}"
+      wx:key="user_coupon_id"
+    >
+      <view class="cc-left">
+        <view class="cc-amount" wx:if="{{item.type === 1}}">
+          <text class="cc-sign">¥</text>{{item.discount_amount}}
+        </view>
+        <view class="cc-amount" wx:elif="{{item.type === 2}}">
+          {{item.discount_rate}}<text class="cc-sign">折</text>
+        </view>
+        <view class="cc-amount cc-amount--gift" wx:else>礼品券</view>
+        <view class="cc-condition">{{item.min_amount_text}}</view>
+      </view>
+      <view class="cc-right">
+        <view class="cc-info">
+          <view class="cc-name">
+            <text>{{item.name}}</text>
+            <text class="cc-type">{{item.type_text}}</text>
+          </view>
+          <view class="cc-scope">
+            <mp-icon name="tag" size="12" color="#94a3b8"></mp-icon>
+            <text>{{item.scope_text}}</text>
+          </view>
+        </view>
+        <view class="cc-bottom">
+          <view class="cc-expire">
+            <mp-icon name="clock" size="12" color="#94a3b8"></mp-icon>
+            <text>{{item.expiry_text}}</text>
+          </view>
+          <view
+            class="cc-btn {{item.status !== 0 ? 'cc-btn--disabled' : ''}}"
+            data-status="{{item.status}}"
+            catchtap="onUseCoupon"
+          >
+            {{item.status === 0 ? '去使用' : item.status === 1 ? '已使用' : '已过期'}}
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loading}}">加载中...</view>
+    <view class="load-more" wx:if="{{!loading && !hasMore && list.length}}">没有更多了</view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty text="暂无优惠券"></empty>
+  </view>
+
+  <!-- ===== 领券中心 ===== -->
+  <view class="claim-section" wx:if="{{activeTab === 0 && claimList.length}}" id="claim-section">
+    <view class="claim-header">
+      <mp-icon name="gift" size="18" color="#f59e0b"></mp-icon>
+      <text class="ch-title">领券中心</text>
+      <view class="ch-tag">每日领取</view>
+    </view>
+    <scroll-view class="claim-scroll" scroll-x enable-flex>
+      <view
+        class="claim-card cb-{{item.colorClass}}"
+        wx:for="{{claimList}}"
+        wx:key="id"
+      >
+        <view class="claim-amount" wx:if="{{item.type === 1}}">
+          <text class="claim-sign">¥</text>{{item.discount_amount}}
+        </view>
+        <view class="claim-amount" wx:elif="{{item.type === 2}}">
+          {{item.discount_rate}}<text class="claim-sign">折</text>
+        </view>
+        <view class="claim-amount" wx:else>
+          <text class="claim-sign">礼品</text>
+        </view>
+        <view class="claim-desc">{{item.min_amount_text}}</view>
+        <view
+          class="claim-btn {{item.user_received >= item.user_limit_count ? 'claim-btn--disabled' : ''}}"
+          data-id="{{item.id}}"
+          data-received="{{item.user_received}}"
+          data-limit="{{item.user_limit_count}}"
+          catchtap="onClaimCoupon"
+        >
+          {{item.user_received >= item.user_limit_count ? '已领取' : '立即领取'}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

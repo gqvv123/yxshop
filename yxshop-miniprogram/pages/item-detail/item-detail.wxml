@@ -1,0 +1,372 @@
+<block>
+<view wx:if="{{item}}" class="detail-page">
+
+  <!-- ===== 主图轮播 ===== -->
+  <swiper class="hero-swiper" autoplay="{{images.length > 1}}" circular="{{images.length > 1}}" indicator-dots="{{images.length > 1}}" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#fff" bindchange="onSwiperChange">
+    <block wx:if="{{images.length}}">
+      <swiper-item wx:for="{{images}}" wx:key="index" wx:for-item="img">
+        <view class="hero-slide">
+          <image class="hero-img" src="{{img}}" mode="aspectFill" binderror="onHeroImgError" data-index="{{index}}"></image>
+        </view>
+      </swiper-item>
+    </block>
+    <swiper-item wx:else>
+      <view class="hero-slide hero-fallback">
+        <mp-icon name="package" size="80" color="#94a3b8"></mp-icon>
+        <text class="hero-fallback-text">暂无图片</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- ===== 悬浮导航 ===== -->
+  <view class="float-nav">
+    <view class="fn-btn" bindtap="onBack">
+      <text class="fn-arrow">‹</text>
+    </view>
+    <view class="fn-right">
+      <view class="fn-btn" bindtap="onShare">
+        <text class="fn-share">↗</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 价格区 ===== -->
+  <view class="price-section">
+    <view class="ps-row">
+      <text class="ps-symbol">¥</text>
+      <text class="ps-price">{{displayPrice}}</text>
+      <text wx:if="{{marketPrice}}" class="ps-origin">¥{{marketPrice}}</text>
+      <view wx:if="{{discountText}}" class="ps-tag">
+        <mp-icon name="zap" size="10" color="#fde68a"></mp-icon>
+        <text class="ps-tag-text">{{discountText}}</text>
+      </view>
+    </view>
+    <view class="ps-tags">
+      <view class="ptag">
+        <mp-icon name="shield" size="10" color="rgba(255,255,255,0.9)"></mp-icon>
+        <text class="ptag-text">正品保障</text>
+      </view>
+      <view class="ptag">
+        <mp-icon name="truck" size="10" color="rgba(255,255,255,0.9)"></mp-icon>
+        <text class="ptag-text">极速发货</text>
+      </view>
+      <view class="ptag">
+        <mp-icon name="recycle" size="10" color="rgba(255,255,255,0.9)"></mp-icon>
+        <text class="ptag-text">7天无理由</text>
+      </view>
+      <view class="ptag">
+        <mp-icon name="file-text" size="10" color="rgba(255,255,255,0.9)"></mp-icon>
+        <text class="ptag-text">可开发票</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 标题区 ===== -->
+  <view class="title-section">
+    <view class="ts-name">{{item.name || item.goods_name}}</view>
+    <view class="ts-sub" wx:if="{{item.subtitle || item.sub_title}}">
+      <text class="ts-sub-text">{{item.subtitle || item.sub_title}}</text>
+    </view>
+    <view class="ts-stats">
+      <view class="ts-stat">
+        <mp-icon name="flame" size="12" color="#dc2626"></mp-icon>
+        <text class="ts-stat-text">已售 {{item.total_sales || item.sales || 0}}</text>
+      </view>
+      <view class="ts-divider"></view>
+      <view class="ts-stat">
+        <mp-icon name="star" size="12" color="#f59e0b"></mp-icon>
+        <text class="ts-stat-text">{{reviewRate}}% 好评</text>
+      </view>
+      <view class="ts-divider"></view>
+      <view class="ts-stat">
+        <mp-icon name="package" size="12" color="#10b981"></mp-icon>
+        <text class="ts-stat-text">库存 {{item.stock || 0}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 促销赠品提示 ===== -->
+  <view wx:if="{{promoText}}" class="promo-banner">
+    <mp-icon name="gift" size="14" color="#b45309"></mp-icon>
+    <text class="promo-text">{{promoText}}</text>
+  </view>
+
+  <!-- ===== 配送信息 ===== -->
+  <view class="ship-section">
+    <view class="ship-item" bindtap="showAddCart">
+      <text class="si-label">选择</text>
+      <text class="si-value">{{selectedSpecText || '请选择规格'}}</text>
+      <text class="si-arrow">›</text>
+    </view>
+    <view class="ship-item">
+      <text class="si-label">配送</text>
+      <view class="si-tags">
+        <view class="si-tag si-tag-free">
+          <mp-icon name="check" size="10" color="#047857"></mp-icon>
+          <text>包邮</text>
+        </view>
+        <view class="si-tag si-tag-auth">
+          <mp-icon name="check" size="10" color="#1e40af"></mp-icon>
+          <text>正品</text>
+        </view>
+        <view class="si-tag si-tag-free">
+          <mp-icon name="check" size="10" color="#047857"></mp-icon>
+          <text>假一赔十</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 评价区 ===== -->
+  <view class="review-section" wx:if="{{reviews.length || reviewSummary}}">
+    <view class="rs-header">
+      <text class="rs-title">商品评价 ({{reviewSummary.total || 0}})</text>
+      <view class="rs-rate">
+        <mp-icon name="star" size="12" color="#f59e0b"></mp-icon>
+        <text class="rs-rate-text">{{reviewSummary.avg_rate || '5.0'}}分</text>
+        <text class="rs-count">好评 {{reviewRate}}%</text>
+      </view>
+    </view>
+    <view class="review-tags" wx:if="{{reviewTags.length}}">
+      <view class="review-tag" wx:for="{{reviewTags}}" wx:key="label" wx:for-item="tag">
+        <text>{{tag.label}}</text>
+        <text class="review-tag-num">{{tag.num}}</text>
+      </view>
+    </view>
+    <view class="review-card" wx:for="{{reviews || []}}" wx:key="id" wx:for-item="rv">
+      <view class="rc-user">
+        <view class="rc-avatar" style="background: {{rv.avatarBg}};">
+          <text class="rc-avatar-text">{{rv.initial}}</text>
+        </view>
+        <text class="rc-name">{{rv.nickname}}</text>
+        <view class="rc-stars">
+          <mp-icon name="star" size="10" color="#f59e0b"></mp-icon>
+          <mp-icon name="star" size="10" color="#f59e0b"></mp-icon>
+          <mp-icon name="star" size="10" color="#f59e0b"></mp-icon>
+          <mp-icon name="star" size="10" color="#f59e0b"></mp-icon>
+          <mp-icon name="star" size="10" color="#f59e0b"></mp-icon>
+        </view>
+      </view>
+      <view class="rc-text">{{rv.content}}</view>
+      <view class="rc-date">{{rv.date}}</view>
+    </view>
+    <view class="rs-more" wx:if="{{reviewSummary.total > reviews.length}}" bindtap="onMoreReviews">
+      <text class="rs-more-text">查看全部{{reviewSummary.total}}条评价</text>
+      <text class="rs-more-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ===== 商品咨询/问答 ===== -->
+  <view class="consult-section" wx:if="{{consultations.length || consultationTotal}}">
+    <view class="cs-header">
+      <text class="cs-title">商品咨询 ({{consultationTotal}})</text>
+      <view class="cs-ask-btn" bindtap="onShowConsultInput">
+        <mp-icon name="message" size="14" color="#2563eb"></mp-icon>
+        <text>提问</text>
+      </view>
+    </view>
+    <view class="cs-list">
+      <view class="cs-item" wx:for="{{consultations}}" wx:key="id">
+        <view class="cs-question">
+          <view class="cs-avatar" style="background: {{item.avatarBg}};">{{item.initial}}</view>
+          <view class="cs-q-content">
+            <text class="cs-q-text">{{item.question}}</text>
+            <text class="cs-q-meta">{{item.nickname}} · {{item.created_at}}</text>
+          </view>
+        </view>
+        <view class="cs-answer" wx:if="{{item.answer}}">
+          <view class="cs-reply-icon">
+            <mp-icon name="message" size="12" color="#2563eb"></mp-icon>
+          </view>
+          <view class="cs-a-content">
+            <text class="cs-a-text">{{item.answer}}</text>
+            <text class="cs-a-meta" wx:if="{{item.reply_at}}">商家回复 · {{item.reply_at}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="cs-more" wx:if="{{consultationTotal > consultations.length}}" bindtap="onMoreConsultations">
+      <text class="cs-more-text">查看全部{{consultationTotal}}条咨询</text>
+      <text class="cs-more-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ===== 店铺信息 ===== -->
+  <view class="shop-section" wx:if="{{shopInfo}}">
+    <view class="shop-row">
+      <view class="shop-logo">
+        <image wx:if="{{shopInfo.logo}}" src="{{shopInfo.logo}}" mode="aspectFill" class="shop-logo-img"></image>
+        <mp-icon wx:else name="briefcase" size="20" color="#fff"></mp-icon>
+      </view>
+      <view class="shop-info">
+        <view class="shop-name">
+          <text>{{shopInfo.name}}</text>
+          <mp-icon wx:if="{{shopInfo.verified}}" name="check-circle" size="14" color="#2563eb"></mp-icon>
+        </view>
+        <text class="shop-desc">{{shopInfo.desc || ('综合体验分 ' + shopInfo.stats.score)}}</text>
+      </view>
+      <view class="shop-btn" bindtap="onShopEnter">进店</view>
+    </view>
+    <view class="shop-stats">
+      <view class="shop-stat">
+        <text class="ss-val">{{shopInfo.stats.items}}</text>
+        <text class="ss-lbl">商品</text>
+      </view>
+      <view class="shop-stat">
+        <text class="ss-val">{{shopInfo.stats.followers}}</text>
+        <text class="ss-lbl">关注</text>
+      </view>
+      <view class="shop-stat">
+        <text class="ss-val">{{shopInfo.stats.score}}</text>
+        <text class="ss-lbl">体验分</text>
+      </view>
+      <view class="shop-stat">
+        <text class="ss-val">{{shopInfo.stats.goodRate}}</text>
+        <text class="ss-lbl">好评率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 相关推荐 ===== -->
+  <view wx:if="{{relatedItems.length}}" class="related-section">
+    <view class="rl-header">
+      <view class="rl-title">
+        <mp-icon name="layers" size="16" color="#2563eb"></mp-icon>
+        <text>相关推荐</text>
+      </view>
+      <text class="rl-sub">为你精选好物</text>
+    </view>
+    <scroll-view scroll-x class="rl-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="rl-list">
+        <view
+          wx:for="{{relatedItems}}"
+          wx:key="id"
+          class="rl-card"
+          data-id="{{item.id || item.goods_id}}"
+          bindtap="onRelatedItemTap"
+        >
+          <view class="rl-cover-wrap">
+            <image
+              wx:if="{{item._cover}}"
+              class="rl-cover"
+              src="{{item._cover}}"
+              mode="aspectFill"
+              lazy-load
+            ></image>
+            <view wx:else class="rl-cover rl-cover-fallback">
+              <mp-icon name="package" size="32" color="#cbd5e1"></mp-icon>
+            </view>
+          </view>
+          <view class="rl-info">
+            <text class="rl-name ellipsis-2">{{item.goods_name || item.name || '商品'}}</text>
+            <view class="rl-price-row">
+              <text class="rl-symbol">¥</text>
+              <text class="rl-price">{{item.sale_price || item.price || item.goods_price || '0.00'}}</text>
+            </view>
+            <text wx:if="{{item.total_sales || item.sales}}" class="rl-sold">已售{{item.total_sales || item.sales}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ===== 图文详情 ===== -->
+  <view class="detail-section">
+    <view class="ds-title">
+      <view class="ds-line"></view>
+      <text class="ds-title-text">商品详情</text>
+      <view class="ds-line"></view>
+    </view>
+
+    <!-- 规格参数 -->
+    <view class="ds-block" wx:if="{{specList.length}}">
+      <view class="ds-block-title">
+        <mp-icon name="layers" size="14" color="#2563eb"></mp-icon>
+        <text class="ds-block-name">规格参数</text>
+      </view>
+      <view class="spec-row" wx:for="{{specList}}" wx:key="label" wx:for-item="sp">
+        <text class="spec-key">{{sp.label}}</text>
+        <text class="spec-val">{{sp.value}}</text>
+      </view>
+    </view>
+
+    <!-- 图文描述 -->
+    <view class="ds-block">
+      <view class="ds-block-title">
+        <mp-icon name="file-text" size="14" color="#2563eb"></mp-icon>
+        <text class="ds-block-name">产品介绍</text>
+      </view>
+      <view wx:if="{{item.detail_html}}" class="ds-rich">
+        <rich-text nodes="{{item.detail_html}}"></rich-text>
+      </view>
+      <view wx:elif="{{item.description}}" class="ds-text">
+        <text>{{item.description}}</text>
+      </view>
+      <view wx:else class="ds-text">
+        <text class="ds-empty">暂无详细描述</text>
+      </view>
+    </view>
+  </view>
+
+  <view style="height: 140rpx;"></view>
+
+  <!-- ===== 底部操作栏 ===== -->
+  <view class="action-bar safe-area-bottom">
+    <view class="ab-icon" bindtap="goCart">
+      <view class="ab-icon-circle cart-bg">
+        <mp-icon name="shopping-cart" size="18" color="#2563eb"></mp-icon>
+      </view>
+      <text class="ab-icon-label">购物车</text>
+    </view>
+    <view class="ab-icon" bindtap="onToggleFavorite">
+      <view class="ab-icon-circle fav-bg">
+        <mp-icon name="heart" size="18" color="{{favorited ? '#dc2626' : '#94a3b8'}}"></mp-icon>
+      </view>
+      <text class="ab-icon-label">{{favorited ? '已收藏' : '收藏'}}</text>
+    </view>
+    <view class="ab-btn ab-btn-cart" bindtap="showAddCart">
+      <mp-icon name="shopping-cart" size="16" color="#fff"></mp-icon>
+      <text class="ab-btn-text">加入购物车</text>
+    </view>
+    <view class="ab-btn ab-btn-buy" bindtap="showBuyNow">
+      <mp-icon name="zap" size="16" color="#fff"></mp-icon>
+      <text class="ab-btn-text">立即购买</text>
+    </view>
+  </view>
+
+  <!-- SKU 选择层 -->
+  <sku-picker item="{{item}}" action="{{skuAction}}" visible="{{showSku}}" bind:confirm="onConfirmSku" bind:close="hideSku"></sku-picker>
+
+  <!-- 咨询输入弹窗 -->
+  <view wx:if="{{showConsultInput}}" class="consult-mask" bindtap="onCancelConsult">
+    <view class="consult-modal" catchtap="noop">
+      <view class="cm-header">
+        <text class="cm-title">我要提问</text>
+        <view class="cm-close" bindtap="onCancelConsult">
+          <mp-icon name="close" size="18" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+      <textarea
+        class="cm-textarea"
+        placeholder="请输入您的问题，商家将尽快回复"
+        value="{{consultContent}}"
+        bindinput="onConsultInput"
+        bindblur="onConsultBlur"
+        maxlength="500"
+        auto-height
+      ></textarea>
+      <view class="cm-footer">
+        <text class="cm-count">{{consultContent.length}}/500</text>
+        <view class="cm-submit-btn {{!consultContent ? 'cm-submit-btn--disabled' : ''}}" bindtap="onSubmitConsult">
+          {{submittingConsult ? '提交中...' : '提交'}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 空状态 -->
+<view wx:if="{{!loading && !item}}" class="empty-wrap">
+  <empty emoji="🔍" text="商品不存在或已下架" subText="去看看其他商品吧"></empty>
+</view>
+</block>

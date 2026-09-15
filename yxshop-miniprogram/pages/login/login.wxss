@@ -1,0 +1,266 @@
+/* login — 企业级登录页（对照 profile 风格统一） */
+.login-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 120rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco-1 {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.hero-deco-2 {
+  position: absolute;
+  bottom: 80rpx;
+  left: -100rpx;
+  width: 280rpx;
+  height: 280rpx;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+/* 顶部导航 */
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-spacer {
+  flex: 1;
+}
+
+/* 品牌区 */
+.brand-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.brand-logo {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 32rpx;
+  background: rgba(255,255,255,0.15);
+  border: 4rpx solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 16rpx 40rpx rgba(0,0,0,0.15);
+}
+.brand-name {
+  color: #fff;
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-top: 24rpx;
+  letter-spacing: 4rpx;
+}
+.brand-slogan {
+  color: rgba(255,255,255,0.7);
+  font-size: 24rpx;
+  margin-top: 8rpx;
+  letter-spacing: 2rpx;
+}
+
+/* ========== 白色内容区 ========== */
+.content-body {
+  background: var(--bg);
+  border-radius: 48rpx 48rpx 0 0;
+  margin-top: -80rpx;
+  position: relative;
+  z-index: 3;
+  padding: 48rpx 48rpx 0 48rpx;
+}
+
+/* 标题区 */
+.form-title-area {
+  margin-bottom: 48rpx;
+}
+.form-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.form-subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+}
+
+/* 微信登录按钮 */
+.btn-wx {
+  background: #07c160;
+  color: #fff;
+  height: 96rpx;
+  line-height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(7,193,96,0.25);
+}
+.btn-wx::after { border: none; }
+.btn-wx.disabled { opacity: 0.6; }
+.wx-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 分割线 */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 40rpx 0;
+}
+.divider-line {
+  flex: 1;
+  height: 2rpx;
+  background: var(--line-light);
+}
+.divider-text {
+  margin: 0 24rpx;
+  color: var(--text-3);
+  font-size: 24rpx;
+}
+
+/* 表单卡片 */
+.form-card {
+  background: var(--card);
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.03);
+  overflow: hidden;
+}
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+  height: 104rpx;
+  border-bottom: 2rpx solid var(--line-light);
+}
+.form-item-last {
+  border-bottom: none;
+}
+.form-icon {
+  width: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.form-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-1);
+  height: 104rpx;
+  line-height: 104rpx;
+}
+.placeholder {
+  color: var(--text-3);
+  font-size: 28rpx;
+}
+.pwd-toggle {
+  width: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-left: 16rpx;
+}
+
+/* 忘记密码 */
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  color: var(--text-3);
+}
+
+/* 协议勾选 */
+.agreement-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-top: 40rpx;
+}
+.check-box {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 4rpx solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+.check-box.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.agreement-text {
+  font-size: 24rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.agreement-link {
+  color: var(--primary);
+}
+
+/* 提交按钮 */
+.btn-submit {
+  margin-top: 48rpx;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  height: 96rpx;
+  line-height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  box-shadow: 0 12rpx 32rpx rgba(37,99,235,0.3);
+}
+.btn-submit::after { border: none; }
+.btn-submit.disabled { opacity: 0.6; }
+
+/* 切换登录/注册 */
+.switch-mode {
+  text-align: center;
+  margin-top: 40rpx;
+  font-size: 26rpx;
+  color: var(--text-3);
+}
+.switch-highlight {
+  color: var(--primary);
+  font-weight: 600;
+}

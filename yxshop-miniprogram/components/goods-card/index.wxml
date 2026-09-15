@@ -1,0 +1,30 @@
+<view class="goods-card {{layout}}" bindtap="onTap">
+  <view class="cover-wrap">
+    <image wx:if="{{_cover}}" class="cover" src="{{_cover}}" mode="aspectFill" lazy-load binderror="onCoverError"></image>
+    <view wx:else class="cover cover-fallback">
+      <mp-icon name="package" size="40" color="#94a3b8"></mp-icon>
+      <text class="cover-fallback-text">暂无图片</text>
+    </view>
+    <view wx:if="{{_badge}}" class="cover-badge {{_badgeType}}">{{_badge}}</view>
+  </view>
+  <view class="info">
+    <view class="title ellipsis-2">{{_name}}</view>
+    <view wx:if="{{_subtitle}}" class="desc ellipsis fz-22">{{_subtitle}}</view>
+    <view class="tags" wx:if="{{_showTags}}">
+      <view wx:if="{{_freeShip}}" class="mini-tag tag-success">包邮</view>
+      <view wx:if="{{_auth}}" class="mini-tag tag-primary">正品</view>
+    </view>
+    <view class="bottom">
+      <view class="price-area">
+        <text class="symbol">¥</text>
+        <text class="price">{{_price}}</text>
+        <text wx:if="{{_marketPrice}}" class="market-price">¥{{_marketPrice}}</text>
+      </view>
+      <view wx:if="{{showCartBtn}}" class="cart-add" catchtap="onCartTap">
+        <text class="cart-plus">+</text>
+      </view>
+      <view wx:elif="{{_sales}}" class="sold">已售{{_sales}}</view>
+    </view>
+    <view wx:if="{{showCartBtn && _sales}}" class="sold-line">已售{{_sales}}</view>
+  </view>
+</view>

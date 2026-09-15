@@ -1,0 +1,343 @@
+<view class="profile-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <!-- 装饰圆 -->
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+
+    <!-- 顶部导航 -->
+    <view class="top-nav">
+      <view class="nav-btn" bindtap="onNotification">
+        <mp-icon name="bell" size="20" color="#fff"></mp-icon>
+        <view wx:if="{{unreadCount > 0}}" class="nav-dot"></view>
+      </view>
+      <view class="nav-spacer"></view>
+      <view class="nav-btn" bindtap="onSettings">
+        <mp-icon name="settings" size="20" color="#fff"></mp-icon>
+      </view>
+    </view>
+
+    <!-- 已登录 -->
+    <block wx:if="{{isLoggedIn && user}}">
+      <!-- 用户信息 -->
+      <view class="user-info">
+        <image class="user-avatar" src="{{userAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="user-detail">
+          <view class="user-name">
+            <text>{{user.nickname || '微信用户'}}</text>
+            <view class="vip-badge" wx:if="{{user.is_vip || user.level >= 1}}">
+              <mp-icon name="crown" size="12" color="#fff"></mp-icon>
+              <text class="vip-badge-text">{{user.level_name || 'PRO'}}</text>
+            </view>
+          </view>
+          <view class="user-id">
+            <text>ID: {{user.id || '—'}}</text>
+            <view class="copy-id" bindtap="onCopyId">
+              <mp-icon name="file-text" size="10" color="rgba(255,255,255,0.7)"></mp-icon>
+              <text>复制</text>
+            </view>
+          </view>
+          <view class="user-tags" wx:if="{{userTags.length}}">
+            <view class="utag" wx:for="{{userTags}}" wx:key="index">
+              <mp-icon name="{{item.icon}}" size="10" color="rgba(255,255,255,0.9)"></mp-icon>
+              <text>{{item.text}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 数据卡片 -->
+      <view class="stats-card">
+        <view class="stats-item" bindtap="onMenu" data-url="/pages/favorite/favorite">
+          <text class="stats-num">{{stats.favoriteCount}}</text>
+          <text class="stats-label">收藏</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item" bindtap="onMenu" data-url="/pages/favorite/favorite">
+          <text class="stats-num">{{stats.followCount}}</text>
+          <text class="stats-label">关注</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item" bindtap="onMenu" data-url="/pages/footprint/footprint">
+          <text class="stats-num">{{stats.footprintCount}}</text>
+          <text class="stats-label">足迹</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item" bindtap="onMenu" data-url="/pages/order/list/list?status=40">
+          <text class="stats-num">{{stats.reviewCount}}</text>
+          <text class="stats-label">评价</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 未登录 -->
+    <block wx:else>
+      <view class="user-info" bindtap="onLogin">
+        <view class="user-avatar avatar-placeholder">
+          <mp-icon name="user-circle" size="36" color="rgba(255,255,255,0.6)"></mp-icon>
+        </view>
+        <view class="user-detail">
+          <view class="user-name">
+            <text>点击登录</text>
+          </view>
+          <view class="user-id">
+            <text>登录享更多权益</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- ===== 白色内容区 ===== -->
+  <view class="content-body">
+
+    <!-- 订单快捷入口 -->
+    <view class="section-card order-section">
+      <view class="order-header">
+        <view class="oh-title">
+          <mp-icon name="file-text" size="18" color="#2563eb"></mp-icon>
+          <text>我的订单</text>
+        </view>
+        <view class="oh-more" bindtap="onMenu" data-url="/pages/order/list/list">
+          <text>全部订单</text>
+          <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+      <view class="order-grid">
+        <view class="order-item" bindtap="onMenu" data-url="/pages/order/list/list?status=10">
+          <view class="oi-icon oi-icon-1">
+            <mp-icon name="tag" size="22" color="#b45309"></mp-icon>
+            <view wx:if="{{orderCounts.pending_payment > 0}}" class="oi-badge">{{orderCounts.pending_payment}}</view>
+          </view>
+          <text class="oi-text">待付款</text>
+        </view>
+        <view class="order-item" bindtap="onMenu" data-url="/pages/order/list/list?status=20">
+          <view class="oi-icon oi-icon-2">
+            <mp-icon name="package" size="22" color="#1e40af"></mp-icon>
+            <view wx:if="{{orderCounts.pending_ship > 0}}" class="oi-badge">{{orderCounts.pending_ship}}</view>
+          </view>
+          <text class="oi-text">待发货</text>
+        </view>
+        <view class="order-item" bindtap="onMenu" data-url="/pages/order/list/list?status=30">
+          <view class="oi-icon oi-icon-3">
+            <mp-icon name="truck" size="22" color="#0f766e"></mp-icon>
+            <view wx:if="{{orderCounts.pending_receive > 0}}" class="oi-badge">{{orderCounts.pending_receive}}</view>
+          </view>
+          <text class="oi-text">待收货</text>
+        </view>
+        <view class="order-item" bindtap="onMenu" data-url="/pages/order/list/list?status=40">
+          <view class="oi-icon oi-icon-4">
+            <mp-icon name="star" size="22" color="#b91c1c"></mp-icon>
+            <view wx:if="{{orderCounts.pending_review > 0}}" class="oi-badge">{{orderCounts.pending_review}}</view>
+          </view>
+          <text class="oi-text">待评价</text>
+        </view>
+        <view class="order-item" bindtap="onMenu" data-url="/pages/order/list/list?status=50">
+          <view class="oi-icon oi-icon-5">
+            <mp-icon name="recycle" size="22" color="#0369a1"></mp-icon>
+          </view>
+          <text class="oi-text">退换/售后</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 钱包卡片 -->
+    <view class="section-card wallet-section">
+      <view class="wallet-grid">
+        <view class="wallet-item" bindtap="onMenu" data-url="/pages/wallet/wallet">
+          <view class="wi-icon wi-icon-1">
+            <mp-icon name="tag" size="18" color="#fff"></mp-icon>
+          </view>
+          <text class="wi-num">¥{{wallet.balance}}</text>
+          <text class="wi-label">余额</text>
+        </view>
+        <view class="wallet-item" bindtap="onMenu" data-url="/pages/point-exchange/point-exchange">
+          <view class="wi-icon wi-icon-2">
+            <mp-icon name="gift" size="18" color="#fff"></mp-icon>
+          </view>
+          <text class="wi-num">{{wallet.points}}</text>
+          <text class="wi-label">积分</text>
+        </view>
+        <view class="wallet-item" bindtap="onMenu" data-url="/pages/coupon/coupon">
+          <view class="wi-icon wi-icon-3">
+            <mp-icon name="ticket" size="18" color="#fff"></mp-icon>
+          </view>
+          <text class="wi-num">{{wallet.couponCount}}</text>
+          <text class="wi-label">优惠券</text>
+        </view>
+        <view class="wallet-item" bindtap="onMenu" data-url="/pages/coupon/coupon">
+          <view class="wi-icon wi-icon-4">
+            <mp-icon name="gift" size="18" color="#fff"></mp-icon>
+          </view>
+          <text class="wi-num">{{wallet.giftCount}}</text>
+          <text class="wi-label">兑换券</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能宫格 -->
+    <view class="section-card func-section">
+      <view class="func-header">
+        <mp-icon name="grid" size="18" color="#2563eb"></mp-icon>
+        <text>常用功能</text>
+      </view>
+      <view class="func-grid">
+        <view class="func-item" bindtap="onMenu" data-url="/pages/address/list/list">
+          <view class="fi-icon fi-icon-1">
+            <mp-icon name="map-pin" size="20" color="#1e40af"></mp-icon>
+          </view>
+          <text class="fi-text">收货地址</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/favorite/favorite">
+          <view class="fi-icon fi-icon-2">
+            <mp-icon name="heart" size="20" color="#be185d"></mp-icon>
+          </view>
+          <text class="fi-text">我的收藏</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/footprint/footprint">
+          <view class="fi-icon fi-icon-3">
+            <mp-icon name="eye" size="20" color="#047857"></mp-icon>
+          </view>
+          <text class="fi-text">浏览记录</text>
+        </view>
+        <view class="func-item" bindtap="onContactService">
+          <view class="fi-icon fi-icon-5">
+            <mp-icon name="headphones" size="20" color="#0369a1"></mp-icon>
+          </view>
+          <text class="fi-text">联系客服</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/sign/sign">
+          <view class="fi-icon fi-icon-8">
+            <mp-icon name="check-circle" size="20" color="#0f766e"></mp-icon>
+          </view>
+          <text class="fi-text">每日签到</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/point-exchange/integral-log/integral-log">
+          <view class="fi-icon fi-icon-9">
+            <mp-icon name="trending-up" size="20" color="#b45309"></mp-icon>
+          </view>
+          <text class="fi-text">积分明细</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/point-exchange/tasks/tasks">
+          <view class="fi-icon fi-icon-10">
+            <mp-icon name="zap" size="20" color="#6b21a8"></mp-icon>
+          </view>
+          <text class="fi-text">积分任务</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务列表 -->
+    <view class="section-card service-section">
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/order/list/list?status=30">
+        <view class="svc-icon svc-icon-3">
+          <mp-icon name="truck" size="16" color="#c2410c"></mp-icon>
+        </view>
+        <text class="svc-name">物流查询</text>
+        <text class="svc-desc">{{orderCounts.pending_receive > 0 ? orderCounts.pending_receive + '件在途' : ''}}</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/feedback/feedback">
+        <view class="svc-icon svc-icon-4">
+          <mp-icon name="message" size="16" color="#6b21a8"></mp-icon>
+        </view>
+        <text class="svc-name">意见反馈</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/cooperation/cooperation">
+        <view class="svc-icon svc-icon-5">
+          <mp-icon name="check-circle" size="16" color="#334155"></mp-icon>
+        </view>
+        <text class="svc-name">招商合作</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/about/about">
+        <view class="svc-icon svc-icon-6">
+          <mp-icon name="alert-circle" size="16" color="#b45309"></mp-icon>
+        </view>
+        <text class="svc-name">关于我们</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+
+    <!-- 设置列表 -->
+    <view class="section-card settings-section">
+      <view class="set-item" bindtap="onMenu" data-url="/pages/profile/security/security">
+        <view class="set-icon">
+          <mp-icon name="lock" size="16" color="#334155"></mp-icon>
+        </view>
+        <text class="set-name">账号安全</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="set-item" bindtap="onNotification">
+        <view class="set-icon">
+          <mp-icon name="bell" size="16" color="#334155"></mp-icon>
+        </view>
+        <text class="set-name">消息通知</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="set-item" bindtap="onLanguageSetting">
+        <view class="set-icon">
+          <mp-icon name="book" size="16" color="#334155"></mp-icon>
+        </view>
+        <text class="set-name">语言</text>
+        <text class="set-val">{{languageLabel}}</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="set-item" bindtap="onDarkModeSetting">
+        <view class="set-icon">
+          <mp-icon name="settings" size="16" color="#334155"></mp-icon>
+        </view>
+        <text class="set-name">深色模式</text>
+        <text class="set-val">{{darkModeLabel}}</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+
+    <!-- 退出按钮 -->
+    <view wx:if="{{isLoggedIn}}" class="logout-btn" bindtap="onLogout">
+      <mp-icon name="log-out" size="16" color="#dc2626"></mp-icon>
+      <text>退出登录</text>
+    </view>
+    <view wx:else class="logout-btn" bindtap="onLogin">
+      <mp-icon name="key" size="16" color="#2563eb"></mp-icon>
+      <text>登录</text>
+    </view>
+
+    <!-- 版权信息 -->
+    <view class="profile-copyright">
+      <text class="pc-version">v{{version}} · 开源版</text>
+      <view class="pc-link" bindtap="onCopyLink">
+        <text>Powered by 珠海远讯科技</text>
+      </view>
+    </view>
+
+    <view style="height: 40rpx;"></view>
+  </view>
+</view>
+
+<!-- 编辑资料弹层 -->
+<view wx:if="{{showEdit}}" class="edit-mask" catchtap="hideEdit">
+  <view class="edit-panel safe-area-bottom" catchtap="">
+    <view class="edit-header">
+      <text class="edit-title">编辑资料</text>
+      <text class="edit-close" bindtap="hideEdit">×</text>
+    </view>
+
+    <view class="edit-row">
+      <text class="edit-label">头像</text>
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image class="avatar-preview" src="{{editForm.avatar_url || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
+      </button>
+    </view>
+
+    <view class="edit-row">
+      <text class="edit-label">昵称</text>
+      <input class="nickname-input" type="nickname" placeholder="点击填写昵称" value="{{editForm.nickname}}" bindinput="onNicknameInput" bindblur="onNicknameInput" />
+    </view>
+
+    <button class="edit-save {{saving ? 'disabled' : ''}}" bindtap="onSaveProfile">
+      {{saving ? '保存中…' : '保存'}}
+    </button>
+  </view>
+</view>

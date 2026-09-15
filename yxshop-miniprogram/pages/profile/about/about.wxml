@@ -1,0 +1,162 @@
+<view class="about-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">关于我们</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 品牌 LOGO -->
+    <view class="brand-area">
+      <image class="brand-logo" src="/assets/default-avatar.png" mode="aspectFill"></image>
+      <text class="brand-name">{{appName}}</text>
+      <text class="brand-slogan">企业集采 · 数智供应链</text>
+      <view class="version-tag">v{{version}}</view>
+    </view>
+  </view>
+
+  <!-- 公司简介 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="briefcase" size="18" color="#2563eb"></mp-icon>
+      <text>公司简介</text>
+    </view>
+    <view class="intro-text">
+      <text>{{appName}}是一家专注于企业级集采供应链的电商平台，致力于为各类企业提供高效、透明、便捷的采购服务。\n\n平台涵盖工业品、办公用品、IT设备、劳保用品等多个品类，通过数字化供应链体系，帮助企业降低采购成本、提升采购效率。</text>
+    </view>
+  </view>
+
+  <!-- 核心数据 -->
+  <view class="stats-row">
+    <view class="stat-item">
+      <text class="stat-num">10万+</text>
+      <text class="stat-label">企业客户</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-num">50万+</text>
+      <text class="stat-label">商品SKU</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-num">300+</text>
+      <text class="stat-label">覆盖城市</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-num">99.5%</text>
+      <text class="stat-label">按时交付</text>
+    </view>
+  </view>
+
+  <!-- 核心优势 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="shield" size="18" color="#2563eb"></mp-icon>
+      <text>核心优势</text>
+    </view>
+    <view class="feature-list">
+      <view class="feature-item" wx:for="{{features}}" wx:key="title">
+        <view class="feature-icon feat-icon-{{index + 1}}">
+          <mp-icon name="{{item.icon}}" size="20" color="#fff"></mp-icon>
+        </view>
+        <view class="feature-info">
+          <text class="feature-title">{{item.title}}</text>
+          <text class="feature-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 资质认证 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="check-circle" size="18" color="#2563eb"></mp-icon>
+      <text>资质认证</text>
+    </view>
+    <view class="cert-grid">
+      <view class="cert-item" wx:for="{{certifications}}" wx:key="title">
+        <view class="cert-icon">
+          <mp-icon name="{{item.icon}}" size="24" color="{{item.color}}"></mp-icon>
+        </view>
+        <text class="cert-title">{{item.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="headphones" size="18" color="#2563eb"></mp-icon>
+      <text>联系我们</text>
+    </view>
+    <view class="contact-list">
+      <view class="contact-row" bindtap="onCall" data-phone="{{hotline}}">
+        <view class="cr-left">
+          <mp-icon name="headphones" size="18" color="#2563eb"></mp-icon>
+          <text class="cr-label">客服热线</text>
+        </view>
+        <view class="cr-right">
+          <text class="cr-value">{{hotline}}</text>
+          <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+      <view class="contact-row" bindtap="onCopy" data-text="{{email}}">
+        <view class="cr-left">
+          <mp-icon name="message" size="18" color="#047857"></mp-icon>
+          <text class="cr-label">商务邮箱</text>
+        </view>
+        <view class="cr-right">
+          <text class="cr-value">{{email}}</text>
+          <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+      <view class="contact-row" bindtap="onCopy" data-text="{{address}}">
+        <view class="cr-left">
+          <mp-icon name="map-pin" size="18" color="#b45309"></mp-icon>
+          <text class="cr-label">公司地址</text>
+        </view>
+        <view class="cr-right">
+          <text class="cr-value addr">{{address}}</text>
+          <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+      <view class="contact-row" bindtap="onCopy" data-text="{{workTime}}">
+        <view class="cr-left">
+          <mp-icon name="clock" size="18" color="#6b21a8"></mp-icon>
+          <text class="cr-label">工作时间</text>
+        </view>
+        <view class="cr-right">
+          <text class="cr-value">{{workTime}}</text>
+          <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 法律信息 -->
+  <view class="legal-section">
+    <view class="legal-item" bindtap="onMenu" data-url="/pages/webview/webview?url={{privacyPolicyUrl}}&title=隐私政策">
+      <text>隐私政策</text>
+      <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+    </view>
+    <view class="legal-item" bindtap="onMenu" data-url="/pages/webview/webview?url={{userAgreementUrl}}&title=用户协议">
+      <text>用户协议</text>
+      <mp-icon name="chevron-right" size="14" color="#94a3b8"></mp-icon>
+    </view>
+  </view>
+
+  <!-- 版权 -->
+  <view class="copyright">
+    <text>{{appName}} v{{version}}</text>
+    <view class="copyright-link" bindtap="onCopyLink">
+      <text class="copyright-sub">Powered by 珠海远讯科技</text>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

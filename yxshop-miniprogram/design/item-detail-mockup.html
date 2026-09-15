@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>远讯商城 · 商品详情设计稿</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    :root {
+      --primary: #2563eb; --primary-dark: #1e3a8a; --primary-light: #3b82f6;
+      --accent: #f59e0b; --danger: #dc2626; --success: #10b981; --purple: #8b5cf6;
+      --text-1: #0f172a; --text-2: #475569; --text-3: #94a3b8;
+      --bg-page: #f5f7fa; --bg-card: #ffffff; --bg-soft: #f1f5f9; --border: #f0f2f5;
+    }
+    body { background: #e8ecf2; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 16px 0 0 0; }
+    .app-container { max-width: 390px; width: 100%; background: var(--bg-page); border-radius: 36px 36px 0 0; box-shadow: 0 24px 48px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06); overflow: hidden; position: relative; padding-bottom: 64px; }
+
+    /* ========== 状态栏 ========== */
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 6px 20px; color: #fff; font-size: 14px; font-weight: 600; position: absolute; top: 0; left: 0; right: 0; z-index: 100; }
+    .status-bar .time { letter-spacing: 0.5px; }
+    .status-icons { display: flex; gap: 7px; align-items: center; font-size: 16px; }
+    .status-icons .signal-bars { display: flex; gap: 2px; align-items: flex-end; }
+    .status-icons .signal-bars span { width: 3px; background: #fff; border-radius: 2px; }
+    .status-icons .signal-bars span:nth-child(1){ height: 5px; } .status-icons .signal-bars span:nth-child(2){ height: 7px; }
+    .status-icons .signal-bars span:nth-child(3){ height: 9px; } .status-icons .signal-bars span:nth-child(4){ height: 11px; }
+    .battery { width: 24px; height: 12px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 3px; position: relative; display: flex; align-items: center; padding: 1px; }
+    .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 6px; background: rgba(255,255,255,0.6); border-radius: 0 2px 2px 0; }
+    .battery .fill { width: 80%; height: 100%; background: #fff; border-radius: 1px; }
+
+    /* ========== 顶部悬浮导航 ========== */
+    .float-nav { position: absolute; top: 48px; left: 0; right: 0; z-index: 99; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    .fn-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; }
+    .fn-right { display: flex; gap: 8px; }
+
+    /* ========== 商品主图 ========== */
+    .product-hero { width: 100%; height: 390px; background: linear-gradient(135deg, #dbeafe, #93c5fd); display: flex; align-items: center; justify-content: center; position: relative; }
+    .product-hero i { font-size: 100px; color: #1e3a8a; }
+    .product-hero .dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+    .product-hero .dots span { width: 6px; height: 6px; border-radius: 10px; background: rgba(255,255,255,0.5); }
+    .product-hero .dots span.active { background: #fff; width: 16px; }
+
+    /* ========== 价格区 ========== */
+    .price-section { background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 16px 20px 18px 20px; position: relative; overflow: hidden; }
+    .price-section::before { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+    .ps-row { display: flex; align-items: baseline; gap: 10px; position: relative; z-index: 2; }
+    .ps-price { font-size: 32px; font-weight: 700; color: #fff; }
+    .ps-price small { font-size: 16px; }
+    .ps-origin { font-size: 14px; color: rgba(255,255,255,0.5); text-decoration: line-through; }
+    .ps-tag { background: rgba(255,255,255,0.15); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; display: flex; align-items: center; gap: 3px; }
+    .ps-tags { display: flex; gap: 6px; margin-top: 10px; position: relative; z-index: 2; }
+    .ps-tags .ptag { font-size: 10px; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); padding: 2px 8px; border-radius: 8px; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 3px; }
+
+    /* ========== 标题区 ========== */
+    .title-section { background: var(--bg-card); padding: 14px 16px; }
+    .ts-name { font-size: 17px; font-weight: 700; color: var(--text-1); line-height: 1.4; }
+    .ts-sub { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+    .ts-sub-item { font-size: 11px; color: var(--text-3); display: flex; align-items: center; gap: 3px; }
+    .ts-promo { margin-top: 10px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+    .ts-promo i { color: #b45309; font-size: 14px; }
+    .ts-promo span { font-size: 12px; color: #92400e; flex: 1; }
+    .ts-promo .tp-btn { font-size: 11px; font-weight: 600; color: #b45309; padding: 3px 10px; background: rgba(255,255,255,0.5); border-radius: 10px; }
+
+    /* ========== 配送信息 ========== */
+    .ship-section { background: var(--bg-card); margin-top: 8px; padding: 0 16px; }
+    .ship-item { display: flex; align-items: center; padding: 12px 0; gap: 12px; border-bottom: 1px solid var(--border); }
+    .ship-item:last-child { border-bottom: none; }
+    .si-label { font-size: 13px; color: var(--text-3); width: 60px; flex-shrink: 0; }
+    .si-value { flex: 1; font-size: 13px; color: var(--text-1); font-weight: 500; }
+    .si-arrow { color: var(--text-3); font-size: 12px; }
+    .si-tags { display: flex; gap: 6px; }
+    .si-tag { font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+    .si-tag.free { background: rgba(16,185,129,0.1); color: #047857; }
+    .si-tag.auth { background: rgba(37,99,235,0.1); color: #1e40af; }
+
+    /* ========== SKU 选择 ========== */
+    .sku-section { background: var(--bg-card); margin-top: 8px; padding: 14px 16px; }
+    .sku-title { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 10px; }
+    .sku-row { margin-bottom: 12px; }
+    .sku-row-label { font-size: 12px; color: var(--text-2); margin-bottom: 8px; }
+    .sku-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .sku-opt { padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 500; border: 2px solid var(--border); color: var(--text-2); background: var(--bg-card); }
+    .sku-opt.active { border-color: var(--primary); color: var(--primary); background: rgba(37,99,235,0.05); }
+    .sku-opt.disabled { color: var(--text-3); text-decoration: line-through; opacity: 0.5; }
+
+    /* ========== 评价区 ========== */
+    .review-section { background: var(--bg-card); margin-top: 8px; padding: 14px 16px; }
+    .rs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .rs-title { font-size: 14px; font-weight: 700; color: var(--text-1); }
+    .rs-rate { font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+    .rs-count { font-size: 12px; color: var(--text-3); }
+    .review-tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .review-tag { font-size: 11px; padding: 3px 10px; border-radius: 12px; background: var(--bg-soft); color: var(--text-2); font-weight: 500; }
+    .review-tag .num { color: var(--text-3); font-size: 10px; margin-left: 3px; }
+    .review-card { padding: 10px 0; border-top: 1px solid var(--border); }
+    .rc-user { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .rc-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; }
+    .rc-name { font-size: 12px; font-weight: 600; color: var(--text-1); }
+    .rc-stars { color: var(--accent); font-size: 10px; margin-left: auto; }
+    .rc-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+    .rc-date { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+
+    /* ========== 店铺信息 ========== */
+    .shop-section { background: var(--bg-card); margin-top: 8px; padding: 14px 16px; }
+    .shop-row { display: flex; align-items: center; gap: 12px; }
+    .shop-logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; flex-shrink: 0; }
+    .shop-info { flex: 1; }
+    .shop-name { font-size: 14px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 6px; }
+    .shop-name .verified { color: var(--primary); font-size: 13px; }
+    .shop-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+    .shop-btn { background: var(--primary); color: #fff; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 16px; border: none; }
+    .shop-stats { display: flex; justify-content: space-around; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .shop-stat { text-align: center; }
+    .shop-stat .val { font-size: 14px; font-weight: 700; color: var(--text-1); }
+    .shop-stat .lbl { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+
+    /* ========== 图文详情 ========== */
+    .detail-section { margin-top: 8px; background: var(--bg-card); padding: 14px 16px 20px 16px; }
+    .ds-title { font-size: 14px; font-weight: 700; color: var(--text-1); text-align: center; margin-bottom: 14px; position: relative; }
+    .ds-title::before, .ds-title::after { content: ''; position: absolute; top: 50%; width: 40px; height: 1px; background: var(--border); }
+    .ds-title::before { left: 80px; } .ds-title::after { right: 80px; }
+    .ds-block { background: var(--bg-soft); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .ds-block h4 { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .ds-block h4 i { color: var(--primary); }
+    .ds-block p { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+    .ds-block .spec-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+    .ds-block .spec-row .sk { color: var(--text-3); } .ds-block .spec-row .sv { color: var(--text-1); font-weight: 500; }
+
+    /* ========== 底部操作栏 ========== */
+    .action-bar { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; height: 56px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 12px; gap: 8px; z-index: 999; box-shadow: 0 -2px 12px rgba(0,0,0,0.04); }
+    .ab-icon { display: flex; flex-direction: column; align-items: center; gap: 1px; width: 44px; flex-shrink: 0; }
+    .ab-icon i { font-size: 17px; color: var(--text-2); }
+    .ab-icon span { font-size: 9px; color: var(--text-3); }
+    .ab-btn { flex: 1; height: 40px; border-radius: 20px; border: none; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .ab-btn.cart { background: linear-gradient(135deg, var(--accent), #f97316); color: #fff; box-shadow: 0 4px 10px rgba(245,158,11,0.3); }
+    .ab-btn.buy { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+
+    /* ========== 底部导航 ========== */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; height: 56px; background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; padding: 0; z-index: 1000; box-shadow: 0 -2px 16px rgba(0,0,0,0.04); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 56px; flex: 1; font-size: 10px; color: var(--text-3); font-weight: 500; transition: 0.15s; position: relative; cursor: pointer; }
+    .nav-item i { font-size: 20px; color: var(--text-3); transition: transform 0.2s; }
+    .nav-item.active i { transform: scale(1.1); }
+    .nav-item.active i, .nav-item.active span { color: var(--primary); }
+    .nav-item.active i { filter: drop-shadow(0 2px 6px rgba(37,99,235,0.2)); }
+    .nav-item .badge-dot { position: absolute; top: 4px; right: 50%; transform: translateX(18px); background: var(--danger); color: #fff; border-radius: 30px; font-size: 9px; font-weight: 700; padding: 1px 5px; min-width: 16px; text-align: center; line-height: 1.3; border: 1.5px solid #fff; box-shadow: 0 2px 6px rgba(220,38,38,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap { width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -2px; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap i { color: #fff; font-size: 19px; filter: none; }
+    .nav-item.nav-cart span { margin-top: 1px; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- ===== 状态栏 ===== -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="status-icons">
+      <span class="signal-bars"><span></span><span></span><span></span><span></span></span>
+      <span style="font-size:13px;">5G</span>
+      <span class="battery"><span class="fill"></span></span>
+    </span>
+  </div>
+
+  <!-- ===== 悬浮导航 ===== -->
+  <div class="float-nav">
+    <div class="fn-btn"><i class="fas fa-chevron-left"></i></div>
+    <div class="fn-right">
+      <div class="fn-btn"><i class="fas fa-share-alt"></i></div>
+      <div class="fn-btn"><i class="fas fa-ellipsis"></i></div>
+    </div>
+  </div>
+
+  <!-- ===== 商品主图 ===== -->
+  <div class="product-hero">
+    <i class="fas fa-laptop"></i>
+    <div class="dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- ===== 价格区 ===== -->
+  <div class="price-section">
+    <div class="ps-row">
+      <span class="ps-price"><small>¥</small>9,999</span>
+      <span class="ps-origin">¥12,999</span>
+      <span class="ps-tag"><i class="fas fa-bolt"></i> 限时直降3000</span>
+    </div>
+    <div class="ps-tags">
+      <span class="ptag"><i class="fas fa-shield-alt"></i> 正品保障</span>
+      <span class="ptag"><i class="fas fa-truck"></i> 全国联保</span>
+      <span class="ptag"><i class="fas fa-undo"></i> 7天无理由</span>
+      <span class="ptag"><i class="fas fa-file-invoice"></i> 可开发票</span>
+    </div>
+  </div>
+
+  <!-- ===== 标题区 ===== -->
+  <div class="title-section">
+    <div class="ts-name">ThinkPad X1 Carbon 企业版 i7/16G/512G 14英寸轻薄商务笔记本</div>
+    <div class="ts-sub">
+      <span class="ts-sub-item"><i class="fas fa-fire"></i> 已售 328</span>
+      <span class="ts-sub-item"><i class="fas fa-thumbs-up"></i> 好评 98%</span>
+      <span class="ts-sub-item"><i class="fas fa-eye"></i> 2,560 浏览</span>
+    </div>
+    <div class="ts-promo">
+      <i class="fas fa-gift"></i>
+      <span>购买即赠：原装包+鼠标+保修延长1年</span>
+      <span class="tp-btn">领取</span>
+    </div>
+  </div>
+
+  <!-- ===== 配送信息 ===== -->
+  <div class="ship-section">
+    <div class="ship-item">
+      <span class="si-label">配送</span>
+      <span class="si-value">上海·浦东新区 明日达</span>
+      <i class="fas fa-chevron-right si-arrow"></i>
+    </div>
+    <div class="ship-item">
+      <span class="si-label">保障</span>
+      <div class="si-tags">
+        <span class="si-tag free"><i class="fas fa-check"></i> 包邮</span>
+        <span class="si-tag auth"><i class="fas fa-check"></i> 正品</span>
+        <span class="si-tag free"><i class="fas fa-check"></i> 假一赔十</span>
+      </div>
+    </div>
+    <div class="ship-item">
+      <span class="si-label">选择</span>
+      <span class="si-value">已选：i7/16G/512G · 企业黑</span>
+      <i class="fas fa-chevron-right si-arrow"></i>
+    </div>
+  </div>
+
+  <!-- ===== SKU 选择 ===== -->
+  <div class="sku-section">
+    <div class="sku-title">规格选择</div>
+    <div class="sku-row">
+      <div class="sku-row-label">处理器/内存/存储</div>
+      <div class="sku-options">
+        <div class="sku-opt">i5/8G/256G</div>
+        <div class="sku-opt active">i7/16G/512G</div>
+        <div class="sku-opt">i7/32G/1T</div>
+        <div class="sku-opt disabled">i9/32G/2T</div>
+      </div>
+    </div>
+    <div class="sku-row">
+      <div class="sku-row-label">颜色</div>
+      <div class="sku-options">
+        <div class="sku-opt active">企业黑</div>
+        <div class="sku-opt">深海蓝</div>
+        <div class="sku-opt">风暴灰</div>
+      </div>
+    </div>
+    <div class="sku-row" style="margin-bottom:0;">
+      <div class="sku-row-label">购买数量</div>
+      <div style="display:flex; align-items:center; gap:0;">
+        <div style="width:32px; height:32px; border-radius:8px 0 0 8px; background:var(--bg-soft); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-2);"><i class="fas fa-minus"></i></div>
+        <div style="width:44px; height:32px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--text-1);">1</div>
+        <div style="width:32px; height:32px; border-radius:0 8px 8px 0; background:var(--bg-soft); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-2);"><i class="fas fa-plus"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 评价区 ===== -->
+  <div class="review-section">
+    <div class="rs-header">
+      <span class="rs-title">商品评价 (328)</span>
+      <span class="rs-rate"><i class="fas fa-star"></i> 4.9分 <span class="rs-count">好评 98%</span></span>
+    </div>
+    <div class="review-tag-row">
+      <span class="review-tag">轻薄便携<span class="num">86</span></span>
+      <span class="review-tag">性能强劲<span class="num">72</span></span>
+      <span class="review-tag">续航持久<span class="num">65</span></span>
+      <span class="review-tag">屏幕清晰<span class="num">58</span></span>
+    </div>
+    <div class="review-card">
+      <div class="rc-user">
+        <div class="rc-avatar">李</div>
+        <span class="rc-name">李***明</span>
+        <span class="rc-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+      </div>
+      <div class="rc-text">公司采购的办公本，轻薄便携性能好，i7处理器日常办公完全够用。键盘手感一如既往的好，企业黑很商务。</div>
+      <div class="rc-date">2026-07-28 规格：i7/16G/512G 企业黑</div>
+    </div>
+    <div class="review-card">
+      <div class="rc-user">
+        <div class="rc-avatar" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">王</div>
+        <span class="rc-name">王***华</span>
+        <span class="rc-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+      </div>
+      <div class="rc-text">第二次购买了，上次买的那批用了两年多没出过问题。这次给新员工又配了5台，发货速度快。</div>
+      <div class="rc-date">2026-07-25 规格：i7/16G/512G 企业黑</div>
+    </div>
+  </div>
+
+  <!-- ===== 店铺信息 ===== -->
+  <div class="shop-section">
+    <div class="shop-row">
+      <div class="shop-logo"><i class="fas fa-store"></i></div>
+      <div class="shop-info">
+        <div class="shop-name">远讯数码旗舰店 <i class="fas fa-circle-check verified"></i></div>
+        <div class="shop-desc">综合体验分 9.8 · 关注 12.3万</div>
+      </div>
+      <button class="shop-btn">进店</button>
+    </div>
+    <div class="shop-stats">
+      <div class="shop-stat"><div class="val">328</div><div class="lbl">商品</div></div>
+      <div class="shop-stat"><div class="val">12.3万</div><div class="lbl">关注</div></div>
+      <div class="shop-stat"><div class="val">9.8</div><div class="lbl">体验分</div></div>
+      <div class="shop-stat"><div class="val">4.9</div><div class="lbl">好评率</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 图文详情 ===== -->
+  <div class="detail-section">
+    <div class="ds-title">商品详情</div>
+    <div class="ds-block">
+      <h4><i class="fas fa-list-check"></i> 规格参数</h4>
+      <div class="spec-row"><span class="sk">品牌</span><span class="sv">ThinkPad</span></div>
+      <div class="spec-row"><span class="sk">型号</span><span class="sv">X1 Carbon 企业版</span></div>
+      <div class="spec-row"><span class="sk">处理器</span><span class="sv">Intel i7-1365U</span></div>
+      <div class="spec-row"><span class="sk">内存</span><span class="sv">16GB LPDDR5</span></div>
+      <div class="spec-row"><span class="sk">存储</span><span class="sv">512GB NVMe SSD</span></div>
+      <div class="spec-row"><span class="sk">屏幕</span><span class="sv">14" 2.2K IPS</span></div>
+      <div class="spec-row"><span class="sk">重量</span><span class="sv">1.12kg</span></div>
+      <div class="spec-row"><span class="sk">保修</span><span class="sv">3年上门服务</span></div>
+    </div>
+    <div class="ds-block">
+      <h4><i class="fas fa-circle-info"></i> 产品介绍</h4>
+      <p>ThinkPad X1 Carbon 企业版专为商务人士打造，采用航空级碳纤维材质机身，仅重 1.12kg。搭载第13代英特尔酷睿 i7 处理器，配合 16GB LPDDR5 内存和 512GB NVMe 固态硬盘，轻松应对各种办公场景。14 英寸 2.2K IPS 显示屏，100% sRGB 色域，显示效果细腻逼真。内置全套企业级安全芯片，支持指纹识别、面部识别双重生物认证。</p>
+    </div>
+  </div>
+
+  <!-- ===== 底部操作栏 ===== -->
+  <div class="action-bar">
+    <div class="ab-icon"><i class="fas fa-store"></i><span>店铺</span></div>
+    <div class="ab-icon"><i class="fas fa-headset"></i><span>客服</span></div>
+    <div class="ab-icon"><i class="far fa-heart"></i><span>收藏</span></div>
+    <button class="ab-btn cart"><i class="fas fa-shopping-cart"></i> 加入购物车</button>
+    <button class="ab-btn buy"><i class="fas fa-bolt"></i> 立即购买</button>
+  </div>
+
+  <!-- ===== 底部导航 ===== -->
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="fas fa-house"></i><span>首页</span></div>
+    <div class="nav-item"><i class="fas fa-th-large"></i><span>分类</span></div>
+    <div class="nav-item nav-cart"><div class="cart-icon-wrap"><i class="fas fa-shopping-cart"></i></div><span>购物车</span><span class="badge-dot">3</span></div>
+    <div class="nav-item"><i class="fas fa-star"></i><span>收藏</span></div>
+    <div class="nav-item"><i class="fas fa-user-circle"></i><span>我的</span></div>
+  </div>
+
+</div>
+</body>
+</html>

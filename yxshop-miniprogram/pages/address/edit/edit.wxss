@@ -1,0 +1,167 @@
+/* address-edit — 企业级地址编辑（蓝色渐变风格） */
+.edit-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 180rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+
+/* ========== 微信导入 ========== */
+.quick-import {
+  margin: 24rpx;
+  background: var(--card);
+  border-radius: 24rpx;
+  padding: 28rpx 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03);
+}
+.qi-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  background: rgba(37,99,235,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.qi-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.qi-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.qi-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+/* ========== 表单 ========== */
+.form-card {
+  margin: 0 24rpx;
+  background: var(--card);
+  border-radius: 28rpx;
+  padding: 0 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03);
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 0;
+  min-height: 48rpx;
+}
+.form-row--top {
+  align-items: flex-start;
+}
+.form-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: var(--text-1);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-1);
+}
+.form-textarea {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-1);
+  min-height: 80rpx;
+  line-height: 1.5;
+}
+.form-picker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.picker-text {
+  font-size: 28rpx;
+  color: var(--text-1);
+}
+.ph {
+  color: var(--text-3);
+  font-size: 28rpx;
+}
+.form-divider {
+  height: 2rpx;
+  background: var(--bg-soft);
+}
+
+/* ========== 底部按钮 ========== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  padding: 20rpx 40rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.04);
+  z-index: 100;
+}
+.save-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(37,99,235,0.25);
+}
+.save-btn--disabled {
+  opacity: 0.6;
+}

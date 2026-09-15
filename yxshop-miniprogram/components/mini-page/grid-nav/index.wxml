@@ -1,0 +1,18 @@
+<view class="grid-nav" wx:if="{{items.length}}">
+  <view class="grid-nav-inner" style="grid-template-columns: repeat({{columns}}, 1fr);">
+    <view
+      wx:for="{{items}}"
+      wx:key="index"
+      class="grid-nav-item"
+      bindtap="onItemTap"
+      data-index="{{index}}"
+    >
+      <view class="nav-icon-wrap nav-color-{{index % 8}}">
+        <image wx:if="{{item.icon}}" class="nav-icon-img" src="{{item.icon}}" mode="aspectFit"></image>
+        <mp-icon wx:elif="{{item.icon_name}}" name="{{item.icon_name}}" size="24" color="{{iconColors[index % 8]}}"></mp-icon>
+        <view wx:if="{{item.badge}}" class="nav-hot-tag">{{item.badge}}</view>
+      </view>
+      <text class="nav-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>

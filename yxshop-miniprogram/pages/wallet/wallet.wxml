@@ -1,0 +1,282 @@
+<view class="wallet-page">
+  <!-- ===== 顶部渐变区 + 余额卡片 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">我的余额</text>
+      <view class="nav-rule" bindtap="onViewBill">账单明细</view>
+    </view>
+
+    <!-- 余额卡片 -->
+    <view class="balance-card">
+      <view class="bc-deco-1"></view>
+      <view class="bc-deco-2"></view>
+      <text class="bc-label">账户余额 (元)</text>
+      <view class="bc-amount">
+        <text class="bc-symbol">¥</text>
+        <text class="bc-int">{{balanceInt}}</text>
+        <text class="bc-dec">.{{balanceDec}}</text>
+      </view>
+      <view class="bc-row">
+        <view class="bc-sub-item">
+          <text class="bc-sub-label">冻结金额</text>
+          <text class="bc-sub-val">¥{{frozenAmount}}</text>
+        </view>
+        <view class="bc-sub-item">
+          <text class="bc-sub-label">累计收入</text>
+          <text class="bc-sub-val">¥{{totalIncome}}</text>
+        </view>
+        <view class="bc-sub-item">
+          <text class="bc-sub-label">累计支出</text>
+          <text class="bc-sub-val">¥{{totalExpense}}</text>
+        </view>
+      </view>
+      <view class="bc-actions">
+        <view class="bc-btn bc-btn-recharge" bindtap="onRecharge">
+          <mp-icon name="plus" size="16" color="#fff"></mp-icon>
+          <text>充值</text>
+        </view>
+        <view class="bc-btn bc-btn-withdraw" bindtap="onWithdraw">
+          <mp-icon name="arrow-up" size="16" color="#fff"></mp-icon>
+          <text>提现</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 快捷功能 ===== -->
+  <view class="section-card quick-row">
+    <view class="quick-item" bindtap="onViewBill">
+      <view class="qi-icon qi-icon-1">
+        <mp-icon name="file-text" size="18" color="#fff"></mp-icon>
+      </view>
+      <text class="qi-text">账单明细</text>
+    </view>
+    <view class="quick-item" bindtap="onBankCard">
+      <view class="qi-icon qi-icon-2">
+        <mp-icon name="credit-card" size="18" color="#fff"></mp-icon>
+      </view>
+      <text class="qi-text">银行卡</text>
+    </view>
+    <view class="quick-item" bindtap="onSecurity">
+      <view class="qi-icon qi-icon-4">
+        <mp-icon name="shield" size="18" color="#fff"></mp-icon>
+      </view>
+      <text class="qi-text">安全设置</text>
+    </view>
+  </view>
+
+  <!-- ===== 收益卡片 ===== -->
+  <view class="income-banner">
+    <view class="ib-left">
+      <view class="ib-icon">
+        <mp-icon name="trending-up" size="18" color="#fff"></mp-icon>
+      </view>
+      <view class="ib-text-area">
+        <text class="ib-text">本月收支</text>
+        <text class="ib-sub">收入 ¥{{monthlyIncome}}</text>
+      </view>
+    </view>
+    <view class="ib-amount">
+      <text>支出 ¥{{totalExpense}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 充值套餐 ===== -->
+  <view class="recharge-section">
+    <view class="rs-title">
+      <mp-icon name="zap" size="16" color="#f59e0b"></mp-icon>
+      <text>快捷充值</text>
+    </view>
+    <view class="rs-grid">
+      <view
+        wx:for="{{packages}}"
+        wx:key="id"
+        class="rs-card {{selectedPackageId === item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onSelectPackage"
+      >
+        <view wx:if="{{item.is_recommended}}" class="rs-gift-tag">推荐</view>
+        <view class="rs-amount">
+          <text class="rs-amount-num">{{item.amount}}</text>
+          <text class="rs-amount-unit">元</text>
+        </view>
+        <text class="rs-gift">{{item.gift_text || ''}}</text>
+      </view>
+      <!-- 自定义金额 -->
+      <view class="rs-card {{selectedPackageId === -1 ? 'active' : ''}}" data-id="{{-1}}" bindtap="onSelectPackage">
+        <view class="rs-amount">
+          <text class="rs-amount-num rs-amount-custom">自定义</text>
+        </view>
+        <text class="rs-gift">手动输入</text>
+      </view>
+    </view>
+
+    <!-- 自定义金额输入 -->
+    <view wx:if="{{selectedPackageId === -1}}" class="custom-amount">
+      <text class="custom-label">充值金额</text>
+      <view class="custom-input-wrap">
+        <text class="custom-symbol">¥</text>
+        <input
+          class="custom-input"
+          type="digit"
+          placeholder="请输入金额"
+          placeholder-class="placeholder"
+          value="{{customAmount}}"
+          bindinput="onCustomInput"
+        />
+      </view>
+    </view>
+
+    <!-- 充值按钮 -->
+    <button class="recharge-btn {{recharging ? 'disabled' : ''}}" bindtap="onConfirmRecharge">
+      {{recharging ? '处理中…' : '立即充值'}}
+    </button>
+  </view>
+
+  <!-- ===== 交易明细 ===== -->
+  <view class="section-card detail-section">
+    <view class="ds-header">
+      <view class="ds-title">
+        <mp-icon name="file-text" size="16" color="#2563eb"></mp-icon>
+        <text>交易明细</text>
+      </view>
+      <view class="ds-filter" bindtap="onToggleFilter">
+        <text>{{filterText}}</text>
+        <mp-icon name="chevron-down" size="12" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+
+    <!-- 筛选下拉 -->
+    <view wx:if="{{showFilter}}" class="filter-dropdown">
+      <view
+        wx:for="{{filterOptions}}"
+        wx:key="value"
+        class="filter-option {{currentFilter === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onSelectFilter"
+      >
+        <text>{{item.label}}</text>
+        <mp-icon wx:if="{{currentFilter === item.value}}" name="check" size="14" color="#2563eb"></mp-icon>
+      </view>
+    </view>
+
+    <!-- 明细列表 -->
+    <view wx:if="{{transactions.length > 0}}">
+      <view
+        wx:for="{{transactions}}"
+        wx:key="id"
+        class="ds-item"
+      >
+        <view class="ds-icon {{item.type === 'income' ? 'ds-icon-income' : 'ds-icon-expense'}}">
+          <mp-icon name="{{item.icon}}" size="16" color="{{item.type === 'income' ? '#047857' : '#b91c1c'}}"></mp-icon>
+        </view>
+        <view class="ds-info">
+          <text class="ds-name">{{item.title}}</text>
+          <text class="ds-date">{{item.created_at}}</text>
+        </view>
+        <view class="ds-right">
+          <text class="ds-amount {{item.type === 'income' ? 'ds-amount-income' : 'ds-amount-expense'}}">{{item.type === 'income' ? '+' : '-'}}¥{{item.amount}}</text>
+          <text class="ds-status ds-status-{{item.status_type}}">{{item.status_text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:else class="ds-empty">
+      <mp-icon name="file-text" size="48" color="#cbd5e1"></mp-icon>
+      <text class="ds-empty-text">暂无交易记录</text>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{hasMore && transactions.length > 0}}" class="ds-loadmore" bindtap="loadMore">
+      <text>加载更多</text>
+    </view>
+    <view wx:if="{{!hasMore && transactions.length > 0}}" class="ds-nomore">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>
+
+<!-- ===== 提现弹窗 ===== -->
+<view wx:if="{{showWithdraw}}" class="withdraw-mask" catchtap="hideWithdraw">
+  <view class="withdraw-panel safe-area-bottom" catchtap="noop">
+    <view class="wd-header">
+      <text class="wd-title">申请提现</text>
+      <text class="wd-close" bindtap="hideWithdraw">×</text>
+    </view>
+
+    <!-- 可提余额 -->
+    <view class="wd-balance-row">
+      <text class="wd-balance-label">可提余额</text>
+      <text class="wd-balance-val">¥{{balance}}</text>
+    </view>
+
+    <!-- 提现方式 -->
+    <view class="wd-section-label">提现方式</view>
+    <view class="wd-type-row">
+      <view class="wd-type-item {{withdrawType === 3 ? 'active' : ''}}" data-type="3" bindtap="onWithdrawTypeChange">
+        <mp-icon name="message-circle" size="18" color="{{withdrawType === 3 ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+        <text>微信</text>
+      </view>
+      <view class="wd-type-item {{withdrawType === 2 ? 'active' : ''}}" data-type="2" bindtap="onWithdrawTypeChange">
+        <mp-icon name="wallet" size="18" color="{{withdrawType === 2 ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+        <text>支付宝</text>
+      </view>
+      <view class="wd-type-item {{withdrawType === 1 ? 'active' : ''}}" data-type="1" bindtap="onWithdrawTypeChange">
+        <mp-icon name="credit-card" size="18" color="{{withdrawType === 1 ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+        <text>银行卡</text>
+      </view>
+    </view>
+
+    <!-- 提现金额 -->
+    <view class="wd-section-label">提现金额</view>
+    <view class="wd-amount-wrap">
+      <text class="wd-symbol">¥</text>
+      <input
+        class="wd-amount-input"
+        type="digit"
+        placeholder="最低 10 元"
+        placeholder-class="wd-placeholder"
+        value="{{withdrawAmount}}"
+        bindinput="onWithdrawAmountInput"
+      />
+      <view class="wd-all-btn" bindtap="onWithdrawAll">全部</view>
+    </view>
+
+    <!-- 支付宝/银行卡额外信息 -->
+    <block wx:if="{{withdrawType === 2}}">
+      <view class="wd-section-label">支付宝账号</view>
+      <input class="wd-input" placeholder="请输入支付宝账号" value="{{withdrawAccount}}" bindinput="onWithdrawAccountInput" />
+      <view class="wd-section-label">真实姓名（选填）</view>
+      <input class="wd-input" placeholder="请输入真实姓名" value="{{withdrawAccountName}}" bindinput="onWithdrawAccountNameInput" />
+    </block>
+    <block wx:if="{{withdrawType === 1}}">
+      <view class="wd-section-label">银行卡号</view>
+      <input class="wd-input" placeholder="请输入银行卡号" value="{{withdrawAccount}}" bindinput="onWithdrawAccountInput" />
+      <view class="wd-section-label">开户人姓名</view>
+      <input class="wd-input" placeholder="请输入开户人姓名" value="{{withdrawAccountName}}" bindinput="onWithdrawAccountNameInput" />
+      <view class="wd-section-label">开户银行</view>
+      <input class="wd-input" placeholder="如：工商银行" value="{{withdrawBankName}}" bindinput="onWithdrawBankNameInput" />
+    </block>
+
+    <!-- 提示 -->
+    <view class="wd-tips">
+      <text>· 提现申请提交后，预计 1-3 个工作日到账</text>
+      <text>· 每笔提现最低 10 元，暂不收取手续费</text>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="wd-submit {{withdrawing ? 'disabled' : ''}}" bindtap="onConfirmWithdraw">
+      {{withdrawing ? '提交中…' : '确认提现'}}
+    </button>
+  </view>
+</view>

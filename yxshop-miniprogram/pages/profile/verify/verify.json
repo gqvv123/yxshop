@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "企业认证",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index"
+  }
+}

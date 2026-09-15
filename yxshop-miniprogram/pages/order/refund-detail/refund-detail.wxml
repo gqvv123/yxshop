@@ -1,0 +1,50 @@
+<view class="refund-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">退款详情</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <!-- 状态卡 -->
+    <view class="status-area">
+      <view class="status-icon-wrap">
+        <mp-icon wx:if="{{refundStatus === 30}}" name="check-circle" size="32" color="#fff"></mp-icon>
+        <mp-icon wx:else name="clock" size="32" color="#fff"></mp-icon>
+      </view>
+      <text class="status-text">{{refundStatus === 30 ? '退款成功' : '退款处理中'}}</text>
+      <text class="refund-amount">退款金额：¥{{refundAmount}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 退款进度 ===== -->
+  <view wx:if="{{timeline.length}}" class="timeline-card">
+    <view class="tc-header">
+      <mp-icon name="file-text" size="16" color="var(--primary)"></mp-icon>
+      <text>退款进度</text>
+    </view>
+    <view class="timeline">
+      <view wx:for="{{timeline}}" wx:key="label" class="timeline-item">
+        <view class="tl-left">
+          <view class="tl-dot {{item.done ? 'tl-dot--done' : ''}}"></view>
+          <view wx:if="{{index < timeline.length - 1}}" class="tl-line"></view>
+        </view>
+        <view class="tl-content">
+          <text class="tl-label">{{item.label}}</text>
+          <text class="tl-time">{{item.timeText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view wx:elif="{{!loading}}" class="empty-card">
+    <mp-icon name="file-text" size="40" color="var(--text-3)"></mp-icon>
+    <text class="empty-text">暂无退款进度信息</text>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

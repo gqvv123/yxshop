@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>远讯商城 · 购物车设计稿</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    :root {
+      --primary: #2563eb; --primary-dark: #1e3a8a; --primary-light: #3b82f6;
+      --accent: #f59e0b; --danger: #dc2626; --success: #10b981; --purple: #8b5cf6;
+      --text-1: #0f172a; --text-2: #475569; --text-3: #94a3b8;
+      --bg-page: #f5f7fa; --bg-card: #ffffff; --bg-soft: #f1f5f9; --border: #f0f2f5;
+    }
+    body { background: #e8ecf2; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 16px 0 0 0; }
+    .app-container { max-width: 390px; width: 100%; background: var(--bg-page); border-radius: 36px 36px 0 0; box-shadow: 0 24px 48px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06); overflow: hidden; position: relative; padding-bottom: 64px; }
+
+    /* ========== 状态栏 ========== */
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 6px 20px; color: #fff; font-size: 14px; font-weight: 600; background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 45%, #3b82f6 100%); position: relative; z-index: 2; }
+    .status-bar .time { letter-spacing: 0.5px; }
+    .status-icons { display: flex; gap: 7px; align-items: center; font-size: 16px; }
+    .status-icons .signal-bars { display: flex; gap: 2px; align-items: flex-end; }
+    .status-icons .signal-bars span { width: 3px; background: #fff; border-radius: 2px; }
+    .status-icons .signal-bars span:nth-child(1){ height: 5px; } .status-icons .signal-bars span:nth-child(2){ height: 7px; }
+    .status-icons .signal-bars span:nth-child(3){ height: 9px; } .status-icons .signal-bars span:nth-child(4){ height: 11px; }
+    .battery { width: 24px; height: 12px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 3px; position: relative; display: flex; align-items: center; padding: 1px; }
+    .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 6px; background: rgba(255,255,255,0.6); border-radius: 0 2px 2px 0; }
+    .battery .fill { width: 80%; height: 100%; background: #fff; border-radius: 1px; }
+
+    /* ========== 顶部导航 ========== */
+    .top-bar { background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 45%, #3b82f6 100%); padding: 0 20px 16px 20px; position: relative; overflow: hidden; }
+    .top-bar::before { content: ''; position: absolute; top: -40px; right: -30px; width: 200px; height: 200px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+    .nav-row { display: flex; align-items: center; gap: 14px; position: relative; z-index: 2; }
+    .nav-back { color: #fff; font-size: 20px; width: 28px; }
+    .nav-title { color: #fff; font-size: 18px; font-weight: 700; flex: 1; text-align: center; }
+    .nav-edit { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 500; }
+
+    /* ========== 管理栏 ========== */
+    .manage-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+    .mb-left { display: flex; align-items: center; gap: 8px; }
+    .check-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text-3); display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+    .check-circle.checked { background: var(--primary); border-color: var(--primary); }
+    .check-circle.checked::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: #fff; font-size: 10px; }
+    .mb-text { font-size: 13px; color: var(--text-2); font-weight: 500; }
+    .mb-right { display: flex; gap: 16px; }
+    .mb-btn { font-size: 13px; color: var(--text-2); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+
+    /* ========== 购物车列表 ========== */
+    .cart-list { padding: 12px; }
+    .cart-group { margin-bottom: 12px; }
+    .store-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg-card); border-radius: 12px 12px 0 0; }
+    .store-header .store-name { font-size: 14px; font-weight: 600; color: var(--text-1); display: flex; align-items: center; gap: 6px; }
+    .store-header .store-name i { color: var(--primary); font-size: 15px; }
+    .store-header .store-coupon { margin-left: auto; font-size: 11px; color: var(--accent); display: flex; align-items: center; gap: 3px; }
+
+    .cart-item { display: flex; align-items: center; gap: 12px; background: var(--bg-card); padding: 14px 12px; border-bottom: 1px solid var(--border); }
+    .cart-item:last-child { border-radius: 0 0 12px 12px; border-bottom: none; }
+    .item-img { width: 80px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; position: relative; }
+    .item-img .item-badge { position: absolute; top: 4px; left: 4px; background: var(--danger); color: #fff; font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 6px; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 600; color: var(--text-1); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+    .item-sku { display: flex; gap: 6px; margin-top: 5px; }
+    .sku-tag { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: var(--bg-soft); color: var(--text-2); font-weight: 500; }
+    .item-price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .item-price { font-size: 16px; font-weight: 700; color: var(--danger); }
+    .item-price small { font-size: 11px; font-weight: 400; color: var(--text-3); margin-left: 3px; text-decoration: line-through; }
+    .qty-control { display: flex; align-items: center; gap: 0; }
+    .qty-btn { width: 26px; height: 26px; border-radius: 8px 0 0 8px; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-2); border: 1px solid var(--border); }
+    .qty-num { width: 36px; height: 26px; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .qty-btn.plus { border-radius: 0 8px 8px 0; background: var(--bg-soft); }
+
+    /* ========== 优惠券提示 ========== */
+    .coupon-hint { background: #fffbeb; border-radius: 8px; padding: 8px 12px; margin: 0 12px 12px 12px; display: flex; align-items: center; gap: 8px; }
+    .coupon-hint i { color: var(--accent); font-size: 14px; }
+    .coupon-hint span { font-size: 12px; color: #92400e; }
+    .coupon-hint .ch-btn { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--accent); padding: 3px 10px; background: rgba(245,158,11,0.1); border-radius: 10px; }
+
+    /* ========== 猜你喜欢 ========== */
+    .section-title { padding: 16px 16px 8px 16px; text-align: center; position: relative; }
+    .section-title::before, .section-title::after { content: ''; position: absolute; top: 50%; width: 50px; height: 1px; background: var(--border); }
+    .section-title::before { left: 80px; } .section-title::after { right: 80px; }
+    .section-title span { font-size: 13px; color: var(--text-3); font-weight: 500; background: var(--bg-page); padding: 0 12px; position: relative; z-index: 2; }
+    .section-title .st-icon { color: var(--primary); font-size: 14px; }
+
+    .recommend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 12px 16px 12px; }
+    .rec-card { background: var(--bg-card); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; padding-bottom: 10px; }
+    .rec-card .img-box { width: 100%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 38px; position: relative; }
+    .rec-card .img-box .badge { position: absolute; top: 8px; left: 8px; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+    .badge.hot { background: var(--danger); } .badge.new { background: var(--primary); } .badge.sale { background: var(--accent); }
+    .rec-card .info { padding: 8px 10px 4px 10px; }
+    .rec-card .info .name { font-size: 13px; font-weight: 600; color: var(--text-1); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; min-height: 34px; }
+    .rec-card .info .price { font-weight: 700; color: var(--danger); font-size: 15px; }
+    .rec-card .info .price small { font-weight: 400; font-size: 11px; color: var(--text-3); margin-left: 3px; text-decoration: line-through; }
+    .rec-card .info .sold { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+    .rec-card .info .price-row { display: flex; align-items: center; justify-content: space-between; }
+    .rec-card .cart-add { background: var(--primary); color: #fff; border: none; width: 26px; height: 26px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(37,99,235,0.2); }
+
+    /* ========== 底部结算栏 ========== */
+    .checkout-bar { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; height: 56px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; z-index: 999; box-shadow: 0 -2px 12px rgba(0,0,0,0.04); }
+    .cb-select { display: flex; align-items: center; gap: 6px; }
+    .cb-select .mb-text { font-size: 13px; }
+    .cb-total { flex: 1; text-align: right; }
+    .cb-total .lbl { font-size: 12px; color: var(--text-2); }
+    .cb-total .amount { font-size: 18px; font-weight: 700; color: var(--danger); }
+    .cb-total .saving { font-size: 11px; color: var(--success); display: block; }
+    .cb-btn { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-size: 15px; font-weight: 700; padding: 0 28px; height: 40px; border-radius: 20px; border: none; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+    /* ========== 底部导航 ========== */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; height: 56px; background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; padding: 0; z-index: 1000; box-shadow: 0 -2px 16px rgba(0,0,0,0.04); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 56px; flex: 1; font-size: 10px; color: var(--text-3); font-weight: 500; transition: 0.15s; position: relative; cursor: pointer; }
+    .nav-item i { font-size: 20px; color: var(--text-3); transition: transform 0.2s; }
+    .nav-item.active i { transform: scale(1.1); }
+    .nav-item.active i, .nav-item.active span { color: var(--primary); }
+    .nav-item.active i { filter: drop-shadow(0 2px 6px rgba(37,99,235,0.2)); }
+    .nav-item .badge-dot { position: absolute; top: 4px; right: 50%; transform: translateX(18px); background: var(--danger); color: #fff; border-radius: 30px; font-size: 9px; font-weight: 700; padding: 1px 5px; min-width: 16px; text-align: center; line-height: 1.3; border: 1.5px solid #fff; box-shadow: 0 2px 6px rgba(220,38,38,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap { width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -2px; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .nav-item.nav-cart .cart-icon-wrap i { color: #fff; font-size: 19px; filter: none; }
+    .nav-item.nav-cart span { margin-top: 1px; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- ===== 状态栏 ===== -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="status-icons">
+      <span class="signal-bars"><span></span><span></span><span></span><span></span></span>
+      <span style="font-size:13px;">5G</span>
+      <span class="battery"><span class="fill"></span></span>
+    </span>
+  </div>
+
+  <!-- ===== 顶部导航 ===== -->
+  <div class="top-bar">
+    <div class="nav-row">
+      <i class="fas fa-chevron-left nav-back"></i>
+      <span class="nav-title">购物车 <small style="font-size:13px; opacity:0.7;">(8)</small></span>
+      <span class="nav-edit">管理</span>
+    </div>
+  </div>
+
+  <!-- ===== 全选管理栏 ===== -->
+  <div class="manage-bar">
+    <div class="mb-left">
+      <div class="check-circle checked"></div>
+      <span class="mb-text">全选</span>
+    </div>
+    <div class="mb-right">
+      <span class="mb-btn"><i class="fas fa-share-alt"></i> 分享</span>
+      <span class="mb-btn"><i class="fas fa-heart"></i> 收藏</span>
+    </div>
+  </div>
+
+  <!-- ===== 优惠券提示 ===== -->
+  <div class="coupon-hint">
+    <i class="fas fa-ticket-alt"></i>
+    <span>已为你匹配 2 张优惠券，满 1000 减 50</span>
+    <span class="ch-btn">去领取 ›</span>
+  </div>
+
+  <!-- ===== 购物车列表 ===== -->
+  <div class="cart-list">
+    <!-- 店铺 1 -->
+    <div class="cart-group">
+      <div class="store-header">
+        <div class="check-circle checked"></div>
+        <span class="store-name"><i class="fas fa-store"></i> 远讯数码旗舰店</span>
+        <span class="store-coupon"><i class="fas fa-ticket-alt"></i> 满1000减50</span>
+      </div>
+      <div class="cart-item">
+        <div class="check-circle checked"></div>
+        <div class="item-img" style="background: linear-gradient(135deg, #dbeafe, #93c5fd); color: #1e3a8a;">
+          <span class="item-badge">PRO</span>
+          <i class="fas fa-laptop"></i>
+        </div>
+        <div class="item-info">
+          <div class="item-name">ThinkPad X1 Carbon 企业版 i7/16G/512G</div>
+          <div class="item-sku">
+            <span class="sku-tag">i7/16G/512G</span>
+            <span class="sku-tag">企业黑</span>
+          </div>
+          <div class="item-price-row">
+            <span class="item-price">¥9,999<small>¥12,999</small></span>
+            <div class="qty-control">
+              <div class="qty-btn"><i class="fas fa-minus"></i></div>
+              <div class="qty-num">1</div>
+              <div class="qty-btn plus"><i class="fas fa-plus"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cart-item">
+        <div class="check-circle checked"></div>
+        <div class="item-img" style="background: linear-gradient(135deg, #f7e8d5, #f0d5b8); color: #1f2a36;">
+          <i class="fas fa-headphones"></i>
+        </div>
+        <div class="item-info">
+          <div class="item-name">旗舰降噪耳机 Pro 40dB 自适应降噪</div>
+          <div class="item-sku">
+            <span class="sku-tag">标准版</span>
+            <span class="sku-tag">深空灰</span>
+          </div>
+          <div class="item-price-row">
+            <span class="item-price">¥1,899<small>¥2,499</small></span>
+            <div class="qty-control">
+              <div class="qty-btn"><i class="fas fa-minus"></i></div>
+              <div class="qty-num">2</div>
+              <div class="qty-btn plus"><i class="fas fa-plus"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 店铺 2 -->
+    <div class="cart-group">
+      <div class="store-header">
+        <div class="check-circle checked"></div>
+        <span class="store-name"><i class="fas fa-store"></i> 家居生活馆</span>
+        <span class="store-coupon"><i class="fas fa-truck"></i> 包邮</span>
+      </div>
+      <div class="cart-item">
+        <div class="check-circle checked"></div>
+        <div class="item-img" style="background: linear-gradient(135deg, #e2e9e0, #c8d4c0); color: #5f4b3a;">
+          <i class="fas fa-couch"></i>
+        </div>
+        <div class="item-info">
+          <div class="item-name">北欧风头层牛皮沙发 企业定制 三人位</div>
+          <div class="item-sku">
+            <span class="sku-tag">三人位</span>
+            <span class="sku-tag">棕色</span>
+            <span class="sku-tag">定制</span>
+          </div>
+          <div class="item-price-row">
+            <span class="item-price">¥7,280<small>¥9,900</small></span>
+            <div class="qty-control">
+              <div class="qty-btn"><i class="fas fa-minus"></i></div>
+              <div class="qty-num">1</div>
+              <div class="qty-btn plus"><i class="fas fa-plus"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 店铺 3 -->
+    <div class="cart-group">
+      <div class="store-header">
+        <div class="check-circle"></div>
+        <span class="store-name"><i class="fas fa-store"></i> 办公文具直供</span>
+      </div>
+      <div class="cart-item">
+        <div class="check-circle"></div>
+        <div class="item-img" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); color: #0f766e;">
+          <i class="fas fa-keyboard"></i>
+        </div>
+        <div class="item-info">
+          <div class="item-name">机械键盘 RGB背光 青轴 有线电竞办公</div>
+          <div class="item-sku">
+            <span class="sku-tag">青轴</span>
+            <span class="sku-tag">黑色</span>
+          </div>
+          <div class="item-price-row">
+            <span class="item-price">¥159<small>¥299</small></span>
+            <div class="qty-control">
+              <div class="qty-btn"><i class="fas fa-minus"></i></div>
+              <div class="qty-num">3</div>
+              <div class="qty-btn plus"><i class="fas fa-plus"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 猜你喜欢 ===== -->
+  <div class="section-title">
+    <span><i class="fas fa-heart st-icon"></i> 猜你喜欢</span>
+  </div>
+  <div class="recommend-grid">
+    <div class="rec-card">
+      <div class="img-box" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);"><span class="badge hot">爆款</span><i class="fas fa-mobile-screen" style="color:#0369a1;"></i></div>
+      <div class="info">
+        <div class="name">5G 智能手机 骁龙8旗舰 12+256G</div>
+        <div class="price-row"><span class="price">¥3,299<small>¥4,999</small></span><button class="cart-add"><i class="fas fa-plus"></i></button></div>
+        <div class="sold">已售 5,890 · 好评 97%</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="img-box" style="background: linear-gradient(135deg, #fef3c7, #fde68a);"><span class="badge sale">特惠</span><i class="fas fa-mug-hot" style="color:#92400e;"></i></div>
+      <div class="info">
+        <div class="name">智能保温杯 316不锈钢 温度显示</div>
+        <div class="price-row"><span class="price">¥49<small>¥99</small></span><button class="cart-add"><i class="fas fa-plus"></i></button></div>
+        <div class="sold">已售 12,560 · 好评 99%</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="img-box" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);"><span class="badge new">新品</span><i class="fas fa-blender" style="color:#065f46;"></i></div>
+      <div class="info">
+        <div class="name">破壁料理机 家用静音 加热多功能</div>
+        <div class="price-row"><span class="price">¥899<small>¥1,499</small></span><button class="cart-add"><i class="fas fa-plus"></i></button></div>
+        <div class="sold">已售 1,860 · 好评 98%</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="img-box" style="background: linear-gradient(135deg, #fee2e2, #fecaca);"><span class="badge hot">推荐</span><i class="fas fa-shoe-prints" style="color:#991b1b;"></i></div>
+      <div class="info">
+        <div class="name">运动跑鞋 透气减震 男女同款</div>
+        <div class="price-row"><span class="price">¥299<small>¥599</small></span><button class="cart-add"><i class="fas fa-plus"></i></button></div>
+        <div class="sold">已售 8,230 · 好评 97%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 底部结算栏 ===== -->
+  <div class="checkout-bar">
+    <div class="cb-select">
+      <div class="check-circle checked"></div>
+      <span class="mb-text">全选</span>
+    </div>
+    <div class="cb-total">
+      <span class="lbl">合计 </span><span class="amount">¥21,236</span>
+      <span class="saving">已优惠 ¥520</span>
+    </div>
+    <button class="cb-btn">结算(5)</button>
+  </div>
+
+  <!-- ===== 底部导航 ===== -->
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="fas fa-house"></i><span>首页</span></div>
+    <div class="nav-item"><i class="fas fa-th-large"></i><span>分类</span></div>
+    <div class="nav-item nav-cart active"><div class="cart-icon-wrap"><i class="fas fa-shopping-cart"></i></div><span>购物车</span><span class="badge-dot">8</span></div>
+    <div class="nav-item"><i class="fas fa-star"></i><span>收藏</span></div>
+    <div class="nav-item"><i class="fas fa-user-circle"></i><span>我的</span></div>
+  </div>
+
+</div>
+</body>
+</html>

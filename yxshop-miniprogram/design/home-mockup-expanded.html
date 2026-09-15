@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>远讯商城 · 企业级电商小程序设计稿</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ========== 全局重置 ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e3a8a;
+      --primary-light: #3b82f6;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --success: #10b981;
+      --text-1: #0f172a;
+      --text-2: #475569;
+      --text-3: #94a3b8;
+      --bg-page: #f5f7fa;
+      --bg-card: #ffffff;
+      --bg-soft: #f1f5f9;
+      --border: #f0f2f5;
+    }
+    body {
+      background: #e8ecf2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px 0 24px 0;
+    }
+
+    /* ========== 移动容器 ========== */
+    .app-container {
+      max-width: 390px;
+      width: 100%;
+      background: var(--bg-page);
+      border-radius: 36px 36px 0 0;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06);
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 64px; /* 固定 tabbar 高度 */
+    }
+
+    /* ========== 顶部渐变背景区 ========== */
+    .top-hero {
+      background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 45%, #3b82f6 100%);
+      padding: 0 0 28px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .top-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -30px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .top-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 30px; left: -60px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+
+    /* ========== 状态栏 ========== */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px 6px 20px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      position: relative;
+      z-index: 2;
+    }
+    .status-bar .time { letter-spacing: 0.5px; }
+    .status-icons { display: flex; gap: 7px; align-items: center; font-size: 16px; }
+    .status-icons .signal-bars { display: flex; gap: 2px; align-items: flex-end; }
+    .status-icons .signal-bars span { width: 3px; background: #fff; border-radius: 2px; }
+    .status-icons .signal-bars span:nth-child(1){ height: 5px; }
+    .status-icons .signal-bars span:nth-child(2){ height: 7px; }
+    .status-icons .signal-bars span:nth-child(3){ height: 9px; }
+    .status-icons .signal-bars span:nth-child(4){ height: 11px; }
+    .battery {
+      width: 24px; height: 12px;
+      border: 1.5px solid rgba(255,255,255,0.8);
+      border-radius: 3px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 1px;
+    }
+    .battery::after {
+      content: ''; position: absolute; right: -3px; top: 3px;
+      width: 2px; height: 6px; background: rgba(255,255,255,0.6); border-radius: 0 2px 2px 0;
+    }
+    .battery .fill { width: 80%; height: 100%; background: #fff; border-radius: 1px; }
+
+    /* ========== 导航栏 ========== */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 4px 20px 10px 20px;
+      position: relative;
+      z-index: 2;
+    }
+    .nav-bar .city {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .nav-bar .city i { font-size: 12px; }
+
+    /* ========== 搜索框 ========== */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: 30px;
+      padding: 9px 16px;
+      gap: 10px;
+      flex: 1;
+      transition: 0.2s;
+      border: 1px solid transparent;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .search-box:focus-within {
+      background: #fff;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+    .search-box i.search-ic { color: var(--text-3); font-size: 16px; }
+    .search-box input {
+      border: none; background: transparent; outline: none; flex: 1;
+      font-size: 14px; color: var(--text-1);
+    }
+    .search-box input::placeholder { color: var(--text-3); }
+    .search-box .scan-icon { color: var(--primary); font-size: 18px; }
+    .search-box .msg-icon { color: #fff; font-size: 20px; position: relative; }
+    .search-box .msg-icon .red-dot {
+      position: absolute; top: -2px; right: -2px;
+      width: 7px; height: 7px; background: var(--danger);
+      border-radius: 50%; border: 1.5px solid var(--primary-dark);
+    }
+
+    /* ========== 公告通知条 ========== */
+    .notice-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 16px 0 16px;
+      padding: 7px 14px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .notice-bar .notice-tag {
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .notice-bar .marquee {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+    .notice-bar .marquee-text {
+      display: inline-block;
+      color: rgba(255,255,255,0.92);
+      font-size: 12px;
+      animation: marquee 18s linear infinite;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .notice-bar .close-x {
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ========== 会员卡 ========== */
+    .vip-card {
+      margin: 14px 16px 0 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+    }
+    .vip-card .vip-left { display: flex; align-items: center; gap: 10px; }
+    .vip-card .vip-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #fff;
+      box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+    }
+    .vip-card .vip-text { color: #fff; }
+    .vip-card .vip-text .vt-1 { font-size: 13px; font-weight: 600; }
+    .vip-card .vip-text .vt-2 { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+    .vip-card .vip-btn {
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+    }
+
+    /* ========== 白色内容区 ========== */
+    .content-body {
+      background: var(--bg-page);
+      border-radius: 24px 24px 0 0;
+      margin-top: 16px;
+      position: relative;
+      z-index: 3;
+      padding-top: 4px;
+    }
+
+    /* ========== 金刚位分类 (10个，2行5列) ========== */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px 4px;
+      padding: 14px 10px 16px 10px;
+      background: var(--bg-card);
+      margin: 0 12px;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    }
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      transition: 0.15s;
+    }
+    .category-item .icon-wrap {
+      width: 46px; height: 46px;
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      transition: 0.2s;
+      position: relative;
+    }
+    .category-item .icon-wrap .hot-tag {
+      position: absolute;
+      top: -4px; right: -6px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 8px;
+      line-height: 1.2;
+    }
+    .category-item span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-2);
+      letter-spacing: 0.1px;
+    }
+    .category-item:nth-child(1) .icon-wrap { background: linear-gradient(145deg, #eff6ff, #dbeafe); color: #1e40af; }
+    .category-item:nth-child(2) .icon-wrap { background: linear-gradient(145deg, #fdf2f8, #fce7f3); color: #be185d; }
+    .category-item:nth-child(3) .icon-wrap { background: linear-gradient(145deg, #ecfdf5, #d1fae5); color: #047857; }
+    .category-item:nth-child(4) .icon-wrap { background: linear-gradient(145deg, #fffbeb, #fef3c7); color: #b45309; }
+    .category-item:nth-child(5) .icon-wrap { background: linear-gradient(145deg, #f0f9ff, #e0f2fe); color: #0369a1; }
+    .category-item:nth-child(6) .icon-wrap { background: linear-gradient(145deg, #faf5ff, #f3e8ff); color: #6b21a8; }
+    .category-item:nth-child(7) .icon-wrap { background: linear-gradient(145deg, #fef2f2, #fee2e2); color: #b91c1c; }
+    .category-item:nth-child(8) .icon-wrap { background: linear-gradient(145deg, #f0fdfa, #ccfbf1); color: #0f766e; }
+    .category-item:nth-child(9) .icon-wrap { background: linear-gradient(145deg, #fff7ed, #ffedd5); color: #c2410c; }
+    .category-item:nth-child(10) .icon-wrap { background: linear-gradient(145deg, #f8fafc, #f1f5f9); color: #334155; }
+
+    /* ========== 主轮播 ========== */
+    .banner-slider {
+      margin: 12px 12px 14px 12px;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      height: 140px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 22px;
+      color: white;
+      justify-content: space-between;
+      box-shadow: 0 6px 16px rgba(37,99,235,0.15);
+    }
+    .banner-slider .banner-bg-deco {
+      position: absolute;
+      right: -20px; top: -20px;
+      width: 120px; height: 120px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .banner-text { z-index: 2; }
+    .banner-text h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.2; }
+    .banner-text p { font-size: 12px; opacity: 0.85; margin-top: 5px; }
+    .banner-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-top: 8px;
+    }
+    .banner-slider .banner-icon {
+      font-size: 44px; opacity: 0.25; z-index: 2;
+    }
+    .banner-slider .dots {
+      position: absolute;
+      bottom: 10px; left: 22px;
+      display: flex; gap: 5px;
+      z-index: 3;
+    }
+    .dots span { width: 7px; height: 7px; border-radius: 10px; background: rgba(255,255,255,0.35); display: block; transition: 0.3s; }
+    .dots span.active { background: #fff; width: 16px; }
+
+    /* ========== 快捷功能横条 ========== */
+    .quick-strip {
+      display: flex;
+      justify-content: space-around;
+      background: var(--bg-card);
+      margin: 0 12px 12px 12px;
+      padding: 12px 4px;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    }
+    .quick-strip .q-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .quick-strip .q-item .q-icon {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      color: #fff;
+    }
+    .quick-strip .q-item span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-2);
+    }
+    .quick-strip .q-item:nth-child(1) .q-icon { background: linear-gradient(135deg, #ef4444, #f87171); }
+    .quick-strip .q-item:nth-child(2) .q-icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+    .quick-strip .q-item:nth-child(3) .q-icon { background: linear-gradient(135deg, #10b981, #34d399); }
+    .quick-strip .q-item:nth-child(4) .q-icon { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+    .quick-strip .q-item:nth-child(5) .q-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+
+    /* ========== 小广告grid (1大2小) ========== */
+    .ad-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 10px;
+      margin: 0 12px 14px 12px;
+    }
+    .ad-card {
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .ad-card .ad-title { font-size: 14px; font-weight: 700; }
+    .ad-card .ad-sub { font-size: 11px; margin-top: 3px; }
+    .ad-card .ad-deco {
+      position: absolute;
+      right: -10px; bottom: -10px;
+      font-size: 48px;
+      opacity: 0.12;
+    }
+    .ad-card.ad-big {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+      grid-row: span 2;
+      min-height: 190px;
+    }
+    .ad-card.ad-sm-1 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+    .ad-card.ad-sm-2 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d; }
+    .ad-card .ad-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.6);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      width: fit-content;
+      z-index: 2;
+    }
+
+    /* ========== 通用区块标题 ========== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px 8px 20px;
+    }
+    .section-header .sh-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.3px;
+    }
+    .section-header .sh-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    .section-header .sh-more {
+      color: var(--text-3);
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* ========== 限时秒杀 ========== */
+    .seckill-section {
+      background: linear-gradient(135deg, #fff5f5, #fef2f2);
+      margin: 0 12px 14px 12px;
+      border-radius: 16px;
+      padding: 14px 0 12px 0;
+      border: 1px solid rgba(220,38,38,0.06);
+    }
+    .seckill-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 10px 16px;
+    }
+    .seckill-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .seckill-title .sk-icon {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 3px 8px rgba(220,38,38,0.25);
+    }
+    .seckill-title .sk-name { font-size: 16px; font-weight: 700; color: var(--danger); }
+    .seckill-title .sk-label { font-size: 11px; color: var(--text-2); }
+    .countdown {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .countdown .cd-label { font-size: 11px; color: var(--text-2); margin-right: 2px; }
+    .countdown .cd-box {
+      background: #1e293b;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .countdown .cd-colon { color: #1e293b; font-weight: 700; font-size: 12px; }
+    .seckill-scroll {
+      display: flex;
+      gap: 10px;
+      padding: 0 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .seckill-scroll::-webkit-scrollbar { display: none; }
+    .seckill-card {
+      min-width: 86px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .seckill-card .sk-img {
+      width: 86px; height: 86px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px;
+      position: relative;
+      margin-bottom: 6px;
+    }
+    .seckill-card .sk-img .sk-badge {
+      position: absolute;
+      top: 0; left: 0;
+      background: var(--danger);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 12px 0 12px 0;
+    }
+    .seckill-card .sk-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--danger);
+    }
+    .seckill-card .sk-origin {
+      font-size: 11px;
+      color: var(--text-3);
+      text-decoration: line-through;
+    }
+    .seckill-card .sk-name {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .seckill-card .sk-progress {
+      margin-top: 4px;
+      height: 14px;
+      background: rgba(220,38,38,0.08);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .seckill-card .sk-progress .fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: linear-gradient(90deg, #f97316, #dc2626);
+      border-radius: 8px;
+    }
+    .seckill-card .sk-progress .txt {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: #fff;
+      font-weight: 600;
+      z-index: 2;
+    }
+
+    /* ========== 拼团专区 ========== */
+    .group-buy-section {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      margin: 0 12px 14px 12px;
+      border-radius: 16px;
+      padding: 14px 0 12px 0;
+      border: 1px solid rgba(16,185,129,0.06);
+    }
+    .group-buy-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 10px 16px;
+    }
+    .gb-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gb-title .gb-icon {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: #fff;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 3px 8px rgba(16,185,129,0.25);
+    }
+    .gb-title .gb-name { font-size: 16px; font-weight: 700; color: #047857; }
+    .gb-title .gb-label { font-size: 11px; color: var(--text-2); }
+    .gb-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 16px;
+    }
+    .gb-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .gb-card .gb-img {
+      width: 100%;
+      aspect-ratio: 1.4/1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      position: relative;
+    }
+    .gb-card .gb-img .gb-tag {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    .gb-card .gb-info { padding: 8px 10px; }
+    .gb-card .gb-name { font-size: 12px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+    .gb-card .gb-price-row { display: flex; align-items: center; justify-content: space-between; }
+    .gb-card .gb-price { font-size: 14px; font-weight: 700; color: #047857; }
+    .gb-card .gb-group-info { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+    .gb-card .gb-join {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      box-shadow: 0 3px 6px rgba(16,185,129,0.2);
+    }
+
+    /* ========== 优惠券中心 ========== */
+    .coupon-section {
+      margin: 0 12px 14px 12px;
+    }
+    .coupon-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 6px 0 10px 0;
+    }
+    .coupon-list::-webkit-scrollbar { display: none; }
+    .coupon-card {
+      min-width: 150px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .coupon-card::before {
+      content: '';
+      position: absolute;
+      left: -6px; top: 50%;
+      transform: translateY(-50%);
+      width: 12px; height: 12px;
+      background: var(--bg-page);
+      border-radius: 50%;
+    }
+    .coupon-card::after {
+      content: '';
+      position: absolute;
+      right: -6px; top: 50%;
+      transform: translateY(-50%);
+      width: 12px; height: 12px;
+      background: var(--bg-page);
+      border-radius: 50%;
+    }
+    .coupon-card.cc-2 { background: linear-gradient(135deg, #dc2626, #f87171); }
+    .coupon-card.cc-3 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+    .coupon-card .cc-amount { font-size: 24px; font-weight: 700; }
+    .coupon-card .cc-amount small { font-size: 13px; font-weight: 500; }
+    .coupon-card .cc-desc { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+    .coupon-card .cc-claim {
+      margin-top: 8px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 4px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ========== 积分商城入口 ========== */
+    .points-banner {
+      margin: 0 12px 14px 12px;
+      background: linear-gradient(135deg, #6b21a8, #8b5cf6);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .points-banner::before {
+      content: '';
+      position: absolute;
+      right: 40px; top: -30px;
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .points-banner .pb-left { z-index: 2; }
+    .points-banner .pb-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .points-banner .pb-sub { font-size: 11px; opacity: 0.8; margin-top: 3px; }
+    .points-banner .pb-btn {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.2);
+      z-index: 2;
+    }
+    .points-banner .pb-icon { font-size: 32px; opacity: 0.3; z-index: 1; }
+
+    /* ========== 直播入口 ========== */
+    .live-banner {
+      margin: 0 12px 14px 12px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .live-banner .live-pulse {
+      width: 10px; height: 10px;
+      background: var(--danger);
+      border-radius: 50%;
+      animation: pulse 1.5s ease infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+    }
+    .live-banner .live-info { flex: 1; z-index: 2; }
+    .live-banner .live-title { font-size: 14px; font-weight: 600; }
+    .live-banner .live-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+    .live-banner .live-thumb {
+      width: 50px; height: 50px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #dc2626, #f87171);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    /* ========== 商品双列 ========== */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 4px 12px 16px 12px;
+    }
+    .product-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+    }
+    .product-card .img-box {
+      width: 100%;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      position: relative;
+    }
+    .product-card .img-box .badge {
+      position: absolute;
+      top: 8px; left: 8px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .product-card .img-box .badge.hot { background: var(--danger); }
+    .product-card .img-box .badge.new { background: var(--primary); }
+    .product-card .img-box .badge.sale { background: var(--accent); }
+    .product-card .img-box .badge.green { background: var(--success); }
+    .product-card .img-box .wishlist {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 30px;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      color: #ef4444;
+      font-size: 13px;
+    }
+    .product-info { padding: 8px 10px 4px 10px; }
+    .product-info .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+      min-height: 34px;
+    }
+    .product-info .tags {
+      display: flex;
+      gap: 4px;
+      margin: 4px 0;
+    }
+    .product-info .tag {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .product-info .tag.free-ship { background: rgba(16,185,129,0.1); color: #047857; }
+    .product-info .tag.auth { background: rgba(37,99,235,0.1); color: #1e40af; }
+    .product-info .tag.gift { background: rgba(245,158,11,0.1); color: #92400e; }
+    .product-info .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product-info .price {
+      font-weight: 700;
+      color: var(--danger);
+      font-size: 15px;
+    }
+    .product-info .price small {
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--text-3);
+      margin-left: 3px;
+      text-decoration: line-through;
+    }
+    .product-info .sold {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .product-info .cart-add {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      width: 26px; height: 26px;
+      border-radius: 30px;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 8px rgba(37,99,235,0.2);
+    }
+
+    /* ========== 品牌专区 ========== */
+    .brand-zone {
+      margin: 0 12px 14px 12px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .brand-zone .bz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .brand-zone .bz-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .brand-zone .bz-more {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+    .brand-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .brand-item {
+      background: var(--bg-soft);
+      border-radius: 10px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-2);
+      letter-spacing: -0.5px;
+    }
+
+    /* ========== 猜你喜欢 tab ========== */
+    .guess-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px 0 4px 0;
+      position: relative;
+    }
+    .guess-tabs::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 20%; right: 20%;
+      height: 1px;
+      background: var(--border);
+    }
+    .guess-tab {
+      font-size: 13px;
+      color: var(--text-3);
+      font-weight: 500;
+      padding-bottom: 8px;
+      position: relative;
+      cursor: default;
+    }
+    .guess-tab.active {
+      color: var(--text-1);
+      font-weight: 700;
+    }
+    .guess-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    .guess-divider {
+      text-align: center;
+      padding: 14px 0 6px 0;
+      position: relative;
+    }
+    .guess-divider span {
+      background: var(--bg-page);
+      padding: 0 14px;
+      font-size: 12px;
+      color: var(--text-3);
+      position: relative;
+      z-index: 2;
+      font-weight: 500;
+    }
+    .guess-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 60px; right: 60px;
+      height: 1px;
+      background: var(--border);
+    }
+    .guess-divider .gd-icon {
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    /* ========== 加载更多 ========== */
+    .load-more {
+      text-align: center;
+      padding: 12px 0 20px 0;
+      color: var(--text-3);
+      font-size: 12px;
+    }
+    .load-more i { margin-right: 4px; }
+
+    /* ========== 底部导航 — fixed 固定定位 ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 390px;
+      height: 56px;          /* 固定高度，类似手机原生 */
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0;
+      z-index: 1000;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.04);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 56px;
+      flex: 1;
+      font-size: 10px;
+      color: var(--text-3);
+      font-weight: 500;
+      transition: 0.15s;
+      position: relative;
+      cursor: pointer;
+    }
+    .nav-item i {
+      font-size: 20px;
+      color: var(--text-3);
+      transition: transform 0.2s;
+    }
+    .nav-item.active i { transform: scale(1.1); }
+    .nav-item.active i, .nav-item.active span { color: var(--primary); }
+    .nav-item.active i { filter: drop-shadow(0 2px 6px rgba(37,99,235,0.2)); }
+    .nav-item .badge-dot {
+      position: absolute;
+      top: 4px;
+      right: 50%;
+      transform: translateX(18px);
+      background: var(--danger);
+      color: #fff;
+      border-radius: 30px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      min-width: 16px;
+      text-align: center;
+      line-height: 1.3;
+      border: 1.5px solid #fff;
+      box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+    }
+    .nav-item.nav-cart .cart-icon-wrap {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -2px;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+    .nav-item.nav-cart .cart-icon-wrap i {
+      color: #fff;
+      font-size: 19px;
+      filter: none;
+    }
+    .nav-item.nav-cart span { margin-top: 1px; }
+
+    /* ========== 浮动客服按钮 ========== */
+    .float-service {
+      position: fixed;
+      right: max(14px, calc(50% - 195px + 14px));
+      bottom: 72px;
+      width: 44px; height: 44px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      z-index: 50;
+      border: 1px solid var(--border);
+    }
+    .float-service i { color: var(--primary); font-size: 20px; }
+    .float-service .fs-dot {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 8px; height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    /* ========== 回到顶部 ========== */
+    .float-top {
+      position: fixed;
+      right: max(14px, calc(50% - 195px + 14px));
+      bottom: 136px;
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      z-index: 50;
+      border: 1px solid var(--border);
+    }
+    .float-top i { color: var(--text-2); font-size: 16px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+
+  <!-- ============ 顶部渐变区 ============ -->
+  <div class="top-hero">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="status-icons">
+        <span class="signal-bars"><span></span><span></span><span></span><span></span></span>
+        <span style="font-size:13px;">5G</span>
+        <span class="battery"><span class="fill"></span></span>
+      </span>
+    </div>
+
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+      <span class="city"><i class="fas fa-map-marker-alt"></i> 上海·浦东 <i class="fas fa-chevron-down" style="font-size:9px;"></i></span>
+      <div class="search-box">
+        <i class="fas fa-search search-ic"></i>
+        <input type="text" placeholder="搜索商品、品牌、品类…" />
+        <i class="fas fa-qrcode scan-icon"></i>
+      </div>
+      <span class="msg-icon" style="position:relative;">
+        <i class="far fa-comment-dots"></i>
+        <span class="red-dot"></span>
+      </span>
+    </div>
+
+    <!-- 公告条 -->
+    <div class="notice-bar">
+      <span class="notice-tag">公告</span>
+      <div class="marquee">
+        <span class="marquee-text">🎉 双十二企业采购节预热开启，满 10000 减 800，企业认证再享额外 95 折 &nbsp;·&nbsp; 新人注册即领 200 元大礼包 &nbsp;·&nbsp; 12 月物流不打烊，全国次日达 &nbsp;·&nbsp; 招商合作热线 400-888-0000</span>
+      </div>
+      <span class="close-x"><i class="fas fa-times"></i></span>
+    </div>
+
+    <!-- 会员卡 -->
+    <div class="vip-card">
+      <div class="vip-left">
+        <div class="vip-icon"><i class="fas fa-crown"></i></div>
+        <div class="vip-text">
+          <div class="vt-1">企业会员 PRO</div>
+          <div class="vt-2">尊享专属价 · 月结 · 专属客服</div>
+        </div>
+      </div>
+      <button class="vip-btn">立即开通 ›</button>
+    </div>
+  </div>
+
+  <!-- ============ 白色内容区 ============ -->
+  <div class="content-body">
+
+    <!-- 金刚位分类 (10个) -->
+    <div class="category-grid">
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-mobile-alt"></i><span class="hot-tag">HOT</span></div><span>数码电器</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-tshirt"></i></div><span>服饰鞋包</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-home"></i></div><span>家居家装</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-utensils"></i></div><span>食品生鲜</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-heartbeat"></i></div><span>个护健康</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-car"></i></div><span>汽车用品</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-tools"></i></div><span>工业品</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-briefcase"></i></div><span>办公文具</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-gem"></i><span class="hot-tag">NEW</span></div><span>奢品钟表</span></div>
+      <div class="category-item"><div class="icon-wrap"><i class="fas fa-th-large"></i></div><span>全部分类</span></div>
+    </div>
+
+    <!-- 主轮播 -->
+    <div class="banner-slider">
+      <div class="banner-bg-deco"></div>
+      <div class="banner-text">
+        <h2>企业采购节 · 预热</h2>
+        <p>满 10000 减 800 · 认证再享 95 折</p>
+        <span class="banner-tag"><i class="fas fa-bolt"></i> 立即抢购</span>
+      </div>
+      <i class="fas fa-building banner-icon"></i>
+      <div class="dots"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- 快捷功能横条 -->
+    <div class="quick-strip">
+      <div class="q-item"><div class="q-icon"><i class="fas fa-bolt"></i></div><span>限时秒杀</span></div>
+      <div class="q-item"><div class="q-icon"><i class="fas fa-users"></i></div><span>拼团特惠</span></div>
+      <div class="q-item"><div class="q-icon"><i class="fas fa-gift"></i></div><span>积分兑换</span></div>
+      <div class="q-item"><div class="q-icon"><i class="fas fa-ticket-alt"></i></div><span>领券中心</span></div>
+      <div class="q-item"><div class="q-icon"><i class="fas fa-truck"></i></div><span>物流查询</span></div>
+    </div>
+
+    <!-- 小广告 grid (1大2小) -->
+    <div class="ad-grid">
+      <div class="ad-card ad-big">
+        <div>
+          <div class="ad-title">企业认证特权</div>
+          <div class="ad-sub">认证即送 500 元券包</div>
+        </div>
+        <span class="ad-btn">去认证 <i class="fas fa-arrow-right" style="font-size:9px;"></i></span>
+        <i class="fas fa-shield-alt ad-deco"></i>
+      </div>
+      <div class="ad-card ad-sm-1">
+        <div>
+          <div class="ad-title">以旧换新</div>
+          <div class="ad-sub">最高补贴 2000</div>
+        </div>
+        <i class="fas fa-recycle ad-deco"></i>
+      </div>
+      <div class="ad-card ad-sm-2">
+        <div>
+          <div class="ad-title">新人礼包</div>
+          <div class="ad-sub">注册领 200 元</div>
+        </div>
+        <i class="fas fa-gift ad-deco"></i>
+      </div>
+    </div>
+
+    <!-- ===== 限时秒杀 ===== -->
+    <div class="seckill-section">
+      <div class="seckill-header">
+        <div class="seckill-title">
+          <div class="sk-icon"><i class="fas fa-bolt"></i></div>
+          <span class="sk-name">限时秒杀</span>
+          <span class="sk-label">· 整点开抢</span>
+        </div>
+        <div class="countdown" id="countdown">
+          <span class="cd-label">距结束</span>
+          <span class="cd-box" id="cd-h">02</span>
+          <span class="cd-colon">:</span>
+          <span class="cd-box" id="cd-m">45</span>
+          <span class="cd-colon">:</span>
+          <span class="cd-box" id="cd-s">30</span>
+        </div>
+      </div>
+      <div class="seckill-scroll">
+        <div class="seckill-card">
+          <div class="sk-img" style="background: linear-gradient(135deg, #dbeafe, #93c5fd);">
+            <span class="sk-badge">5折</span>
+            <i class="fas fa-laptop" style="color: #1e3a8a;"></i>
+          </div>
+          <div class="sk-price">¥4,999</div>
+          <div class="sk-origin">¥9,999</div>
+          <div class="sk-name">ThinkPad X1</div>
+          <div class="sk-progress"><div class="fill" style="width:75%;"></div><span class="txt">已抢75%</span></div>
+        </div>
+        <div class="seckill-card">
+          <div class="sk-img" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+            <span class="sk-badge">3折</span>
+            <i class="fas fa-headphones" style="color: #92400e;"></i>
+          </div>
+          <div class="sk-price">¥599</div>
+          <div class="sk-origin">¥1,899</div>
+          <div class="sk-name">降噪耳机 Pro</div>
+          <div class="sk-progress"><div class="fill" style="width:60%;"></div><span class="txt">已抢60%</span></div>
+        </div>
+        <div class="seckill-card">
+          <div class="sk-img" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
+            <span class="sk-badge">4折</span>
+            <i class="fas fa-mobile-alt" style="color: #9d174d;"></i>
+          </div>
+          <div class="sk-price">¥2,599</div>
+          <div class="sk-origin">¥6,499</div>
+          <div class="sk-name">5G 智能手机</div>
+          <div class="sk-progress"><div class="fill" style="width:90%;"></div><span class="txt">已抢90%</span></div>
+        </div>
+        <div class="seckill-card">
+          <div class="sk-img" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+            <span class="sk-badge">6折</span>
+            <i class="fas fa-blender" style="color: #065f46;"></i>
+          </div>
+          <div class="sk-price">¥899</div>
+          <div class="sk-origin">¥1,499</div>
+          <div class="sk-name">破壁料理机</div>
+          <div class="sk-progress"><div class="fill" style="width:40%;"></div><span class="txt">已抢40%</span></div>
+        </div>
+        <div class="seckill-card">
+          <div class="sk-img" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);">
+            <span class="sk-badge">5折</span>
+            <i class="fas fa-camera" style="color: #3730a3;"></i>
+          </div>
+          <div class="sk-price">¥3,299</div>
+          <div class="sk-origin">¥6,599</div>
+          <div class="sk-name">微单相机</div>
+          <div class="sk-progress"><div class="fill" style="width:55%;"></div><span class="txt">已抢55%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 拼团专区 ===== -->
+    <div class="group-buy-section">
+      <div class="group-buy-header">
+        <div class="gb-title">
+          <div class="gb-icon"><i class="fas fa-users"></i></div>
+          <span class="gb-name">拼团特惠</span>
+          <span class="gb-label">· 2人成团享低价</span>
+        </div>
+        <span class="sh-more">更多 <i class="fas fa-chevron-right" style="font-size:9px;"></i></span>
+      </div>
+      <div class="gb-grid">
+        <div class="gb-card">
+          <div class="gb-img" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+            <span class="gb-tag">2人团</span>
+            <i class="fas fa-mug-hot" style="color: #92400e;"></i>
+          </div>
+          <div class="gb-info">
+            <div class="gb-name">智能保温杯 316不锈钢</div>
+            <div class="gb-price-row">
+              <div>
+                <div class="gb-price">¥39.9</div>
+                <div class="group-info">单买¥69 · 已拼1280件</div>
+              </div>
+              <button class="gb-join">去拼团</button>
+            </div>
+          </div>
+        </div>
+        <div class="gb-card">
+          <div class="gb-img" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe);">
+            <span class="gb-tag">3人团</span>
+            <i class="fas fa-keyboard" style="color: #1e40af;"></i>
+          </div>
+          <div class="gb-info">
+            <div class="gb-name">机械键盘 RGB 背光</div>
+            <div class="gb-price-row">
+              <div>
+                <div class="gb-price">¥159</div>
+                <div class="group-info">单买¥299 · 已拼860件</div>
+              </div>
+              <button class="gb-join">去拼团</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 优惠券中心 ===== -->
+    <div class="section-header" style="padding-bottom:0;">
+      <div class="sh-left">
+        <h3>🎫 优惠券中心</h3>
+        <span class="sh-tag" style="background:rgba(220,38,38,0.1); color:var(--danger);">每日领取</span>
+      </div>
+      <span class="sh-more">全部 <i class="fas fa-chevron-right" style="font-size:9px;"></i></span>
+    </div>
+    <div class="coupon-section">
+      <div class="coupon-list">
+        <div class="coupon-card">
+          <div class="cc-amount"><small>¥</small>50</div>
+          <div class="cc-desc">满 500 元可用</div>
+          <div class="cc-claim">立即领取 <i class="fas fa-arrow-right" style="font-size:9px;"></i></div>
+        </div>
+        <div class="coupon-card cc-2">
+          <div class="cc-amount"><small>¥</small>200</div>
+          <div class="cc-desc">满 2000 元可用</div>
+          <div class="cc-claim">立即领取 <i class="fas fa-arrow-right" style="font-size:9px;"></i></div>
+        </div>
+        <div class="coupon-card cc-3">
+          <div class="cc-amount"><small>¥</small>20</div>
+          <div class="cc-desc">无门槛 · 全品类</div>
+          <div class="cc-claim">立即领取 <i class="fas fa-arrow-right" style="font-size:9px;"></i></div>
+        </div>
+        <div class="coupon-card">
+          <div class="cc-amount"><small>¥</small>100</div>
+          <div class="cc-desc">满 1000 元可用</div>
+          <div class="cc-claim">立即领取 <i class="fas fa-arrow-right" style="font-size:9px;"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 积分商城入口 ===== -->
+    <div class="points-banner">
+      <div class="pb-left">
+        <div class="pb-title"><i class="fas fa-gift"></i> 积分商城</div>
+        <div class="pb-sub">你的积分：2,860 分 · 可兑换好物</div>
+      </div>
+      <i class="fas fa-coins pb-icon"></i>
+      <button class="pb-btn">去兑换 ›</button>
+    </div>
+
+    <!-- ===== 直播入口 ===== -->
+    <div class="live-banner">
+      <div class="live-pulse"></div>
+      <div class="live-info">
+        <div class="live-title">直播中 · 企业采购选品会</div>
+        <div class="live-sub">1,283 人正在观看 · 下单享直播专属价</div>
+      </div>
+      <div class="live-thumb"><i class="fas fa-video"></i></div>
+    </div>
+
+    <!-- ===== 新品首发 ===== -->
+    <div class="section-header">
+      <div class="sh-left">
+        <h3>🔥 新品首发</h3>
+        <span class="sh-tag" style="background:rgba(37,99,235,0.1); color:var(--primary);">本周上新</span>
+      </div>
+      <span class="sh-more">查看全部 <i class="fas fa-chevron-right" style="font-size:9px;"></i></span>
+    </div>
+    <div class="product-grid">
+      <!-- 商品 1 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #dbeafe, #93c5fd);">
+          <span class="badge new">新品</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-laptop" style="font-size:42px; color:#1e3a8a;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">ThinkPad X1 Carbon 企业版 i7/16G/512G</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥9,999<small>¥12,999</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 328 · 好评 98%</div>
+        </div>
+      </div>
+      <!-- 商品 2 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #f0e6d6, #e8d5b8);">
+          <span class="badge hot">热卖</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-watch" style="font-size:38px; color:#4b3a2b;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">潜航者 机械腕表 瑞士天文台认证</div>
+          <div class="tags">
+            <span class="tag auth">正品</span>
+            <span class="tag gift">赠表盒</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥4,350<small>¥5,200</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 156 · 好评 99%</div>
+        </div>
+      </div>
+      <!-- 商品 3 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #e2e9e0, #c8d4c0);">
+          <span class="badge green">环保</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-couch" style="font-size:42px; color:#5f4b3a;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">北欧风头层牛皮沙发 企业定制</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag gift">定制</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥7,280<small>¥9,900</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 89 · 好评 97%</div>
+        </div>
+      </div>
+      <!-- 商品 4 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #f7e8d5, #f0d5b8);">
+          <span class="badge sale">特价</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-headphones" style="font-size:40px; color:#1f2a36;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">旗舰降噪耳机 Pro 40dB 自适应</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥1,899<small>¥2,499</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 2,136 · 好评 98%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 品牌专区 ===== -->
+    <div class="brand-zone">
+      <div class="bz-header">
+        <span class="bz-title">🏆 品牌专区</span>
+        <span class="bz-more">查看全部 ›</span>
+      </div>
+      <div class="brand-grid">
+        <div class="brand-item">Apple</div>
+        <div class="brand-item">华为</div>
+        <div class="brand-item">联想</div>
+        <div class="brand-item">戴尔</div>
+        <div class="brand-item">小米</div>
+        <div class="brand-item">美的</div>
+        <div class="brand-item">海尔</div>
+        <div class="brand-item">罗技</div>
+      </div>
+    </div>
+
+    <!-- ===== 猜你喜欢 ===== -->
+    <div class="guess-divider">
+      <span><i class="fas fa-heart gd-icon"></i> 猜你喜欢</span>
+    </div>
+    <div class="guess-tabs">
+      <span class="guess-tab active">推荐</span>
+      <span class="guess-tab">数码</span>
+      <span class="guess-tab">服饰</span>
+      <span class="guess-tab">家居</span>
+      <span class="guess-tab">食品</span>
+    </div>
+
+    <!-- 猜你喜欢商品 grid -->
+    <div class="product-grid">
+      <!-- 商品 5 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);">
+          <span class="badge hot">爆款</span>
+          <span class="wishlist"><i class="fas fa-heart" style="color:#ef4444;"></i></span>
+          <i class="fas fa-mobile-screen" style="font-size:42px; color:#0369a1;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">5G 智能手机 骁龙8旗舰芯片 12+256G</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+            <span class="tag gift">赠耳机</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥3,299<small>¥4,999</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 5,890 · 好评 97%</div>
+        </div>
+      </div>
+      <!-- 商品 6 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+          <span class="badge sale">特惠</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-mug-hot" style="font-size:40px; color:#92400e;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">智能保温杯 316不锈钢 温度显示</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥49<small>¥99</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 12,560 · 好评 99%</div>
+        </div>
+      </div>
+      <!-- 商品 7 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
+          <span class="badge new">上新</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-spray-can" style="font-size:40px; color:#9d174d;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">香氛套装 持久留香 50ml×3瓶 礼盒装</div>
+          <div class="tags">
+            <span class="tag auth">正品</span>
+            <span class="tag gift">礼盒</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥199<small>¥399</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 3,420 · 好评 96%</div>
+        </div>
+      </div>
+      <!-- 商品 8 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+          <span class="badge green">精选</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-blender" style="font-size:40px; color:#065f46;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">破壁料理机 家用静音 加热多功能</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥899<small>¥1,499</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 1,860 · 好评 98%</div>
+        </div>
+      </div>
+      <!-- 商品 9 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);">
+          <span class="badge hot">爆款</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-camera" style="font-size:40px; color:#3730a3;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">微单相机 4K Vlog 套机 含变焦镜头</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+            <span class="tag gift">赠存储卡</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥3,299<small>¥6,599</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 460 · 好评 98%</div>
+        </div>
+      </div>
+      <!-- 商品 10 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #fee2e2, #fecaca);">
+          <span class="badge sale">限时</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-shoe-prints" style="font-size:40px; color:#991b1b;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">运动跑鞋 透气减震 男女同款 多色可选</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag gift">赠袜</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥299<small>¥599</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 8,230 · 好评 97%</div>
+        </div>
+      </div>
+      <!-- 商品 11 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1);">
+          <span class="badge new">新品</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-toilet-paper" style="font-size:40px; color:#0f766e;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">原生木浆抽纸 120包 整箱家用囤货</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥59<small>¥129</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 25,600 · 好评 99%</div>
+        </div>
+      </div>
+      <!-- 商品 12 -->
+      <div class="product-card">
+        <div class="img-box" style="background: linear-gradient(135deg, #fff7ed, #ffedd5);">
+          <span class="badge hot">推荐</span>
+          <span class="wishlist"><i class="far fa-heart"></i></span>
+          <i class="fas fa-keyboard" style="font-size:40px; color:#c2410c;"></i>
+        </div>
+        <div class="product-info">
+          <div class="name">机械键盘 RGB背光 青轴 有线电竞</div>
+          <div class="tags">
+            <span class="tag free-ship">包邮</span>
+            <span class="tag auth">正品</span>
+          </div>
+          <div class="price-row">
+            <span class="price">¥159<small>¥299</small></span>
+            <button class="cart-add"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="sold">已售 6,780 · 好评 98%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载更多 -->
+    <div class="load-more">
+      <i class="fas fa-spinner fa-pulse"></i> 上拉加载更多好物…
+    </div>
+
+  </div><!-- /content-body -->
+
+  <!-- ===== 浮动按钮 ===== -->
+  <div class="float-top" onclick="scrollTop()">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+  <div class="float-service">
+    <i class="fas fa-headset"></i>
+    <span class="fs-dot"></span>
+  </div>
+
+  <!-- ===== 底部导航 ===== -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <i class="fas fa-house"></i>
+      <span>首页</span>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-th-large"></i>
+      <span>分类</span>
+    </div>
+    <div class="nav-item nav-cart">
+      <div class="cart-icon-wrap"><i class="fas fa-shopping-cart"></i></div>
+      <span>购物车</span>
+      <span class="badge-dot">3</span>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-star"></i>
+      <span>收藏</span>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-user-circle"></i>
+      <span>我的</span>
+    </div>
+  </div>
+
+</div><!-- /app-container -->
+
+<script>
+  // ===== 秒杀倒计时 =====
+  let totalSeconds = 2 * 3600 + 45 * 60 + 30;
+  function updateCountdown() {
+    if (totalSeconds <= 0) totalSeconds = 3 * 3600;
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
+    document.getElementById('cd-s').textContent = String(s).padStart(2, '0');
+    totalSeconds--;
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  // ===== 轮播图 dots 轮换 =====
+  const dots = document.querySelectorAll('.banner-slider .dots span');
+  let currentDot = 0;
+  setInterval(() => {
+    dots[currentDot].classList.remove('active');
+    currentDot = (currentDot + 1) % dots.length;
+    dots[currentDot].classList.add('active');
+  }, 3000);
+
+  // ===== 猜你喜欢 tab 切换 =====
+  document.querySelectorAll('.guess-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.guess-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // ===== 回到顶部 =====
+  function scrollTop() {
+    const app = document.getElementById('app');
+    app.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

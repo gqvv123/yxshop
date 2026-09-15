@@ -1,0 +1,96 @@
+/* coupon — 企业级优惠券 */
+.coupon-section {
+  margin: 12rpx 24rpx 0;
+}
+.cs-header {
+  padding: 16rpx 8rpx 12rpx;
+}
+.cs-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.cs-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #0f172a;
+}
+.cs-tag {
+  background: rgba(220,38,38,0.1);
+  color: #dc2626;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.coupon-scroll {
+  white-space: nowrap;
+}
+.coupon-card {
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: 16rpx;
+  margin-right: 16rpx;
+  padding: 20rpx 24rpx;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  min-width: 220rpx;
+}
+.coupon-card:last-child {
+  margin-right: 0;
+}
+.coupon-card.cc-0 {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+.coupon-card.cc-1 {
+  background: linear-gradient(135deg, #dc2626, #f87171);
+}
+.coupon-card.cc-2 {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.coupon-amount {
+  display: flex;
+  align-items: baseline;
+}
+.coupon-symbol {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.coupon-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-left: 4rpx;
+}
+.coupon-info {
+  margin-top: 8rpx;
+}
+.coupon-name {
+  font-size: 24rpx;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200rpx;
+}
+.coupon-condition {
+  font-size: 20rpx;
+  opacity: 0.85;
+  display: block;
+  margin-top: 4rpx;
+}
+.coupon-claim {
+  margin-top: 12rpx;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  padding: 6rpx 16rpx;
+  border-radius: 16rpx;
+  width: fit-content;
+  border: 1rpx solid rgba(255,255,255,0.2);
+}
+.claim-text {
+  font-size: 22rpx;
+  font-weight: 600;
+}

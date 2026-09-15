@@ -1,0 +1,71 @@
+.promo-grid {
+  margin: 0 24rpx 24rpx 24rpx;
+  display: grid;
+  gap: 20rpx;
+}
+
+.promo-grid.layout-one_big_two_small {
+  grid-template-columns: 1.2fr 1fr;
+}
+
+.promo-grid.layout-two_col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.promo-grid.layout-three_col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.pg-card {
+  border-radius: 28rpx;
+  padding: 28rpx;
+  position: relative;
+  overflow: hidden;
+  min-height: 180rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.promo-grid.layout-one_big_two_small .pg-big {
+  grid-row: span 2;
+  min-height: 380rpx;
+}
+
+.pg-card-body {
+  z-index: 1;
+}
+
+.pg-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  display: block;
+}
+
+.pg-sub {
+  font-size: 22rpx;
+  margin-top: 6rpx;
+  display: block;
+  opacity: 0.85;
+}
+
+.pg-btn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.6);
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  width: fit-content;
+  z-index: 1;
+}
+
+.pg-deco {
+  position: absolute;
+  right: -20rpx;
+  bottom: -20rpx;
+  font-size: 96rpx;
+  opacity: 0.12;
+  z-index: 0;
+}

@@ -1,0 +1,83 @@
+<view class="sign-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">每日签到</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <!-- 签到状态卡 -->
+    <view class="sign-card">
+      <view class="sc-left">
+        <view class="sc-label">已连续签到</view>
+        <view class="sc-num">{{continuousDays}} <text class="sc-unit">天</text></view>
+        <view class="sc-sub">累计签到 {{totalDays}} 天</view>
+      </view>
+      <view class="sc-right">
+        <view class="sc-icon {{signedToday ? 'sc-icon--done' : ''}}">
+          <mp-icon name="{{signedToday ? 'check' : 'zap'}}" size="32" color="#fff"></mp-icon>
+        </view>
+        <view class="sc-btn {{signedToday ? 'sc-btn--done' : ''}}" bindtap="onSign">
+          {{signedToday ? '今日已签' : '签到 +' + signPoints + '积分'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 日历区 ===== -->
+  <view class="calendar-section">
+    <view class="cal-header">
+      <view class="cal-arrow" bindtap="onPrevMonth">
+        <mp-icon name="chevron-right" size="18" color="#475569" style="transform: rotate(180deg);"></mp-icon>
+      </view>
+      <text class="cal-title">{{year}}年{{month + 1}}月</text>
+      <view class="cal-arrow" bindtap="onNextMonth">
+        <mp-icon name="chevron-right" size="18" color="#475569"></mp-icon>
+      </view>
+    </view>
+    <view class="cal-weekdays">
+      <text class="cal-wd" wx:for="{{weekDays}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="cal-grid">
+      <view
+        class="cal-day {{item.empty ? 'cal-day--empty' : ''}} {{item.isSigned ? 'cal-day--signed' : ''}} {{item.isToday ? 'cal-day--today' : ''}} {{item.isFuture ? 'cal-day--future' : ''}}"
+        wx:for="{{calendarDays}}"
+        wx:key="dateStr"
+      >
+        <block wx:if="{{!item.empty}}">
+          <text class="cal-day-num">{{item.day}}</text>
+          <view wx:if="{{item.isSigned}}" class="cal-day-check">
+            <mp-icon name="check" size="12" color="#10b981"></mp-icon>
+          </view>
+          <text wx:if="{{item.isToday && !item.isSigned}}" class="cal-day-today-tag">今天</text>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 签到规则 ===== -->
+  <view class="rules-section">
+    <view class="rules-title">
+      <mp-icon name="trophy" size="16" color="#f59e0b"></mp-icon>
+      <text>签到奖励规则</text>
+    </view>
+    <view class="rules-grid">
+      <view class="rule-item" wx:for="{{rules}}" wx:key="day">
+        <view class="rule-circle {{continuousDays >= item.day ? 'rule-circle--done' : ''}}">
+          <text class="rule-day">{{item.day}}</text>
+          <text class="rule-day-unit">天</text>
+        </view>
+        <text class="rule-pts">+{{item.points}}分</text>
+      </view>
+    </view>
+    <view class="rules-tip">
+      <mp-icon name="alert-circle" size="12" color="#94a3b8"></mp-icon>
+      <text>连续签到越多，每天获得积分越多，中断后重新计算</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,180 @@
+<view class="cart-page">
+  <!-- ===== 顶部导航（蓝色渐变） ===== -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="nav-row">
+      <view class="nav-back" style="visibility: hidden;">
+        <text class="nav-back-arrow">‹</text>
+      </view>
+      <text class="nav-title">购物车<text wx:if="{{allItems.length}}" class="nav-count">({{allItems.length}})</text></text>
+      <text class="nav-edit" bindtap="onToggleEdit">{{isEditing ? '完成' : '管理'}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 未登录 ===== -->
+  <block wx:if="{{!isLoggedIn}}">
+    <empty emoji="🔐" text="登录后才能查看购物车" subText="登录可同步您的购物车数据" actionText="立即登录" bind:action="onLogin"></empty>
+    <!-- 猜你喜欢 -->
+    <view wx:if="{{recommendItems.length}}" class="recommend-section">
+      <view class="section-title">
+        <view class="section-line"></view>
+        <view class="section-text-wrap">
+          <mp-icon name="heart" size="14" color="#2563eb"></mp-icon>
+          <text class="section-text">猜你喜欢</text>
+        </view>
+        <view class="section-line"></view>
+      </view>
+      <view class="recommend-grid">
+        <goods-card wx:for="{{recommendItems}}" wx:key="id" item="{{item}}" show-cart-btn="{{true}}" bind:cart="onRecAddCart"></goods-card>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 空购物车 ===== -->
+  <block wx:elif="{{allItems.length === 0 && !loading}}">
+    <empty emoji="🛒" text="购物车空空如也" subText="快去挑选心仪的好物吧" actionText="去逛逛" bind:action="onLogin"></empty>
+    <view wx:if="{{recommendItems.length}}" class="recommend-section">
+      <view class="section-title">
+        <view class="section-line"></view>
+        <view class="section-text-wrap">
+          <mp-icon name="heart" size="14" color="#2563eb"></mp-icon>
+          <text class="section-text">猜你喜欢</text>
+        </view>
+        <view class="section-line"></view>
+      </view>
+      <view class="recommend-grid">
+        <goods-card wx:for="{{recommendItems}}" wx:key="id" item="{{item}}" show-cart-btn="{{true}}" bind:cart="onRecAddCart"></goods-card>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 购物车列表 ===== -->
+  <block wx:else>
+    <!-- 全选管理栏 -->
+    <view class="manage-bar">
+      <view class="mb-left" bindtap="onToggleAll">
+        <view class="check-circle {{allSelected ? 'checked' : ''}}">
+          <view wx:if="{{allSelected}}" class="check-icon">✓</view>
+        </view>
+        <text class="mb-text">全选</text>
+      </view>
+      <view class="mb-right">
+        <view class="mb-btn" bindtap="onShare">
+          <mp-icon name="zap" size="14" color="#475569"></mp-icon>
+          <text class="mb-btn-text">分享</text>
+        </view>
+        <view class="mb-btn" bindtap="onFavorite">
+          <mp-icon name="heart" size="14" color="#475569"></mp-icon>
+          <text class="mb-btn-text">收藏</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 优惠券提示 -->
+    <view wx:if="{{couponHint}}" class="coupon-hint" bindtap="onGoCoupon">
+      <mp-icon name="ticket" size="16" color="#f59e0b"></mp-icon>
+      <text class="coupon-hint-text">{{couponHint}}</text>
+      <view class="coupon-hint-btn">去领取 ›</view>
+    </view>
+
+    <!-- 购物车列表（按店铺分组） -->
+    <view class="cart-list">
+      <view class="cart-group" wx:for="{{stores}}" wx:for-item="store" wx:key="store_id" data-index="{{index}}">
+        <!-- 店铺头部 -->
+        <view class="store-header" data-store-id="{{store.store_id}}" bindtap="onToggleStore">
+          <view class="check-circle {{storeSelected[store.store_id] ? 'checked' : ''}}">
+            <view wx:if="{{storeSelected[store.store_id]}}" class="check-icon">✓</view>
+          </view>
+          <view class="store-name-wrap">
+            <mp-icon name="briefcase" size="16" color="#2563eb"></mp-icon>
+            <text class="store-name">{{store.store_name || '自营'}}</text>
+          </view>
+          <view wx:if="{{store.store_hint}}" class="store-coupon">
+            <mp-icon wx:if="{{store.store_hint_type === 'coupon'}}" name="ticket" size="12" color="#f59e0b"></mp-icon>
+            <mp-icon wx:elif="{{store.store_hint_type === 'shipping'}}" name="truck" size="12" color="#10b981"></mp-icon>
+            <text class="store-coupon-text">{{store.store_hint}}</text>
+          </view>
+        </view>
+
+        <!-- 商品列表（左滑删除） -->
+        <view class="swipe-item" wx:for="{{store.items}}" wx:for-item="item" wx:for-index="iidx" wx:key="_id"
+              data-id="{{item._id}}" bindtouchstart="onSwipeStart" bindtouchend="onSwipeEnd">
+          <!-- 底层删除按钮 -->
+          <view class="swipe-action" data-id="{{item._id}}" catchtap="onRemove">
+            <mp-icon name="trash" size="20" color="#fff"></mp-icon>
+            <text class="swipe-action-text">删除</text>
+          </view>
+          <!-- 表层商品卡片 -->
+          <view class="swipe-content cart-item" style="transform: translateX({{item._offset || 0}}px); transition: transform {{item._anim ? '0.3s' : '0s'}};">
+            <!-- 选择框 -->
+            <view class="check-circle {{selected[item._id] ? 'checked' : ''}}" data-id="{{item._id}}" catchtap="onToggleSelect">
+              <view wx:if="{{selected[item._id]}}" class="check-icon">✓</view>
+            </view>
+
+            <!-- 商品图片 -->
+            <view class="item-img-wrap">
+              <image wx:if="{{item._cover}}" class="item-img" src="{{item._cover}}" mode="aspectFill" lazy-load binderror="onImgError" data-sidx="{{index}}" data-idx="{{iidx}}"></image>
+              <view wx:else class="item-img item-img-fallback">
+                <mp-icon name="package" size="36" color="#cbd5e1"></mp-icon>
+              </view>
+              <view wx:if="{{item._badge}}" class="item-badge {{item._badgeType}}">{{item._badge}}</view>
+            </view>
+
+            <!-- 商品信息 -->
+            <view class="item-info">
+              <view class="item-name ellipsis-2">{{item.item_name || item.goods_name}}</view>
+              <view class="item-sku" wx:if="{{item._skuTags.length}}">
+                <view class="sku-tag" wx:for="{{item._skuTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+              </view>
+              <view class="item-price-row">
+                <view class="price-area">
+                  <text class="price-symbol">¥</text>
+                  <text class="item-price">{{item._priceText}}</text>
+                  <text wx:if="{{item._marketPriceText}}" class="item-market-price">¥{{item._marketPriceText}}</text>
+                </view>
+                <view class="qty-control">
+                  <view class="qty-btn" data-id="{{item._id}}" data-delta="-1" catchtap="onChangeQty">−</view>
+                  <view class="qty-num">{{item.quantity}}</view>
+                  <view class="qty-btn plus" data-id="{{item._id}}" data-delta="1" catchtap="onChangeQty">＋</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 猜你喜欢 -->
+    <view wx:if="{{recommendItems.length}}" class="recommend-section">
+      <view class="section-title">
+        <view class="section-line"></view>
+        <view class="section-text-wrap">
+          <mp-icon name="heart" size="14" color="#2563eb"></mp-icon>
+          <text class="section-text">猜你喜欢</text>
+        </view>
+        <view class="section-line"></view>
+      </view>
+      <view class="recommend-grid">
+        <goods-card wx:for="{{recommendItems}}" wx:key="id" item="{{item}}" show-cart-btn="{{true}}" bind:cart="onRecAddCart"></goods-card>
+      </view>
+    </view>
+
+    <!-- 底部结算栏 -->
+    <view class="checkout-bar safe-area-bottom">
+      <view class="cb-select" bindtap="onToggleAll">
+        <view class="check-circle {{allSelected ? 'checked' : ''}}">
+          <view wx:if="{{allSelected}}" class="check-icon">✓</view>
+        </view>
+        <text class="cb-text">全选</text>
+      </view>
+      <view class="cb-total">
+        <text class="cb-label">合计 </text>
+        <text class="cb-symbol">¥</text>
+        <text class="cb-amount">{{totalPrice}}</text>
+        <text wx:if="{{savedAmount > 0}}" class="cb-saving">已优惠 ¥{{savedAmountText}}</text>
+      </view>
+      <view class="cb-btn {{totalQty === 0 ? 'disabled' : ''}}" bindtap="onCheckout">
+        结算{{totalQty ? '(' + totalQty + ')' : ''}}
+      </view>
+    </view>
+  </block>
+</view>

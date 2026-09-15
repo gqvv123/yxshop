@@ -1,0 +1,60 @@
+<view class="logistics-page">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="nav-row">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">物流追踪</text>
+      <view class="nav-refresh" bindtap="onRefresh">
+        <mp-icon name="recycle" size="18" color="#fff"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快递信息卡 -->
+  <view class="express-card" wx:if="{{expressNo}}">
+    <view class="ec-icon">
+      <mp-icon name="truck" size="24" color="#fff"></mp-icon>
+    </view>
+    <view class="ec-info">
+      <text class="ec-name">{{expressName || '快递物流'}}</text>
+      <text class="ec-no">运单号：{{expressNo}}</text>
+    </view>
+    <view class="ec-copy {{copySuccess ? 'ec-copy--done' : ''}}" bindtap="onCopyExpressNo">
+      <mp-icon name="{{copySuccess ? 'check' : 'file-text'}}" size="14" color="{{copySuccess ? '#10b981' : '#2563eb'}}"></mp-icon>
+      <text>{{copySuccess ? '已复制' : '复制'}}</text>
+    </view>
+  </view>
+
+  <!-- 物流轨迹 -->
+  <view class="traces-section" wx:if="{{traces.length}}">
+    <view class="ts-title">
+      <mp-icon name="trending-up" size="16" color="#2563eb"></mp-icon>
+      <text>物流轨迹</text>
+    </view>
+    <view class="trace-list">
+      <view class="trace-item {{index === 0 ? 'trace-item--latest' : ''}}" wx:for="{{traces}}" wx:key="index">
+        <view class="ti-dot-wrap">
+          <view class="ti-dot"></view>
+          <view wx:if="{{index !== traces.length - 1}}" class="ti-line"></view>
+        </view>
+        <view class="ti-content">
+          <text class="ti-text">{{item.content}}</text>
+          <text class="ti-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">查询中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && !traces.length}}" class="empty-wrap">
+    <empty emoji="📦" text="暂无物流信息" subText="请稍后刷新重试"></empty>
+  </view>
+</view>

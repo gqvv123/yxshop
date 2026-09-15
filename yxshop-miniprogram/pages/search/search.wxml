@@ -1,0 +1,71 @@
+<view class="search-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">搜索</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <mp-icon name="search" size="16" color="#94a3b8"></mp-icon>
+      <input
+        class="search-input"
+        placeholder="搜索商品"
+        placeholder-class="ph"
+        bindinput="onInput"
+        bindconfirm="onConfirm"
+        confirm-type="search"
+        value="{{keyword}}"
+        auto-focus
+      />
+      <view wx:if="{{keyword}}" class="clear-btn" bindtap="onClearInput">
+        <mp-icon name="x" size="14" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 热门搜索 ===== -->
+  <view wx:if="{{hotWords.length}}" class="section">
+    <view class="section-header">
+      <mp-icon name="trending-up" size="16" color="var(--primary)"></mp-icon>
+      <text class="section-title">热门搜索</text>
+    </view>
+    <view class="tag-list">
+      <view
+        wx:for="{{hotWords}}"
+        wx:key="*this"
+        class="tag-pill tag-hot"
+        data-kw="{{item}}"
+        bindtap="onTagTap"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- ===== 搜索历史 ===== -->
+  <view wx:if="{{history.length}}" class="section">
+    <view class="section-header">
+      <mp-icon name="clock" size="16" color="var(--text-2)"></mp-icon>
+      <text class="section-title">搜索历史</text>
+      <view class="clear-action" bindtap="onClearHistory">
+        <mp-icon name="trash" size="14" color="var(--text-3)"></mp-icon>
+        <text>清空</text>
+      </view>
+    </view>
+    <view class="tag-list">
+      <view
+        wx:for="{{history}}"
+        wx:key="*this"
+        class="tag-pill"
+        data-kw="{{item}}"
+        bindtap="onTagTap"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

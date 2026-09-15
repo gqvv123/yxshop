@@ -1,0 +1,205 @@
+/* favorite — 企业级收藏页面（蓝色渐变风格） */
+.fav-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 180rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-action {
+  color: rgba(255,255,255,0.9);
+  font-size: 28rpx;
+  padding: 8rpx 0;
+}
+.nav-placeholder { width: 64rpx; }
+.fav-stats {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 40rpx 0 40rpx;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.7);
+  position: relative;
+  z-index: 2;
+}
+
+/* ========== 收藏网格 ========== */
+.fav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  padding: 24rpx;
+}
+.fav-card {
+  background: var(--card);
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03);
+}
+.fav-img-box {
+  width: 100%;
+  aspect-ratio: 1/1;
+  position: relative;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+.fav-img { width: 100%; height: 100%; }
+.fav-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-soft);
+}
+.fav-check {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fav-check--on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.fav-tag {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+  color: #fff;
+}
+.fav-tag--hot { background: #dc2626; }
+.fav-info { padding: 16rpx 20rpx 20rpx 20rpx; }
+.fav-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  min-height: 72rpx;
+}
+.fav-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+.fav-price {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--primary);
+}
+.fav-market {
+  font-size: 22rpx;
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+.fav-sales {
+  font-size: 20rpx;
+  color: var(--text-3);
+  margin-top: 6rpx;
+}
+
+/* 空状态 */
+.empty-wrap { padding: 100rpx 0; }
+
+/* ========== 底部操作栏 ========== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  padding: 20rpx 40rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.04);
+  z-index: 100;
+}
+.bb-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 28rpx;
+  color: var(--text-2);
+}
+.bb-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bb-check--on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.bb-remove {
+  background: linear-gradient(135deg, #dc2626, #f87171);
+  color: #fff;
+  padding: 14rpx 48rpx;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.bb-remove--disabled {
+  background: var(--bg-soft) !important;
+  color: var(--text-3) !important;
+}

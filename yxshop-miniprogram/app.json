@@ -1,0 +1,108 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/category/category",
+    "pages/cart/cart",
+    "pages/profile/profile",
+
+    "pages/login/login",
+    "pages/item-detail/item-detail",
+    "pages/item-list/item-list",
+
+    "pages/order/confirm/confirm",
+    "pages/order/list/list",
+    "pages/order/detail/detail",
+
+    "pages/address/list/list",
+    "pages/address/edit/edit",
+
+    "pages/favorite/favorite",
+    "pages/notification/notification",
+    "pages/search/search",
+    "pages/webview/webview",
+
+    "pages/forgot-password/forgot-password",
+    "pages/order/review/review",
+    "pages/order/refund-detail/refund-detail",
+
+    "pages/coupon/coupon",
+    "pages/point-exchange/point-exchange",
+    "pages/wallet/wallet",
+    "pages/footprint/footprint",
+    "pages/profile/feedback/feedback",
+    "pages/profile/cooperation/cooperation",
+    "pages/profile/about/about",
+    "pages/profile/contract/contract",
+    "pages/profile/security/security",
+    "pages/profile/verify/verify",
+
+    "pages/sign/sign",
+    "pages/point-exchange/records/records",
+    "pages/point-exchange/tasks/tasks",
+    "pages/point-exchange/integral-log/integral-log",
+    "pages/logistics/logistics"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "远讯商城",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f6fa",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#94a3b8",
+    "selectedColor": "#2563eb",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/category/category",
+        "text": "分类",
+        "iconPath": "assets/tabbar/category.png",
+        "selectedIconPath": "assets/tabbar/category-active.png"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+        "text": "购物车",
+        "iconPath": "assets/tabbar/cart.png",
+        "selectedIconPath": "assets/tabbar/cart-active.png"
+      },
+      {
+        "pagePath": "pages/order/list/list",
+        "text": "订单",
+        "iconPath": "assets/tabbar/favorite.png",
+        "selectedIconPath": "assets/tabbar/favorite-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/tabbar/profile.png",
+        "selectedIconPath": "assets/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 15000,
+    "downloadFile": 30000,
+    "uploadFile": 30000
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于查找附近门店和精确配送"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseAddress"
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

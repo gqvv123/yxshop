@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>优品 · 企业级电商</title>
+  <!-- Font Awesome (图标库) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 12px 0 20px 0;
+    }
+    /* 移动卡片容器 — 模拟小程序界面 */
+    .app-container {
+      max-width: 390px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px 32px 24px 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 72px; /* 底部导航留白 */
+      transition: all 0.2s;
+    }
+    /* ----- 状态栏 / 顶部导航 ----- */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px 8px 20px;
+      background: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+    }
+    .status-bar i {
+      font-size: 18px;
+      color: #334155;
+    }
+    .status-bar .time {
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    /* ----- 搜索栏 (企业级风格) ----- */
+    .search-section {
+      padding: 10px 20px 14px 20px;
+      background: #ffffff;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #f1f4f9;
+      border-radius: 30px;
+      padding: 10px 18px;
+      gap: 10px;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+    .search-box:focus-within {
+      background: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .search-box i {
+      color: #64748b;
+      font-size: 16px;
+    }
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      flex: 1;
+      font-size: 15px;
+      font-weight: 400;
+      color: #0f172a;
+    }
+    .search-box input::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .search-box .scan-icon {
+      color: #2563eb;
+      font-size: 18px;
+      margin-left: 4px;
+    }
+    /* ----- 分类快捷入口 (8个) 企业级丰富 ----- */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 6px;
+      padding: 8px 16px 18px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border-radius: 16px;
+      padding: 8px 0;
+      transition: 0.15s;
+      cursor: default;
+    }
+    .category-item .icon-wrap {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(145deg, #f0f4fe, #e9eefa);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #1e3a8a;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      transition: 0.2s;
+    }
+    .category-item span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #1e293b;
+      letter-spacing: 0.2px;
+    }
+    .category-item:nth-child(2) .icon-wrap { background: #fce9f0; color: #b91c3a; }
+    .category-item:nth-child(3) .icon-wrap { background: #e6f7ec; color: #0b6e3b; }
+    .category-item:nth-child(4) .icon-wrap { background: #fef3e0; color: #b45309; }
+    .category-item:nth-child(5) .icon-wrap { background: #e0f0fe; color: #0369a1; }
+    .category-item:nth-child(6) .icon-wrap { background: #f3e8ff; color: #6b21a5; }
+    .category-item:nth-child(7) .icon-wrap { background: #fee2e2; color: #b91c1c; }
+    .category-item:nth-child(8) .icon-wrap { background: #d1fae5; color: #065f46; }
+    /* ----- 轮播横幅（企业级视觉） ----- */
+    .banner-slider {
+      margin: 6px 16px 16px 16px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      background: #dbeafe;
+      position: relative;
+      height: 130px;
+      background-image: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      color: white;
+      justify-content: space-between;
+    }
+    .banner-text h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+    }
+    .banner-text p {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+    .banner-tag {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .banner-slider .dots {
+      position: absolute;
+      bottom: 12px;
+      left: 24px;
+      display: flex;
+      gap: 6px;
+    }
+    .dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.4);
+      display: block;
+    }
+    .dots span.active {
+      background: white;
+      width: 18px;
+    }
+    /* ----- 商品区域标题 (企业级) ----- */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 16px 20px 6px 20px;
+    }
+    .section-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .section-header a {
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    /* ----- 商品卡片 (双列) 专业布局 ----- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 6px 16px 16px 16px;
+    }
+    .product-card {
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      border: 1px solid #f1f5f9;
+      transition: 0.15s;
+      padding-bottom: 12px;
+    }
+    .product-card .img-box {
+      width: 100%;
+      aspect-ratio: 1/1;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #475569;
+      position: relative;
+    }
+    .product-card .img-box .badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #dc2626;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .product-card .img-box .wishlist {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(4px);
+      border-radius: 30px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ef4444;
+      font-size: 14px;
+    }
+    .product-info {
+      padding: 8px 10px 4px 10px;
+    }
+    .product-info .name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .product-info .desc {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .product-info .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product-info .price {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 16px;
+    }
+    .product-info .price small {
+      font-weight: 400;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-left: 3px;
+      text-decoration: line-through;
+    }
+    .product-info .cart-add {
+      background: #2563eb;
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 30px;
+      font-size: 14px;
+      cursor: default;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+    }
+    /* ----- 特色品牌 / 企业服务模块 ----- */
+    .brand-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      background: #f8fafc;
+      margin: 8px 16px 14px 16px;
+      padding: 10px 6px;
+      border-radius: 40px;
+      border: 1px solid #ecf1f7;
+    }
+    .brand-strip .item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #1e293b;
+    }
+    .brand-strip .item i {
+      color: #2563eb;
+      font-size: 16px;
+    }
+    /* ----- 更多推荐 (横向滑动) 企业级丰富 ----- */
+    .scroll-x {
+      display: flex;
+      gap: 12px;
+      padding: 6px 16px 18px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-x::-webkit-scrollbar { display: none; }
+    .scroll-item {
+      min-width: 100px;
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 10px 10px 8px 10px;
+      text-align: center;
+      border: 1px solid #edf2f7;
+      flex-shrink: 0;
+    }
+    .scroll-item .circle {
+      width: 54px;
+      height: 54px;
+      background: white;
+      border-radius: 30px;
+      margin: 0 auto 6px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .scroll-item span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #1e293b;
+      display: block;
+    }
+    .scroll-item .sub {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    /* ----- 底部导航 (企业级) 5个菜单 ----- */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid #f0f2f5;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 12px 0;
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.96);
+      border-radius: 0 0 24px 24px;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+      transition: 0.1s;
+      cursor: default;
+    }
+    .nav-item i {
+      font-size: 22px;
+      color: #94a3b8;
+    }
+    .nav-item.active i,
+    .nav-item.active span {
+      color: #2563eb;
+    }
+    .nav-item.active i {
+      filter: drop-shadow(0 2px 6px rgba(37,99,235,0.2));
+    }
+    .nav-item .badge-dot {
+      background: #dc2626;
+      color: white;
+      border-radius: 30px;
+      font-size: 9px;
+      padding: 1px 7px;
+      margin-top: -4px;
+    }
+    /* 一些小装饰 */
+    .divider {
+      height: 4px;
+      background: #f1f5f9;
+      margin: 4px 16px 0 16px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- 顶部状态 -->
+  <div class="status-bar">
+    <span><i class="fas fa-chevron-left"></i> 返回</span>
+    <span class="time">优品 · 企业购</span>
+    <span class="status-icons">
+      <i class="fas fa-bell"></i>
+      <i class="fas fa-ellipsis-v"></i>
+    </span>
+  </div>
+  <!-- 搜索 -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="搜索企业专供、品牌、品类..." />
+      <i class="fas fa-qrcode scan-icon"></i>
+    </div>
+  </div>
+  <!-- 分类导航 (8个) -->
+  <div class="category-grid">
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-tshirt"></i></div><span>男装</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-female"></i></div><span>女装</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-mobile-alt"></i></div><span>数码</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-home"></i></div><span>家居</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-car"></i></div><span>汽车</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-book"></i></div><span>图书</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-heartbeat"></i></div><span>健康</span></div>
+    <div class="category-item"><div class="icon-wrap"><i class="fas fa-gem"></i></div><span>奢品</span></div>
+  </div>
+  <!-- 横幅 -->
+  <div class="banner-slider">
+    <div class="banner-text">
+      <h2>企业采购专享</h2>
+      <p>全场满减 · 企业认证再享9折</p>
+      <div style="margin-top: 8px;"><span class="banner-tag"><i class="fas fa-tag"></i> 立即询价</span></div>
+    </div>
+    <div style="font-size: 48px; opacity: 0.3;"><i class="fas fa-building"></i></div>
+    <div class="dots"><span class="active"></span><span></span><span></span></div>
+  </div>
+  <!-- 品牌/服务条 -->
+  <div class="brand-strip">
+    <span class="item"><i class="fas fa-shield-alt"></i> 正品保障</span>
+    <span class="item"><i class="fas fa-truck"></i> 企业物流</span>
+    <span class="item"><i class="fas fa-headset"></i> 专属客服</span>
+    <span class="item"><i class="fas fa-credit-card"></i> 月结支持</span>
+  </div>
+  <!-- 新品上市 + 查看全部 -->
+  <div class="section-header">
+    <h3>🔥 新品首发</h3>
+    <a href="#">查看全部 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+  </div>
+  <!-- 商品双列 -->
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="img-box" style="background: #d9eaf7;"><i class="fas fa-laptop" style="font-size: 42px; color: #1e3a8a;"></i><span class="badge">企业价</span><span class="wishlist"><i class="far fa-heart"></i></span></div>
+      <div class="product-info">
+        <div class="name">ThinkPad X1 企业版</div>
+        <div class="desc">i7/16GB/512GB 商务</div>
+        <div class="price-row"><span class="price">¥9,999 <small>¥12,999</small></span><span class="cart-add"><i class="fas fa-plus"></i></span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="img-box" style="background: #f0e6d6;"><i class="fas fa-watch" style="font-size: 38px; color: #4b3a2b;"></i><span class="badge" style="background: #2563eb;">旗舰</span><span class="wishlist"><i class="far fa-heart"></i></span></div>
+      <div class="product-info">
+        <div class="name">潜航者 机械腕表</div>
+        <div class="desc">瑞士天文台认证</div>
+        <div class="price-row"><span class="price">¥4,350 <small>¥5,200</small></span><span class="cart-add"><i class="fas fa-plus"></i></span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="img-box" style="background: #e2e9e0;"><i class="fas fa-couch" style="font-size: 42px; color: #5f4b3a;"></i><span class="badge" style="background: #0b6e3b;">环保</span><span class="wishlist"><i class="far fa-heart"></i></span></div>
+      <div class="product-info">
+        <div class="name">北欧风 皮质沙发</div>
+        <div class="desc">头层牛皮 企业定制</div>
+        <div class="price-row"><span class="price">¥7,280 <small>¥9,900</small></span><span class="cart-add"><i class="fas fa-plus"></i></span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="img-box" style="background: #f7e8d5;"><i class="fas fa-headphones" style="font-size: 40px; color: #1f2a36;"></i><span class="badge" style="background: #b45309;">降噪</span><span class="wishlist"><i class="far fa-heart"></i></span></div>
+      <div class="product-info">
+        <div class="name">旗舰降噪耳机 Pro</div>
+        <div class="desc">40dB 自适应降噪</div>
+        <div class="price-row"><span class="price">¥1,899 <small>¥2,499</small></span><span class="cart-add"><i class="fas fa-plus"></i></span></div>
+      </div>
+    </div>
+  </div>
+  <!-- 企业级特色：横向推荐 -->
+  <div class="section-header" style="padding-top: 6px;">
+    <h3>🏆 企业优选</h3>
+    <a href="#">更多 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+  </div>
+  <div class="scroll-x">
+    <div class="scroll-item"><div class="circle"><i class="fas fa-print" style="color: #2563eb;"></i></div><span>办公打印</span><span class="sub">惠普·佳能</span></div>
+    <div class="scroll-item"><div class="circle"><i class="fas fa-cloud" style="color: #0b6e3b;"></i></div><span>云服务</span><span class="sub">企业存储</span></div>
+    <div class="scroll-item"><div class="circle"><i class="fas fa-tools" style="color: #b45309;"></i></div><span>MRO工业品</span><span class="sub">紧固件·轴承</span></div>
+    <div class="scroll-item"><div class="circle"><i class="fas fa-chart-line" style="color: #6b21a5;"></i></div><span>数据分析</span><span class="sub">BI 工具</span></div>
+    <div class="scroll-item"><div class="circle"><i class="fas fa-briefcase" style="color: #b91c1c;"></i></div><span>企业礼品</span><span class="sub">定制方案</span></div>
+  </div>
+  <!-- 底部导航 (5项) 企业级常用 -->
+  <div class="bottom-nav">
+    <div class="nav-item active"><i class="fas fa-home"></i><span>首页</span></div>
+    <div class="nav-item"><i class="fas fa-th-large"></i><span>分类</span></div>
+    <div class="nav-item"><i class="fas fa-shopping-cart"></i><span>购物车 <span class="badge-dot">3</span></span></div>
+    <div class="nav-item"><i class="fas fa-star"></i><span>收藏</span></div>
+    <div class="nav-item"><i class="fas fa-user-circle"></i><span>我的</span></div>
+  </div>
+</div>
+<!-- 容器结束 -->
+</body>
+</html>

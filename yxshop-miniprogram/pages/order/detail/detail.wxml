@@ -1,0 +1,173 @@
+<view class="detail-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">订单详情</text>
+      <view class="nav-right"></view>
+    </view>
+
+    <!-- 状态区 -->
+    <view wx:if="{{order}}" class="hero-status">
+      <view class="hs-icon">
+        <mp-icon name="{{order.statusIcon}}" size="32" color="#fff"></mp-icon>
+      </view>
+      <view class="hs-text">
+        <text class="hs-title">{{order.statusText}}</text>
+        <text class="hs-sub" wx:if="{{order.statusTip}}">{{order.statusTip}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 内容区 ===== -->
+  <block wx:if="{{order}}">
+    <!-- 物流信息（已发货） -->
+    <view wx:if="{{order.delivery && order.delivery.length}}" class="card logistics-card" bindtap="onLogistics">
+      <view class="lc-icon">
+        <mp-icon name="truck" size="20" color="{{order.flowStatus == 30 ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+      </view>
+      <view class="lc-content">
+        <text class="lc-title">{{order.deliveryText || '查看物流'}}</text>
+        <text class="lc-sub" wx:if="{{order.express_no}}">快递单号：{{order.express_no}}</text>
+      </view>
+      <mp-icon name="chevron-right" size="18" color="#cbd5e1"></mp-icon>
+    </view>
+
+    <!-- 收货地址 -->
+    <view wx:if="{{order.address}}" class="card address-card">
+      <view class="ac-bar"></view>
+      <view class="ac-content">
+        <view class="ac-user">
+          <text class="ac-name">{{order.address.name || order.receiver_name || '收货人'}}</text>
+          <text class="ac-phone">{{order.address.phone || order.receiver_phone || ''}}</text>
+        </view>
+        <view class="ac-addr">
+          <mp-icon name="map-pin" size="16" color="#94a3b8"></mp-icon>
+          <text class="ac-addr-text">{{order.address.full_address || order.address.province_name}}{{order.address.city_name}}{{order.address.district_name}} {{order.address.detail || order.address.address || ''}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="card goods-card">
+      <view class="gc-header">
+        <mp-icon name="home" size="14" color="#2563eb"></mp-icon>
+        <text class="gc-store">{{order.store_name || '远讯商城'}}</text>
+      </view>
+      <view class="gc-list">
+        <view class="gc-item" wx:for="{{order.decoratedItems || []}}" wx:for-item="g" wx:key="gkey">
+          <view class="gc-img-wrap">
+            <image wx:if="{{g.coverUrl}}" class="gc-img" src="{{g.coverUrl}}" mode="aspectFill" lazy-load></image>
+            <view wx:else class="gc-img gc-img-placeholder">
+              <mp-icon name="package" size="24" color="#cbd5e1"></mp-icon>
+            </view>
+          </view>
+          <view class="gc-info">
+            <text class="gc-name">{{g.name}}</text>
+            <view wx:if="{{g.skuTags.length}}" class="gc-sku">
+              <text class="sku-tag" wx:for="{{g.skuTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+            <view class="gc-price-row">
+              <text class="gc-price">¥{{g.priceText}}</text>
+              <text class="gc-qty">x{{g.qtyText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <!-- 买家留言 -->
+      <view wx:if="{{order.buyer_note}}" class="gc-note">
+        <text class="gc-note-label">买家留言</text>
+        <text class="gc-note-text">{{order.buyer_note}}</text>
+      </view>
+    </view>
+
+    <!-- 金额明细 -->
+    <view class="card amount-card">
+      <view class="amt-row">
+        <text class="amt-label">商品总额</text>
+        <text class="amt-value">¥{{order.prettyTotalPrice}}</text>
+      </view>
+      <view wx:if="{{order.express_price > 0}}" class="amt-row">
+        <text class="amt-label">运费</text>
+        <text class="amt-value">+¥{{order.prettyExpress}}</text>
+      </view>
+      <view wx:if="{{order.coupon_price > 0}}" class="amt-row">
+        <text class="amt-label">优惠券</text>
+        <text class="amt-value amt-discount">-¥{{order.prettyCoupon}}</text>
+      </view>
+      <view wx:if="{{order.discount_price > 0}}" class="amt-row">
+        <text class="amt-label">会员折扣</text>
+        <text class="amt-value amt-discount">-¥{{order.prettyDiscount}}</text>
+      </view>
+      <view class="amt-divider"></view>
+      <view class="amt-total-row">
+        <text class="amt-total-label">实付款</text>
+        <text class="amt-total-value">¥{{order.prettyTotal}}</text>
+      </view>
+    </view>
+
+    <!-- 订单信息 -->
+    <view class="card info-card">
+      <view class="ic-row">
+        <text class="ic-label">订单编号</text>
+        <view class="ic-value-wrap" bindtap="onCopyOrderNo">
+          <text class="ic-value">{{order.order_no}}</text>
+          <text class="ic-copy">复制</text>
+        </view>
+      </view>
+      <view class="ic-row">
+        <text class="ic-label">下单时间</text>
+        <text class="ic-value">{{order.prettyDate}}</text>
+      </view>
+      <view wx:if="{{order.pay_time_text}}" class="ic-row">
+        <text class="ic-label">支付时间</text>
+        <text class="ic-value">{{order.pay_time_text}}</text>
+      </view>
+      <view wx:if="{{order.delivery_time_text}}" class="ic-row">
+        <text class="ic-label">发货时间</text>
+        <text class="ic-value">{{order.delivery_time_text}}</text>
+      </view>
+      <view wx:if="{{order.receipt_time_text}}" class="ic-row">
+        <text class="ic-label">收货时间</text>
+        <text class="ic-value">{{order.receipt_time_text}}</text>
+      </view>
+      <view wx:if="{{order.pay_method_text}}" class="ic-row">
+        <text class="ic-label">支付方式</text>
+        <text class="ic-value">{{order.pay_method_text}}</text>
+      </view>
+    </view>
+
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+      <view class="bb-left">
+        <view class="bb-icon-btn" bindtap="onContact">
+          <mp-icon name="headphones" size="20" color="#64748b"></mp-icon>
+          <text class="bb-icon-text">客服</text>
+        </view>
+      </view>
+      <view class="bb-actions">
+          <view
+          wx:for="{{order.actions || []}}"
+          wx:for-item="act"
+          wx:key="action"
+          class="bb-btn bb-btn-{{act.type}}"
+          data-action="{{act.action}}"
+          bindtap="onAction"
+        >
+          <text>{{act.label}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="bottom-spacer"></view>
+  </block>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading}}" class="empty-wrap">
+    <empty text="订单不存在"></empty>
+  </view>
+</view>

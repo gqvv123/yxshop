@@ -1,0 +1,158 @@
+<view class="pe-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">积分商城</text>
+      <view class="nav-rule" bindtap="onShowRules">兑换规则</view>
+    </view>
+    <!-- 积分卡片 -->
+    <view class="points-card">
+      <view class="pc-row">
+        <view class="pc-left">
+          <view class="pc-label">我的积分</view>
+          <view class="pc-num">{{points}} <text class="pc-unit">分</text></view>
+        </view>
+        <view class="pc-icon">
+          <mp-icon name="crown" size="28" color="#fff"></mp-icon>
+        </view>
+      </view>
+      <view class="pc-tips">
+        <view class="pc-tip" bindtap="onGoIntegralLog">
+          <mp-icon name="file-text" size="12" color="rgba(255,255,255,0.7)"></mp-icon>
+          <text>积分明细</text>
+        </view>
+        <view class="pc-tip">
+          <mp-icon name="clock" size="12" color="rgba(255,255,255,0.7)"></mp-icon>
+          <text>年底清零</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 赚积分任务 ===== -->
+  <view class="task-banner">
+    <view class="tb-header">
+      <view class="tb-title">
+        <mp-icon name="zap" size="18" color="#8b5cf6"></mp-icon>
+        <text>赚积分</text>
+      </view>
+      <view class="tb-more" bindtap="onGoTasks">
+        <text>查看全部</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+    <view class="task-grid">
+      <view class="task-item" bindtap="onTaskTap" data-type="sign">
+        <view class="ti-icon ti-icon--blue">
+          <mp-icon name="check-circle" size="20" color="#fff"></mp-icon>
+        </view>
+        <text class="ti-label">每日签到</text>
+        <text class="ti-pts">+5分</text>
+      </view>
+      <view class="task-item" bindtap="onTaskTap" data-type="shop">
+        <view class="ti-icon ti-icon--gold">
+          <mp-icon name="shopping-cart" size="20" color="#fff"></mp-icon>
+        </view>
+        <text class="ti-label">购物得积分</text>
+        <text class="ti-pts">+10分</text>
+      </view>
+      <view class="task-item" bindtap="onTaskTap" data-type="comment">
+        <view class="ti-icon ti-icon--green">
+          <mp-icon name="star" size="20" color="#fff"></mp-icon>
+        </view>
+        <text class="ti-label">评价晒单</text>
+        <text class="ti-pts">+20分</text>
+      </view>
+      <view class="task-item" bindtap="onTaskTap" data-type="invite">
+        <view class="ti-icon ti-icon--purple">
+          <mp-icon name="users" size="20" color="#fff"></mp-icon>
+        </view>
+        <text class="ti-label">邀请好友</text>
+        <text class="ti-pts">+50分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 兑换分类 ===== -->
+  <scroll-view class="cate-strip" scroll-x enable-flex>
+    <view
+      class="cate-pill {{activeCate === index ? 'active' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="*this"
+      data-idx="{{index}}"
+      bindtap="onCateTap"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- ===== 兑换商品网格 ===== -->
+  <view class="exchange-grid" wx:if="{{list.length}}">
+    <view
+      class="ex-card"
+      wx:for="{{list}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onItemTap"
+    >
+      <view class="img-box">
+        <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="ex-img" lazy-load></image>
+        <view wx:else class="img-placeholder">
+          <mp-icon name="package" size="40" color="#cbd5e1"></mp-icon>
+        </view>
+        <view wx:if="{{item.is_hot}}" class="hot-tag">
+          <mp-icon name="flame" size="10" color="#fff"></mp-icon>
+          <text>热门</text>
+        </view>
+        <view class="stock-tag">剩余 {{item.stock}}</view>
+      </view>
+      <view class="ex-info">
+        <view class="ex-name">{{item.name}}</view>
+        <view class="ex-points">
+          <text class="ep-num">{{item.points_exchange}}</text>
+          <text class="ep-unit">分</text>
+          <text wx:if="{{item.price > 0}}" class="ep-extra">+ ¥{{item.price}}</text>
+        </view>
+        <view class="ex-bottom">
+          <text class="ex-sold">已兑 {{item.total_sales}}</text>
+          <view
+            class="ex-btn {{item.points_exchange > points || item.stock <= 0 ? 'ex-btn--disabled' : ''}}"
+            catchtap="onExchange"
+            data-id="{{item.id}}"
+            data-points="{{item.points_exchange}}"
+            data-stock="{{item.stock}}"
+            data-name="{{item.name}}"
+          >
+            {{item.stock <= 0 ? '已抢完' : item.points_exchange > points ? '积分不足' : '兑换'}}
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loading}}">加载中...</view>
+    <view class="load-more" wx:if="{{!loading && !hasMore && list.length}}">没有更多了</view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty text="暂无积分商品"></empty>
+  </view>
+
+  <!-- ===== 兑换记录 ===== -->
+  <view class="record-banner" bindtap="onGoRecords">
+    <view class="rb-left">
+      <view class="rb-icon">
+        <mp-icon name="file-text" size="18" color="#fff"></mp-icon>
+      </view>
+      <view class="rb-text-wrap">
+        <text class="rb-text">兑换记录</text>
+        <text class="rb-sub">查看你的兑换订单和物流</text>
+      </view>
+    </view>
+    <mp-icon name="chevron-right" size="18" color="#94a3b8"></mp-icon>
+  </view>
+</view>

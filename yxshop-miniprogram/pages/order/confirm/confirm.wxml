@@ -1,0 +1,100 @@
+<view class="confirm-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">确认订单</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="address-card" bindtap="onPickAddress">
+    <block wx:if="{{address}}">
+      <view class="addr-top">
+        <mp-icon name="map-pin" size="16" color="var(--primary)"></mp-icon>
+        <text class="addr-name">{{address.name}}</text>
+        <text class="addr-phone">{{address.phone}}</text>
+      </view>
+      <view class="addr-detail">
+        {{address.province_name}}{{address.city_name}}{{address.district_name}} {{address.detail}}
+      </view>
+    </block>
+    <view wx:else class="addr-empty">
+      <mp-icon name="map-pin" size="20" color="var(--text-3)"></mp-icon>
+      <text>点击选择收货地址</text>
+    </view>
+    <mp-icon name="chevron-right" size="16" color="var(--text-3)"></mp-icon>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-card" wx:if="{{goods.length}}">
+    <view class="gc-header">
+      <mp-icon name="package" size="16" color="var(--primary)"></mp-icon>
+      <text>商品信息</text>
+    </view>
+    <view class="goods-item" wx:for="{{goods}}" wx:key="id">
+      <image class="goods-cover" src="{{item.main_image || item.cover || ''}}" mode="aspectFill" lazy-load></image>
+      <view class="goods-info">
+        <view class="goods-name ellipsis-2">{{item.goods_name || item.name}}</view>
+        <view wx:if="{{item.spec_key_name}}" class="goods-spec">{{item.spec_key_name}}</view>
+        <view class="goods-bottom">
+          <text class="goods-price">¥{{item.price || item.sale_price || '0.00'}}</text>
+          <text class="goods-qty">×{{item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="form-card">
+    <view class="fc-label">订单备注</view>
+    <input class="fc-input" placeholder="选填，50字以内" placeholder-class="ph" maxlength="50" bindinput="onRemarkInput" />
+  </view>
+
+  <!-- 支付方式 -->
+  <view class="form-card">
+    <view class="fc-label">支付方式</view>
+    <radio-group class="pay-options" bindchange="onPaymentChange">
+      <label class="pay-option">
+        <radio value="wechat" checked="{{paymentMethod === 'wechat'}}" color="var(--primary)"/>
+        <view class="po-info">
+          <mp-icon name="message" size="18" color="#10b981"></mp-icon>
+          <text>微信支付</text>
+        </view>
+      </label>
+      <label class="pay-option">
+        <radio value="alipay" checked="{{paymentMethod === 'alipay'}}" color="var(--primary)"/>
+        <view class="po-info">
+          <mp-icon name="credit-card" size="18" color="#3b82f6"></mp-icon>
+          <text>支付宝</text>
+        </view>
+      </label>
+    </radio-group>
+  </view>
+
+  <!-- 合计 -->
+  <view class="summary-card">
+    <view class="sum-row">
+      <text>商品合计</text>
+      <text class="sum-price">¥{{totalPrice}}</text>
+    </view>
+    <view class="sum-row sub">
+      <text>共 {{totalQty}} 件商品</text>
+    </view>
+  </view>
+
+  <!-- 底部 -->
+  <view class="bottom-bar safe-area-bottom">
+    <view class="bb-total">
+      <text>合计</text>
+      <text class="bb-price">¥{{totalPrice}}</text>
+    </view>
+    <view class="bb-submit {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '处理中…' : '提交订单'}}
+    </view>
+  </view>
+</view>

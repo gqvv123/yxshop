@@ -1,0 +1,18 @@
+<view class="search-bar {{hero ? 'hero' : ''}}" bindtap="onTap">
+  <view class="city-btn" wx:if="{{showCity}}" catchtap="onCityTap">
+    <mp-icon name="map-pin" size="12" color="{{hero ? '#fff' : '#2563eb'}}"></mp-icon>
+    <text class="city-name">{{cityName}}</text>
+    <mp-icon name="chevron-down" size="9" color="{{hero ? 'rgba(255,255,255,0.7)' : '#94a3b8'}}"></mp-icon>
+  </view>
+  <view class="search-box {{style === 'square' ? 'square' : 'rounded'}}">
+    <mp-icon name="search" size="16" color="#94a3b8"></mp-icon>
+    <text class="placeholder">{{placeholder}}</text>
+    <view class="scan-btn" wx:if="{{showScan}}" catchtap="onScanTap">
+      <mp-icon name="scan" size="18" color="#2563eb"></mp-icon>
+    </view>
+  </view>
+  <view class="msg-btn" wx:if="{{showMsg}}" catchtap="onMsgTap">
+    <mp-icon name="message" size="20" color="{{hero ? '#fff' : '#94a3b8'}}"></mp-icon>
+    <view class="msg-red-dot" wx:if="{{msgDot}}"></view>
+  </view>
+</view>

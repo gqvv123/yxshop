@@ -1,0 +1,23 @@
+{
+  "navigationBarTitleText": "远讯商城",
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "goods-card": "/components/goods-card/index",
+    "empty": "/components/empty/index",
+    "mp-search-bar": "/components/mini-page/search-bar/index",
+    "mp-swiper": "/components/mini-page/swiper/index",
+    "mp-notice-bar": "/components/mini-page/notice-bar/index",
+    "mp-rich-text": "/components/mini-page/rich-text/index",
+    "mp-image-ad": "/components/mini-page/image-ad/index",
+    "mp-grid-nav": "/components/mini-page/grid-nav/index",
+    "mp-product-list": "/components/mini-page/product-list/index",
+    "mp-coupon": "/components/mini-page/coupon/index",
+    "mp-coupon-receive": "/components/mini-page/coupon-receive/index",
+    "mp-point-exchange": "/components/mini-page/point-exchange/index",
+    "mp-promo-banner": "/components/mini-page/promo-banner/index",
+    "mp-promo-grid": "/components/mini-page/promo-grid/index",
+    "mp-brand-zone": "/components/mini-page/brand-zone/index",
+    "privacy-popup": "/components/privacy-popup/index"
+  }
+}

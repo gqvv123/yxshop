@@ -1,0 +1,55 @@
+<view class="fp-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">浏览记录</text>
+      <view class="nav-action" wx:if="{{list.length}}" bindtap="onClearAll">
+        <mp-icon name="trash" size="16" color="rgba(255,255,255,0.9)"></mp-icon>
+        <text>清空</text>
+      </view>
+      <view wx:else class="nav-placeholder"></view>
+    </view>
+    <view class="fp-stats" wx:if="{{list.length}}">
+      <mp-icon name="eye" size="14" color="rgba(255,255,255,0.7)"></mp-icon>
+      <text>共浏览过 {{total}} 件商品</text>
+    </view>
+  </view>
+
+  <!-- ===== 浏览记录列表 ===== -->
+  <view class="fp-list" wx:if="{{list.length}}">
+    <view class="fp-card" wx:for="{{list}}" wx:key="view_id" data-id="{{item.item_id}}" bindtap="onItemTap">
+      <view class="fp-img-box">
+        <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="fp-img" lazy-load></image>
+        <view wx:else class="fp-img-placeholder">
+          <mp-icon name="package" size="36" color="#cbd5e1"></mp-icon>
+        </view>
+      </view>
+      <view class="fp-info">
+        <view class="fp-name">{{item.name}}</view>
+        <view class="fp-meta">
+          <text class="fp-price">¥{{item.price}}</text>
+          <view class="fp-view-count" wx:if="{{item.view_count > 1}}">
+            <mp-icon name="eye" size="12" color="#94a3b8"></mp-icon>
+            <text>浏览 {{item.view_count}} 次</text>
+          </view>
+        </view>
+        <view class="fp-time">{{item.viewed_at_text}}</view>
+      </view>
+      <view class="fp-remove" data-view-id="{{item.view_id}}" catchtap="onRemoveOne">
+        <mp-icon name="trash" size="16" color="#94a3b8"></mp-icon>
+      </view>
+    </view>
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loading}}">加载中...</view>
+    <view class="load-more" wx:if="{{!loading && !hasMore && list.length}}">没有更多了</view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty text="暂无浏览记录"></empty>
+  </view>
+</view>

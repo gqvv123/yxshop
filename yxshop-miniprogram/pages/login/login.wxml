@@ -1,0 +1,148 @@
+<view class="login-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+
+    <!-- 返回按钮 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <view class="nav-spacer"></view>
+    </view>
+
+    <!-- 品牌 Logo -->
+    <view class="brand-area">
+      <view class="brand-logo">
+        <mp-icon name="shopping-cart" size="40" color="#fff"></mp-icon>
+      </view>
+      <view class="brand-name">远讯商城</view>
+      <view class="brand-slogan">企业级采购 · 一站式服务</view>
+    </view>
+  </view>
+
+  <!-- ===== 白色内容区 ===== -->
+  <view class="content-body">
+    <!-- 标题区 -->
+    <view class="form-title-area">
+      <text class="form-title">{{mode === 'register' ? '注册新账号' : '欢迎回来'}}</text>
+      <text class="form-subtitle">{{mode === 'register' ? '创建账号开启采购之旅' : '登录您的账号继续使用'}}</text>
+    </view>
+
+    <!-- 微信一键登录 -->
+    <button class="btn-wx {{wxSubmitting ? 'disabled' : ''}}" bindtap="onWxLogin" disabled="{{wxSubmitting}}">
+      <view class="wx-icon-wrap">
+        <mp-icon name="message" size="20" color="#fff"></mp-icon>
+      </view>
+      <text>{{wxSubmitting ? '登录中…' : '微信一键登录'}}</text>
+    </button>
+
+    <!-- 分割线 -->
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">或使用账号{{mode === 'register' ? '注册' : '登录'}}</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <!-- 表单 -->
+    <view class="form-card">
+      <!-- 账号 -->
+      <view class="form-item">
+        <view class="form-icon">
+          <mp-icon name="user-circle" size="18" color="#94a3b8"></mp-icon>
+        </view>
+        <input
+          class="form-input"
+          placeholder="请输入手机号或用户名"
+          placeholder-class="placeholder"
+          data-field="username"
+          bindinput="onInput"
+          value="{{form.username}}"
+        />
+      </view>
+
+      <!-- 注册模式：手机号 -->
+      <view wx:if="{{mode === 'register'}}" class="form-item">
+        <view class="form-icon">
+          <mp-icon name="bell" size="18" color="#94a3b8"></mp-icon>
+        </view>
+        <input
+          class="form-input"
+          placeholder="11 位手机号"
+          placeholder-class="placeholder"
+          type="number"
+          maxlength="11"
+          data-field="phone"
+          bindinput="onInput"
+          value="{{form.phone}}"
+        />
+      </view>
+
+      <!-- 注册模式：昵称 -->
+      <view wx:if="{{mode === 'register'}}" class="form-item">
+        <view class="form-icon">
+          <mp-icon name="user-circle" size="18" color="#94a3b8"></mp-icon>
+        </view>
+        <input
+          class="form-input"
+          placeholder="昵称（可选）"
+          placeholder-class="placeholder"
+          data-field="nickname"
+          bindinput="onInput"
+          value="{{form.nickname}}"
+        />
+      </view>
+
+      <!-- 密码 -->
+      <view class="form-item form-item-last">
+        <view class="form-icon">
+          <mp-icon name="lock" size="18" color="#94a3b8"></mp-icon>
+        </view>
+        <input
+          class="form-input"
+          placeholder="至少 6 位密码"
+          placeholder-class="placeholder"
+          password="{{!showPassword}}"
+          data-field="password"
+          bindinput="onInput"
+          value="{{form.password}}"
+        />
+        <view class="pwd-toggle" bindtap="onTogglePassword">
+          <mp-icon name="{{showPassword ? 'eye' : 'eye-off'}}" size="18" color="#94a3b8"></mp-icon>
+        </view>
+      </view>
+    </view>
+
+    <!-- 忘记密码（仅登录模式） -->
+    <view wx:if="{{mode === 'login'}}" class="forgot-row" bindtap="onForgotPassword">
+      <text>忘记密码？</text>
+    </view>
+
+    <!-- 协议勾选 -->
+    <view class="agreement-row">
+      <view class="check-box {{agreed ? 'checked' : ''}}" bindtap="onToggleAgree">
+        <mp-icon wx:if="{{agreed}}" name="check" size="14" color="#fff"></mp-icon>
+      </view>
+      <view class="agreement-text">
+        <text>我已阅读并同意</text>
+        <text class="agreement-link" catchtap="onViewTerms">《用户协议》</text>
+        <text>和</text>
+        <text class="agreement-link" catchtap="onViewPrivacy">《隐私政策》</text>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="btn-submit {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '处理中…' : (mode === 'register' ? '注册并登录' : '登 录')}}
+    </button>
+
+    <!-- 切换登录/注册 -->
+    <view class="switch-mode">
+      <text wx:if="{{mode === 'login'}}" data-mode="register" bindtap="switchMode">没有账号？<text class="switch-highlight">立即注册</text></text>
+      <text wx:else data-mode="login" bindtap="switchMode">已有账号？<text class="switch-highlight">返回登录</text></text>
+    </view>
+
+    <view style="height: 60rpx;"></view>
+  </view>
+</view>

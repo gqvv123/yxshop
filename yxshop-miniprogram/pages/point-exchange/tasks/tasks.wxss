@@ -1,0 +1,188 @@
+/* tasks — 积分任务页面 */
+.tasks-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+.top-hero {
+  background: linear-gradient(160deg, #4c1d95 0%, #6b21a8 45%, #8b5cf6 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco-1 {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder {
+  width: 64rpx;
+}
+.points-bar {
+  margin: 32rpx 32rpx 0 32rpx;
+  background: rgba(255,255,255,0.12);
+  border: 1rpx solid rgba(255,255,255,0.15);
+  border-radius: 20rpx;
+  padding: 24rpx 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  position: relative;
+  z-index: 2;
+}
+.pb-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 16rpx rgba(245,158,11,0.3);
+}
+.pb-text {
+  color: rgba(255,255,255,0.7);
+  font-size: 24rpx;
+  flex: 1;
+}
+.pb-num {
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.task-section {
+  padding: 24rpx;
+}
+.task-card {
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: var(--shadow-sm);
+}
+.tc-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tc-icon--0 {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+.tc-icon--1 {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+.tc-icon--2 {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+.tc-icon--3 {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+.tc-info {
+  flex: 1;
+  min-width: 0;
+}
+.tc-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-1);
+  display: block;
+}
+.tc-desc {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+  display: block;
+}
+.tc-progress {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+.tc-progress-bar {
+  flex: 1;
+  height: 8rpx;
+  background: var(--bg-soft);
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+.tc-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  border-radius: 999rpx;
+}
+.tc-progress-text {
+  font-size: 20rpx;
+  color: var(--text-3);
+}
+.tc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+.tc-points {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--accent);
+}
+.tc-btn {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+}
+.tc-btn--todo {
+  background: var(--primary-50);
+  color: var(--primary);
+}
+.tc-btn--claimable {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(245,158,11,0.3);
+}
+.tc-btn--done {
+  background: var(--bg-soft);
+  color: var(--text-3);
+}
+.empty-wrap {
+  padding-top: 120rpx;
+}

@@ -1,0 +1,46 @@
+<view class="records-page">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="nav-row">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">兑换记录</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="record-list" wx:if="{{list.length}}">
+    <view class="record-card" wx:for="{{list}}" wx:key="id">
+      <view class="rc-top">
+        <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="rc-img"></image>
+        <view wx:else class="rc-img rc-img--placeholder">
+          <mp-icon name="package" size="32" color="#cbd5e1"></mp-icon>
+        </view>
+        <view class="rc-info">
+          <text class="rc-name">{{item.name || item.item_name || '积分商品'}}</text>
+          <view class="rc-meta">
+            <text class="rc-points">-{{item.points_cost || item.points || 0}} 积分</text>
+            <text wx:if="{{item.money_cost > 0}}" class="rc-money">+¥{{item.money_cost}}</text>
+          </view>
+          <text class="rc-date">{{item.created_at}}</text>
+        </view>
+        <view class="rc-status rc-status--{{item.statusClass}}">{{item.statusText}}</view>
+      </view>
+      <view wx:if="{{item.express_no}}" class="rc-express">
+        <mp-icon name="truck" size="14" color="#475569"></mp-icon>
+        <text>{{item.express_name || '快递'}}：{{item.express_no}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="load-more" wx:if="{{loading}}">加载中...</view>
+  <view class="load-more" wx:if="{{!loading && !hasMore && list.length}}">没有更多了</view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty emoji="📦" text="暂无兑换记录" subText="去积分商城兑换好物吧"></empty>
+  </view>
+</view>

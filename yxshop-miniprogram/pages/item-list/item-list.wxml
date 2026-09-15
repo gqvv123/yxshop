@@ -1,0 +1,52 @@
+<view class="list-page">
+  <!-- 筛选排序栏 -->
+  <view class="filter-bar">
+    <view class="filter-tab {{sortType === 'default' ? 'active' : ''}}" data-sort="default" bindtap="onSortChange">
+      <text>综合</text>
+    </view>
+    <view class="filter-tab {{sortType === 'sales' ? 'active' : ''}}" data-sort="sales" bindtap="onSortChange">
+      <text>销量</text>
+    </view>
+    <view class="filter-tab {{sortType === 'price' ? 'active' : ''}}" data-sort="price" bindtap="onSortChange">
+      <text>价格</text>
+      <text class="sort-arrow">{{sortPriceAsc ? '↑' : '↓'}}</text>
+    </view>
+    <view class="filter-tab" bindtap="onToggleLayout">
+      <text class="layout-icon">{{isGridLayout ? '☰' : '▦'}}</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view wx:if="{{items.length}}" class="goods-container {{isGridLayout ? 'grid-2' : 'list-1'}}">
+    <goods-card wx:for="{{items}}" wx:key="id" item="{{item}}" layout="{{isGridLayout ? 'grid' : 'list'}}"></goods-card>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading}}" class="empty-wrap">
+    <empty emoji="🔍" text="没有找到商品" subText="换个关键词试试吧"></empty>
+  </view>
+
+  <!-- 加载中骨架屏 -->
+  <view wx:if="{{loading && !items.length}}" class="loading-skeleton {{isGridLayout ? 'grid-2' : 'list-1'}}">
+    <view class="sk-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+      <view class="sk-img skeleton-anim"></view>
+      <view class="sk-line skeleton-anim"></view>
+      <view class="sk-line-short skeleton-anim"></view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{loading && items.length}}" class="loading-more">
+    <text class="loading-dot">●</text>
+    <text class="loading-dot">●</text>
+    <text class="loading-dot">●</text>
+    <text class="loading-text">加载中…</text>
+  </view>
+
+  <!-- 到底提示 -->
+  <view wx:if="{{finished && items.length}}" class="finished-tip">
+    <view class="finished-line"></view>
+    <text class="finished-text">已经到底了</text>
+    <view class="finished-line"></view>
+  </view>
+</view>

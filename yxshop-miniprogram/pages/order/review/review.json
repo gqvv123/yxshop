@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "评价订单",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index"
+  }
+}

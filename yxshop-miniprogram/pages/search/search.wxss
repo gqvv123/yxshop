@@ -1,0 +1,133 @@
+/* search — 企业级搜索页（蓝色渐变风格） */
+.search-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+
+/* 搜索框 */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 24rpx 32rpx 0;
+  background: var(--card);
+  border-radius: var(--r-full);
+  padding: 0 28rpx;
+  height: 80rpx;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.08);
+}
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-1);
+  height: 80rpx;
+}
+.ph {
+  color: var(--text-3);
+}
+.clear-btn {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ========== 通用区块 ========== */
+.section {
+  margin: 24rpx;
+  background: var(--card);
+  border-radius: var(--r-lg);
+  padding: 28rpx 32rpx;
+  box-shadow: var(--shadow-sm);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 24rpx;
+}
+.section-title {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.clear-action {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* 标签列表 */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.tag-pill {
+  background: var(--bg-soft);
+  padding: 14rpx 28rpx;
+  border-radius: var(--r-full);
+  font-size: 26rpx;
+  color: var(--text-2);
+  transition: all 0.2s;
+}
+.tag-pill:active {
+  transform: scale(0.96);
+}
+.tag-hot {
+  background: var(--primary-50);
+  color: var(--primary);
+  font-weight: 600;
+}

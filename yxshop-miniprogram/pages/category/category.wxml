@@ -1,0 +1,98 @@
+<view class="cate-page">
+  <!-- 搜索栏（蓝色渐变背景） -->
+  <view class="search-bar" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="search-box" bindtap="onSearchTap">
+      <mp-icon name="search" size="16" color="#94a3b8"></mp-icon>
+      <text class="search-placeholder">搜索商品、品牌、品类…</text>
+      <mp-icon name="grid" size="16" color="#94a3b8"></mp-icon>
+    </view>
+  </view>
+
+  <!-- 主体 -->
+  <view class="cate-body">
+    <!-- 左侧分类 -->
+    <scroll-view class="left-panel" scroll-y enhanced show-scrollbar="{{false}}">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="left-item {{index === currentIndex ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onCategoryTap"
+      >
+        <view wx:if="{{index === currentIndex}}" class="left-bar"></view>
+        <text class="left-name">{{item.name}}</text>
+      </view>
+      <view style="height: 40rpx;"></view>
+    </scroll-view>
+
+    <!-- 右侧内容 -->
+    <scroll-view class="right-panel" scroll-y enhanced show-scrollbar="{{false}}">
+      <!-- 分类Banner -->
+      <view class="cate-banner">
+        <view class="cate-banner-text">
+          <view class="cb-title">{{currentCategory.name || '精选好物'}}</view>
+          <view class="cb-sub">{{currentCategory.desc || '品质优选 · 正品保障'}}</view>
+          <view class="cb-tag">
+            <text class="cb-tag-icon">🛡️</text>
+            <text class="cb-tag-text">假一赔十</text>
+          </view>
+        </view>
+        <view class="cate-banner-deco">
+          <image wx:if="{{currentCategory.image}}" class="cb-image" src="{{currentCategory.image}}" mode="aspectFill"></image>
+          <text wx:else class="cb-emoji">🛍️</text>
+        </view>
+      </view>
+
+      <!-- 子分类网格 -->
+      <view wx:if="{{subCategories.length}}" class="sub-grid">
+        <view
+          wx:for="{{subCategories}}"
+          wx:key="id"
+          class="sub-item"
+          data-id="{{item.id}}"
+          data-index="{{index}}"
+          bindtap="onSubCategoryTap"
+        >
+          <view class="sub-icon sub-icon-{{index % 6}}">
+            <image wx:if="{{item.icon}}" class="sub-icon-img" src="{{item.icon}}" mode="aspectFit"></image>
+            <text wx:else class="sub-icon-emoji">{{item.emoji || '📦'}}</text>
+          </view>
+          <text class="sub-name">{{item.name}}</text>
+        </view>
+      </view>
+
+      <!-- 热门商品标题 -->
+      <view wx:if="{{items.length || loading}}" class="section-label">
+        <text class="section-icon">🔥</text>
+        <text class="section-text">热门商品</text>
+      </view>
+
+      <!-- 商品列表 -->
+      <view wx:if="{{items.length}}" class="product-grid">
+        <goods-card
+          wx:for="{{items}}"
+          wx:key="id"
+          item="{{item}}"
+          show-cart-btn="{{true}}"
+          bind:cart="onAddCart"
+        ></goods-card>
+      </view>
+
+      <!-- 加载中骨架屏 -->
+      <view wx:elif="{{loading}}" class="loading-skeleton">
+        <view class="sk-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="sk-img skeleton-anim"></view>
+          <view class="sk-line skeleton-anim"></view>
+          <view class="sk-line-short skeleton-anim"></view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:elif="{{!loading && categories.length}}" class="empty-wrap">
+        <empty emoji="📭" text="该分类下暂无商品" subText="请看看其他分类吧"></empty>
+      </view>
+
+      <view style="height: 40rpx;"></view>
+    </scroll-view>
+  </view>
+</view>

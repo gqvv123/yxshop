@@ -1,0 +1,127 @@
+<view class="order-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" style="visibility: hidden;"></view>
+      <text class="nav-title">我的订单</text>
+      <view class="nav-search" bindtap="onSearch">
+        <mp-icon name="search" size="20" color="rgba(255,255,255,0.9)"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Tab 切换 ===== -->
+  <scroll-view class="tab-scroll" scroll-x enable-flex>
+    <view class="tab-bar">
+      <view
+        wx:for="{{tabs}}"
+        wx:key="key"
+        class="tab-item {{current === index ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onTabTap"
+      >
+        <text>{{item.label}}</text>
+        <view wx:if="{{item.badge > 0}}" class="tab-badge">{{item.badge}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- ===== 订单列表 ===== -->
+  <view wx:if="{{items.length}}" class="order-list">
+    <view
+      class="order-card"
+      wx:for="{{items}}"
+      wx:key="key"
+      data-id="{{item.order_id || item.id}}"
+      bindtap="onItemTap"
+    >
+      <!-- 卡片头部：店铺 + 状态 -->
+      <view class="oc-header">
+        <view class="oc-store">
+          <mp-icon name="home" size="14" color="#2563eb"></mp-icon>
+          <text class="oc-store-name">{{item.store_name || '远讯商城'}}</text>
+        </view>
+        <text class="oc-status oc-status-{{item.statusClass}}">{{item.statusText}}</text>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="oc-items">
+        <view
+          class="oc-item"
+          wx:for="{{item.items || []}}"
+          wx:for-item="g"
+          wx:key="gkey"
+        >
+          <!-- 商品图片 -->
+          <view class="oc-img-wrap">
+            <image
+              wx:if="{{g.coverUrl}}"
+              class="oc-img"
+              src="{{g.coverUrl}}"
+              mode="aspectFill"
+              lazy-load
+            ></image>
+            <view wx:else class="oc-img oc-img-placeholder">
+              <mp-icon name="package" size="24" color="#cbd5e1"></mp-icon>
+            </view>
+          </view>
+          <!-- 商品信息 -->
+          <view class="oc-info">
+            <text class="oc-name">{{g.name}}</text>
+            <view wx:if="{{g.skuTags.length}}" class="oc-sku">
+              <text class="sku-tag" wx:for="{{g.skuTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+            <view class="oc-price-row">
+              <text class="oc-price">¥{{g.priceText}}</text>
+              <text class="oc-qty">x{{g.qtyText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 卡片底部：合计 + 操作按钮 -->
+      <view class="oc-footer">
+        <view class="oc-total">
+          <text class="oc-total-label">{{item.footerLabel}}</text>
+          <text class="oc-total-amount">¥{{item.prettyTotal}}</text>
+        </view>
+        <view class="oc-actions" catchtap="">
+          <view
+            wx:for="{{item.actions || []}}"
+            wx:for-item="act"
+            wx:key="akey"
+            class="oc-btn oc-btn-{{act.type}}"
+            data-action="{{act.action}}"
+            data-id="{{item.order_id || item.id}}"
+            catchtap="onAction"
+          >
+            <mp-icon
+              wx:if="{{act.icon}}"
+              name="{{act.icon}}"
+              size="12"
+              color="{{act.iconColor}}"
+            ></mp-icon>
+            <text>{{act.label}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading}}" class="empty-wrap">
+    <empty text="还没有相关订单"></empty>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{loading && items.length}}" class="loading-tip">
+    <text>加载中…</text>
+  </view>
+  <view wx:if="{{finished && items.length}}" class="loading-tip">
+    <text>没有更多了</text>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

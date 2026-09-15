@@ -1,0 +1,170 @@
+/* order/review — 企业级评价页（蓝色渐变风格） */
+.review-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+
+/* ========== 通用卡片 ========== */
+.section-card {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  margin: 20rpx 24rpx 0;
+  padding: 28rpx 32rpx;
+  box-shadow: var(--shadow-sm);
+}
+.section-card.row-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 28rpx;
+  color: var(--text-1);
+  font-weight: 600;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 20rpx;
+}
+
+/* 评分 */
+.stars {
+  display: flex;
+  gap: 20rpx;
+}
+.star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rating-text {
+  font-size: 24rpx;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 12rpx;
+  display: block;
+}
+
+/* 评价内容 */
+.content-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 28rpx;
+  color: var(--text-1);
+  line-height: 1.6;
+}
+.ph {
+  color: var(--text-3);
+}
+.char-count {
+  text-align: right;
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+}
+
+/* 图片上传 */
+.img-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.img-wrap {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+.img-item {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-md);
+}
+.img-del {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-add {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed var(--line);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-soft);
+}
+
+/* 提交按钮 */
+.submit-area {
+  padding: 32rpx 24rpx 0;
+}
+.submit-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: var(--r-full);
+  font-size: 30rpx;
+  font-weight: 700;
+  box-shadow: 0 8rpx 24rpx rgba(37,99,235,0.25);
+}
+.submit-btn.disabled {
+  opacity: 0.6;
+}
+.submit-btn::after {
+  border: none;
+}

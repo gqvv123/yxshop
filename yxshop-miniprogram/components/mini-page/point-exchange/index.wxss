@@ -1,0 +1,104 @@
+/* point-exchange — 企业级积分兑换 */
+.point-exchange {
+  background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+  margin: 12rpx 24rpx 0;
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid rgba(139,92,246,0.06);
+}
+
+/* 头部 */
+.pe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16rpx;
+}
+.pe-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.pe-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #6b21a8;
+}
+.pe-more {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.pe-more-text {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+.pe-more-arrow {
+  font-size: 26rpx;
+  color: #94a3b8;
+}
+
+/* 列表 */
+.pe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.pe-card {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx;
+  background: #fff;
+  border-radius: 14rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
+}
+.pe-cover {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+.pe-cover-wrap .cover-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-radius: 12rpx;
+}
+.pe-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+.pe-name {
+  font-size: 26rpx;
+  color: #0f172a;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pe-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pe-points {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #6b21a8;
+}
+.pe-btn {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 20rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 10rpx rgba(139,92,246,0.2);
+}

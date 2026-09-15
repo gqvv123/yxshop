@@ -1,0 +1,213 @@
+/* logistics — 物流追踪页面 */
+.logistics-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+.top-bar {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 40rpx 32rpx 40rpx;
+  position: relative;
+  overflow: hidden;
+}
+.nav-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-refresh {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 快递信息卡 */
+.express-card {
+  margin: -16rpx 24rpx 0 24rpx;
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 3;
+}
+.ec-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6rpx 16rpx rgba(37,99,235,0.2);
+}
+.ec-info {
+  flex: 1;
+  min-width: 0;
+}
+.ec-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  display: block;
+}
+.ec-no {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-top: 6rpx;
+  display: block;
+}
+.ec-copy {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  background: var(--primary-50);
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+.ec-copy text {
+  font-size: 22rpx;
+  color: var(--primary);
+  font-weight: 600;
+}
+.ec-copy--done {
+  background: #ecfdf5;
+}
+.ec-copy--done text {
+  color: var(--success);
+}
+
+/* 物流轨迹 */
+.traces-section {
+  margin: 24rpx;
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 32rpx 24rpx;
+  box-shadow: var(--shadow-sm);
+}
+.ts-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+}
+.ts-title text {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.trace-list {
+  padding-left: 8rpx;
+}
+.trace-item {
+  display: flex;
+  gap: 20rpx;
+  min-height: 100rpx;
+}
+.ti-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 24rpx;
+}
+.ti-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: var(--line);
+  border: 4rpx solid var(--bg);
+  margin-top: 6rpx;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.trace-item--latest .ti-dot {
+  width: 24rpx;
+  height: 24rpx;
+  background: var(--primary);
+  border: 4rpx solid var(--primary-50);
+  box-shadow: 0 0 0 6rpx rgba(37,99,235,0.1);
+}
+.ti-line {
+  flex: 1;
+  width: 2rpx;
+  background: var(--line);
+  margin-top: 4rpx;
+  margin-bottom: 4rpx;
+}
+.ti-content {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 24rpx;
+}
+.ti-text {
+  font-size: 26rpx;
+  color: var(--text-2);
+  line-height: 1.5;
+  display: block;
+}
+.trace-item--latest .ti-text {
+  color: var(--text-1);
+  font-weight: 600;
+}
+.ti-time {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 加载中 */
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120rpx;
+  gap: 20rpx;
+}
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid var(--line);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loading-text {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+.empty-wrap {
+  padding-top: 120rpx;
+}
