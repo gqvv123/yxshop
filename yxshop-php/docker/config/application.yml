@@ -1,0 +1,187 @@
+# YXShop Webman 应用配置
+app:
+  name: yxshop-php
+  version: 1.0.0
+  description: 基于Webman的电商系统API
+  debug: ${APP_DEBUG:false}
+  env: ${APP_ENV:production}
+  timezone: ${TZ:Asia/Shanghai}
+
+# 服务器配置
+server:
+  listen: 0.0.0.0:8787
+  processes: ${WORKER_PROCESSES:4}
+  reloadable: true
+  max_request: 1000000
+  max_package_size: 10M
+
+# Nacos配置中心
+nacos:
+  server_addr: ${NACOS_SERVER_ADDR:localhost:8848}
+  namespace: ${NACOS_NAMESPACE:yxshop}
+  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  config:
+    data_id: yxshop-php.yml
+    group: DEFAULT_GROUP
+    refresh: true
+  discovery:
+    service_name: yxshop-php
+    group: DEFAULT_GROUP
+    weight: 1
+    enabled: true
+
+# 数据库配置
+database:
+  default: mysql
+  connections:
+    mysql:
+      driver: mysql
+      host: ${DB_HOST:mysql}
+      port: ${DB_PORT:3306}
+      database: ${DB_DATABASE:yxshop}
+      username: ${DB_USERNAME:yxshop}
+      password: ${DB_PASSWORD:secret}
+      charset: utf8mb4
+      collation: utf8mb4_unicode_ci
+      prefix: ''
+      strict: true
+      engine: InnoDB
+      options:
+        PDO::ATTR_CASE: PDO::CASE_NATURAL
+        PDO::ATTR_ERRMODE: PDO::ERRMODE_EXCEPTION
+        PDO::ATTR_ORACLE_NULLS: PDO::NULL_NATURAL
+        PDO::ATTR_STRINGIFY_FETCHES: false
+        PDO::ATTR_EMULATE_PREPARES: false
+
+# Redis配置
+redis:
+  default:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 0
+    timeout: 5.0
+    retry_interval: 100
+    read_timeout: 0
+    context: null
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.yxshop: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: /app/runtime/logs/yxshop-php.log
+    max-size: 100MB
+    max-history: 30
+
+# 业务配置
+yxshop:
+  # 应用信息
+  app:
+    name: YXShop商城系统
+    version: 1.0.0
+    description: 基于Webman的电商系统
+    
+  # 版本控制
+  version:
+    default: basic
+    features:
+      basic:
+        - user_management
+        - product_management
+        - order_management
+        - inventory_management
+        - payment_management
+      professional:
+        - advanced_coupon
+        - advanced_discount
+        - promotion_management
+        - points_system
+        - order_batch
+        - inventory_warning
+        - user_analytics
+        - notification_system
+        - basic_analytics
+      enterprise:
+        - distribution_system
+        - multi_warehouse
+        - advanced_logistics
+        - after_sales_management
+        - review_management
+        - miniprogram_management
+        - system_management
+        - advanced_analytics
+        - multi_tenant
+        - multi_language
+        - api_management
+
+  # 支付配置
+  payment:
+    wechat:
+      app_id: ${WECHAT_APP_ID:}
+      app_secret: ${WECHAT_APP_SECRET:}
+      mch_id: ${WECHAT_MCH_ID:}
+      key: ${WECHAT_KEY:}
+      notify_url: ${WECHAT_NOTIFY_URL:http://localhost/api/payment/wechat/notify}
+    alipay:
+      app_id: ${ALIPAY_APP_ID:}
+      private_key: ${ALIPAY_PRIVATE_KEY:}
+      public_key: ${ALIPAY_PUBLIC_KEY:}
+      notify_url: ${ALIPAY_NOTIFY_URL:http://localhost/api/payment/alipay/notify}
+      return_url: ${ALIPAY_RETURN_URL:http://localhost/payment/return}
+
+  # 短信配置
+  sms:
+    driver: aliyun
+    aliyun:
+      access_key_id: ${SMS_ALIYUN_ACCESS_KEY_ID:}
+      access_key_secret: ${SMS_ALIYUN_ACCESS_KEY_SECRET:}
+      sign_name: ${SMS_ALIYUN_SIGN_NAME:YXShop}
+      template_code: ${SMS_ALIYUN_TEMPLATE_CODE:}
+
+  # 邮件配置
+  mail:
+    driver: smtp
+    host: ${MAIL_HOST:smtp.qq.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    encryption: ${MAIL_ENCRYPTION:tls}
+    from:
+      address: ${MAIL_FROM_ADDRESS:}
+      name: ${MAIL_FROM_NAME:YXShop}
+
+  # 文件存储配置
+  storage:
+    driver: local
+    local:
+      root: /app/public/uploads
+    oss:
+      access_key_id: ${AWS_ACCESS_KEY_ID:}
+      access_key_secret: ${AWS_SECRET_ACCESS_KEY:}
+      bucket: ${AWS_BUCKET:}
+      region: ${AWS_DEFAULT_REGION:}
+
+  # 监控配置
+  monitoring:
+    sentry:
+      dsn: ${SENTRY_LARAVEL_DSN:}
+      traces_sample_rate: ${SENTRY_TRACES_SAMPLE_RATE:0.1}
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true

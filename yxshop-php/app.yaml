@@ -1,0 +1,196 @@
+# YXShop 商城系统 - 应用基础配置
+# 所有敏感值（密码、密钥）请通过 .env 环境变量注入，不要在此硬编码
+
+app:
+  name: "YXShop商城系统"
+  version: "1.0.0"
+  debug: ${APP_DEBUG:true}
+  url: ${APP_URL:http://localhost:8777}
+  timezone: "Asia/Shanghai"
+
+# 数据库配置（敏感信息从 .env 读取）
+database:
+  connection: "mysql"
+  host: ${DB_HOST:127.0.0.1}
+  port: ${DB_PORT:3306}
+  database: ${DB_DATABASE:yxshop}
+  username: ${DB_USERNAME:root}
+  password: ${DB_PASSWORD:}
+  charset: "utf8mb4"
+  collation: "utf8mb4_unicode_ci"
+  prefix: ""
+  strict: true
+  engine: "InnoDB"
+  options:
+    min_connections: 1
+    max_connections: 100
+    wait_timeout: 60
+    max_idle_time: 30
+
+# Redis配置（敏感信息从 .env 读取）
+redis:
+  host: ${REDIS_HOST:127.0.0.1}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  database: ${REDIS_DB:0}
+  timeout: 5
+  retry_interval: 0
+  read_timeout: -1
+  prefix: "yxshop_"
+
+# 缓存配置
+cache:
+  driver: "redis"
+  prefix: "yxshop_cache_"
+  default_ttl: 3600
+  stores:
+    file:
+      driver: "file"
+      path: "/tmp/cache"
+    redis:
+      driver: "redis"
+      connection: "default"
+    memory:
+      driver: "memory"
+
+# 会话配置
+session:
+  driver: "redis"
+  lifetime: 7200
+  expire_on_close: false
+  encrypt: false
+  files: "/tmp/sessions"
+  connection: "default"
+  table: "sessions"
+  store: "default"
+  prefix: "yxshop_session_"
+
+# JWT配置（密钥从 .env 读取，不要硬编码）
+jwt:
+  secret: ${JWT_SECRET:}
+  algorithm: "HS256"
+  expire_time: 7200
+  refresh_expire_time: 604800
+  blacklist_cache_time: 86400
+
+# 支付配置（所有密钥从 .env 读取）
+pay:
+  default: "wechat"
+  timeout: 300
+  log:
+    file: "/logs/pay.log"
+    level: "info"
+  drivers:
+    alipay:
+      driver: "alipay"
+      app_id: ${ALIPAY_APP_ID:}
+      app_secret_cert: ${ALIPAY_APP_SECRET_CERT:}
+      app_public_cert: ${ALIPAY_APP_PUBLIC_CERT:}
+      alipay_public_cert: ${ALIPAY_PUBLIC_CERT:}
+      encrypt_key: ${ALIPAY_ENCRYPT_KEY:}
+      notify_url: ${ALIPAY_NOTIFY_URL:}
+      return_url: ${ALIPAY_RETURN_URL:}
+      mode: ${ALIPAY_MODE:dev}
+    wechat:
+      driver: "wechat"
+      app_id: ${WECHAT_APP_ID:}
+      app_secret: ${WECHAT_APP_SECRET:}
+      mch_id: ${WECHAT_MCH_ID:}
+      key: ${WECHAT_KEY:}
+      cert_path: ${WECHAT_CERT_PATH:}
+      key_path: ${WECHAT_KEY_PATH:}
+      notify_url: ${WECHAT_NOTIFY_URL:}
+      return_url: ${WECHAT_RETURN_URL:}
+      mode: ${WECHAT_MODE:dev}
+    unionpay:
+      driver: "unionpay"
+      mch_id: ${UNIONPAY_MCH_ID:}
+      app_id: ${UNIONPAY_APP_ID:}
+      cert_path: ${UNIONPAY_CERT_PATH:}
+      key_path: ${UNIONPAY_KEY_PATH:}
+      notify_url: ${UNIONPAY_NOTIFY_URL:}
+      return_url: ${UNIONPAY_RETURN_URL:}
+      mode: ${UNIONPAY_MODE:dev}
+
+# Push推送配置（密钥从 .env 读取）
+push:
+  app_key: ${PUSH_APP_KEY:}
+  app_secret: ${PUSH_APP_SECRET:}
+  app_id: "your-push-app-id"
+  host: ${PUSH_HOST:http://127.0.0.1:3232}
+  auth: "/plugin/webman/push/auth"
+  channel_hook: "/plugin/webman/push/channel-hook"
+
+# 短信配置（密钥从 .env 读取）
+sms:
+  driver: "aliyun"
+  aliyun:
+    access_key_id: ${SMS_ACCESS_KEY_ID:}
+    access_key_secret: ${SMS_ACCESS_KEY_SECRET:}
+    sign_name: ${SMS_SIGN_NAME:}
+    template_code: ${SMS_TEMPLATE_CODE:}
+
+# 邮件配置（密码从 .env 读取）
+mail:
+  driver: "smtp"
+  host: ${MAIL_HOST:smtp.qq.com}
+  port: ${MAIL_PORT:587}
+  username: ${MAIL_USERNAME:}
+  password: ${MAIL_PASSWORD:}
+  encryption: "tls"
+  from_address: ${MAIL_FROM_ADDRESS:}
+  from_name: "YXShop商城系统"
+
+# 文件上传配置
+upload:
+  path: "/uploads"
+  max_size: 10485760
+  allowed_types:
+    - "jpg"
+    - "jpeg"
+    - "png"
+    - "gif"
+    - "webp"
+  disk: "local"
+
+# 日志配置
+log:
+  level: "info"
+  path: "/logs"
+  max_files: 30
+  channels:
+    - "stack"
+    - "single"
+    - "daily"
+
+# 性能监控配置
+monitor:
+  enabled: true
+  slow_query_threshold: 1000
+  log_slow_queries: true
+  cache_queries: true
+
+# 查询优化配置
+query_optimizer:
+  enabled: true
+  cache_ttl: 300
+  pagination_limit: 50
+  max_query_time: 5000
+
+# 通知配置
+notification:
+  channels:
+    - "database"
+    - "mail"
+    - "sms"
+  default_channel: "database"
+
+# 安全配置
+security:
+  csrf_protection: true
+  rate_limiting: true
+  max_requests_per_minute: 60
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:3001"
+    - "https://your-domain.com"

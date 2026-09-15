@@ -1,0 +1,128 @@
+/.env
+/.env.*
+!/.env.example
+
+# IDE & 工具
+/.idea/
+/.vscode/
+/.deveco/
+/.claude/
+/.opencode/
+/.codeartsdoer/
+/.spec/
+*.swp
+*.swo
+*~
+
+# 运行时
+/runtime/
+/vendor/
+/public/uploads/
+
+/composer.phar
+/phpunit.xml
+/phpunit.result.cache
+
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+
+*.bak
+*.log
+
+# ========== 管理后台前端已拆分为独立仓库 ==========
+# 开源版: yxshop-admin (公开)
+# 商业版: yxshop-admin-commercial (私有)
+/admin-vue/
+
+# ========== 商业版/企业版后端代码隔离 ==========
+# 后端 PHP 商业版/企业版目录（独立私有仓库 yxshop-php-commercial）
+# 升级时将商业版仓库的 commercial/ 和 enterprise/ 目录复制过来即可
+/commercial/
+/enterprise/
+
+# 商业版/企业版数据库迁移
+/database/migrations/commercial/
+/database/migrations/enterprise/
+/database/migrations/2026_14_create_missing_tables.sql
+/database/migrations/2026_17_enterprise_refactor.sql
+/database/migrations/2026_23_after_sales_enterprise.sql
+/database/migrations/2026_24_article_enterprise.sql
+/database/migrations/2026_25_file_enterprise.sql
+/database/seed_seckill_groupbuy.sql
+/database/migrations/p2_marketing.sql
+/database/migrations/2026_28_card_recharge.sql
+/database/migrations/2026_30_dealer_enterprise.sql
+/database/migrations/2026_31_warehouse_supplier_enterprise.sql
+/database/migrations/2026_35_data_change_log_enhance.sql
+
+# 商业版/企业版路由配置（已移至 commercial/route/ 和 enterprise/route/ 目录）
+# 以下旧路径已不存在，保留注释供参考
+
+# 商业版/企业版纯商业逻辑文件（非集成守卫文件）
+/app/model/AgentCapital.php
+/app/model/AgentPerformanceSnapshot.php
+/app/model/AgentWithdraw.php
+/app/model/AuditComplianceReport.php
+/app/model/FieldPermission.php
+/app/model/MarketingRoiReport.php
+/app/model/PermissionChangeLog.php
+/app/model/TenantDomain.php
+/app/model/TenantOperationLog.php
+/app/model/TenantPlan.php
+/app/model/TenantSubscription.php
+/app/model/TenantUsageMetric.php
+/app/repository/AuditComplianceReportRepository.php
+/app/command/AgentLevelCheckCommand.php
+
+# 商业版/企业版数据文件
+/database/seed_home_enterprise.sql
+/database/templates/home_enterprise.json
+
+# 商业版/企业版 Blade 视图（孤儿视图，对应 Controller 已移除）
+/app/admin/view/admin/customer/
+/app/admin/view/admin/seller/
+/app/admin/view/admin/seller_order/
+/app/admin/view/admin/seller_product/
+/app/admin/view/admin/seller_shop.blade.php
+/app/admin/view/admin/delivery_man/
+/app/admin/view/admin/digital_product/
+/app/admin/view/admin/shipping/
+/app/admin/view/admin/setting/shipping.blade.php
+/app/admin/view/admin/report/kyc_log.blade.php
+/app/admin/view/admin/report/kyc_log_details.blade.php
+/app/admin/view/admin/setting/delivery_app_setting.blade.php
+/app/admin/view/admin/setting/seller_kyc_settings.blade.php
+/app/admin/view/admin/setting/partials/customer_setting.blade.php
+/app/admin/view/admin/setting/partials/analytical_tool.blade.php
+
+# 商业版编译产物
+/public/yxadmin/assets/community-*.js
+/public/yxadmin/assets/seckill-*.js
+/public/yxadmin/assets/group-buy-*.js
+/public/yxadmin/assets/agent-*.js
+/public/yxadmin/assets/GroupBuy-*
+/public/yxadmin/assets/Seckill-*
+/public/yxadmin/assets/SeckillEditor-*
+/public/yxadmin/assets/GroupBuyEditor-*
+/public/yxadmin/assets/invoice-*
+/public/admin/assets/GroupBuy-*
+/public/admin/assets/Seckill-*
+/public/admin/assets/SeckillEditor-*
+/public/admin/assets/GroupBuyEditor-*
+/public/admin/assets/invoice-*
+
+# 商业版旧版前端编译产物
+/public/js/resources_js_views_Seller*
+/public/js/resources_js_views_Customers_*
+/public/js/resources_js_containers_TheContainerSeller*
+/public/js/resources_js_views_Orders_InvoiceOrder*
+/public/js/resources_js_views_Setting_PrivacyPolicySeller*
+
+# 商业版数据库 seed 数据
+/database/seed_page_fix/seed_invoice*
+/database/seed_page_fix/seed_supplier*
+/database/seed_page_fix/seed_warehouse*
+/database/seed_page_fix/seed_purchase_orders.sql
+/database/warehouse_function_todo.md
+/database/yxshop_community_*

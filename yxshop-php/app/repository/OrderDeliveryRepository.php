@@ -1,0 +1,127 @@
+<?php
+
+namespace app\repository;
+
+use app\model\OrderDelivery;
+
+/**
+ * 订单仓储类
+ */
+class OrderDeliveryRepository extends BaseRepository
+{
+    protected $model = OrderDelivery::class;
+
+    public function getList($appId = 0, $pageSize = 20, $keyword = '')
+    {
+        $query = $this->query()->orderBy('created_at', 'desc');
+        if ($appId > 0) {
+            $query->where('app_id', $appId);
+        }
+        return $query->paginate($pageSize);
+    }
+
+    /**
+     * 根据订单号查找订单
+     */
+    public function findByOrderNo($orderNo)
+    {
+        return $this->query()->where('order_no', $orderNo)->first();
+    }
+
+    /**
+     * 根据订单ID查找物流记录
+     */
+    public function findByOrderId($orderId)
+    {
+        return $this->query()->where('order_id', $orderId)->first();
+    }
+
+    /**
+     * 根据订单ID获取所有物流记录（带快递公司关联）
+     */
+    public function getByOrderIdWithExpress(int $orderId)
+    {
+        return $this->query()
+            ->where('order_id', $orderId)
+            ->with(['express'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * 获取用户订单统计
+     */
+    public function getUserOrderStats($userId, $appId = 0)
+    {
+        $query = $this->query()->where('user_id', $userId);
+        
+        if ($appId > 0) {
+            $query->where('app_id', $appId);
+        }
+
+        return [
+            'total' => $query->count(),
+            'pending' => $query->where('order_status', Order::ORDER_STATUS_PENDING)->count(),
+            'completed' => $query->where('order_status', Order::ORDER_STATUS_COMPLETE)->count(),
+            'cancelled' => $query->where('order_status', Order::ORDER_STATUS_CANCEL)->count(),
+        ];
+    }
+
+    /**
+     * 获取订单销售统计
+     */
+    public function getSalesStats($startTime = null, $endTime = null, $appId = 0)
+    {
+        $query = $this->query()
+            ->where('order_status', Order::ORDER_STATUS_COMPLETE)
+            ->where('pay_status', Order::PAY_STATUS_PAID);
+
+        if ($startTime) {
+            $query->where('created_at', '>=', $startTime);
+        }
+
+        if ($endTime) {
+            $query->where('created_at', '<=', $endTime);
+        }
+
+        if ($appId > 0) {
+            $query->where('app_id', $appId);
+        }
+
+        return [
+            'order_count' => $query->count(),
+            'total_amount' => $query->sum('pay_price'),
+            'avg_amount' => $query->avg('pay_price'),
+        ];
+    }
+
+    /**
+     * 获取待处理订单
+     */
+    public function getPendingOrders($appId = 0)
+    {
+        $query = $this->query()
+            ->where('order_status', Order::ORDER_STATUS_PENDING)
+            ->with(['user', 'items']);
+
+        if ($appId > 0) {
+            $query->where('app_id', $appId);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * 获取超时未支付订单
+     */
+    public function getTimeoutOrders($timeout = 1800) // 30分钟
+    {
+        $timeoutTime = time() - $timeout;
+        
+        return $this->query()
+            ->where('order_status', Order::ORDER_STATUS_PENDING)
+            ->where('pay_status', Order::PAY_STATUS_UNPAID)
+            ->where('created_at', '<', $timeoutTime)
+            ->get();
+    }
+}

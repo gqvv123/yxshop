@@ -1,0 +1,75 @@
+# YXShop Admin 后台管理配置
+app:
+  name: yxshop-admin
+  version: 1.0.0
+  description: 基于Webman的电商系统后台管理
+  debug: ${APP_DEBUG:false}
+  env: ${APP_ENV:production}
+  timezone: ${TZ:Asia/Shanghai}
+
+# 服务器配置
+server:
+  listen: 0.0.0.0:8788
+  processes: ${WORKER_PROCESSES:2}
+  reloadable: true
+  max_request: 1000000
+  max_package_size: 10M
+
+# Nacos配置中心
+nacos:
+  server_addr: ${NACOS_SERVER_ADDR:localhost:8848}
+  namespace: ${NACOS_NAMESPACE:yxshop}
+  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  config:
+    data_id: yxshop-admin.yml
+    group: DEFAULT_GROUP
+    refresh: true
+  discovery:
+    service_name: yxshop-admin
+    group: DEFAULT_GROUP
+    weight: 1
+    enabled: true
+
+# API服务配置
+api:
+  base_url: ${API_BASE_URL:http://yxshop-php:8787}
+  timeout: 30
+  retry_times: 3
+
+# 业务配置
+yxshop:
+  # 后台管理配置
+  admin:
+    title: YXShop后台管理系统
+    logo: /admin/assets/images/logo.png
+    favicon: /admin/assets/images/favicon.ico
+    theme: default
+    layout: sidebar
+    
+  # 权限配置
+  permission:
+    super_admin_role: 1
+    default_permissions:
+      - dashboard.view
+      - profile.view
+      - profile.edit
+      
+  # 分页配置
+  pagination:
+    default_per_page: 20
+    max_per_page: 100
+    
+  # 文件上传配置
+  upload:
+    max_size: 10M
+    allowed_types:
+      - jpg
+      - jpeg
+      - png
+      - gif
+      - pdf
+      - doc
+      - docx
+      - xls
+      - xlsx
+    path: /admin/uploads

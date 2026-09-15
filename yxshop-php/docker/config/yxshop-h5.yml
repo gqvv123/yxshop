@@ -1,0 +1,71 @@
+# YXShop H5 移动端配置
+app:
+  name: yxshop-h5
+  version: 1.0.0
+  description: 基于Webman的电商系统H5移动端
+  debug: ${APP_DEBUG:false}
+  env: ${APP_ENV:production}
+  timezone: ${TZ:Asia/Shanghai}
+
+# 服务器配置
+server:
+  listen: 0.0.0.0:8789
+  processes: ${WORKER_PROCESSES:2}
+  reloadable: true
+  max_request: 1000000
+  max_package_size: 10M
+
+# Nacos配置中心
+nacos:
+  server_addr: ${NACOS_SERVER_ADDR:localhost:8848}
+  namespace: ${NACOS_NAMESPACE:yxshop}
+  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  config:
+    data_id: yxshop-h5.yml
+    group: DEFAULT_GROUP
+    refresh: true
+  discovery:
+    service_name: yxshop-h5
+    group: DEFAULT_GROUP
+    weight: 1
+    enabled: true
+
+# API服务配置
+api:
+  base_url: ${API_BASE_URL:http://yxshop-php:8787}
+  timeout: 30
+  retry_times: 3
+
+# 业务配置
+yxshop:
+  # H5端配置
+  h5:
+    title: YXShop商城
+    description: 专业的电商购物平台
+    keywords: 商城,购物,电商,优惠
+    theme: default
+    layout: mobile
+    
+  # 微信配置
+  wechat:
+    app_id: ${WECHAT_APP_ID:}
+    app_secret: ${WECHAT_APP_SECRET:}
+    jsapi_ticket_cache_time: 7200
+    
+  # 分享配置
+  share:
+    title: YXShop商城
+    desc: 专业的电商购物平台
+    link: ${H5_BASE_URL:http://localhost/h5}
+    imgUrl: ${H5_BASE_URL:http://localhost/h5}/assets/images/share.jpg
+    
+  # 分页配置
+  pagination:
+    default_per_page: 20
+    max_per_page: 50
+    
+  # 缓存配置
+  cache:
+    home_data_ttl: 300
+    product_list_ttl: 600
+    product_detail_ttl: 1800
