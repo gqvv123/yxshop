@@ -13,10 +13,9 @@
  */
 
 use support\view\Raw;
-use support\view\Twig;
-use support\view\Blade;
-use support\view\ThinkPHP;
 
+// 管理后台已改为 Vue3 SPA 架构，后端纯 API 返回 JSON
+// 不再需要 Blade/Twig 模板引擎，使用 Raw（纯字符串/无渲染）
 return [
-    'handler' => Blade::class
+    'handler' => Raw::class
 ];

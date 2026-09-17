@@ -39,14 +39,6 @@ class BaseController
     protected $allowAllAction = [
         'login/login',
         'login/captcha',
-        'wechat_auth/qrcode',
-        'wechat_auth/scan-status',
-    ];
-    
-    /* @var array $notLayoutAction 无需全局layout */
-    protected $notLayoutAction = [
-        'login/login',
-        'login/captcha'
     ];
 
 
@@ -86,16 +78,13 @@ class BaseController
     {
         // 当前路由信息
         $this->getRouteInfo($request);
-        
+
         // 管理员登录信息（优先从当前请求的 session 获取，其次从中间件）
         $sessionInstance = $request->session();
         $sessionAdmin = $sessionInstance ? $sessionInstance->get('admin') : null;
         $this->admin = $sessionAdmin ?? $request->admin ?? [];
 
         $this->app_id = $this->admin['app_id'] ?? 0;
-        
-        // 全局layout
-        $this->layout($request);
     }
 
     /**
@@ -110,109 +99,6 @@ class BaseController
                 return $this->renderError('权限不足');
             }
             return $this->renderError('权限不足');
-        }
-    }
-
-    /**
-     * 全局layout模板输出
-     */
-    private function layout(Request $request)
-    {
-        // 验证当前请求是否在白名单
-        if (!in_array($this->routeUri, $this->notLayoutAction)) {
-            // 获取基础URL
-            $protocol = $request->header('x-forwarded-proto') ?: 'http';
-            $host = $request->host();
-            $baseUrl = $protocol . '://' . $host;
-            
-            // 获取货币列表（通过 Service）
-            $currencys = collect([]);
-            $currency = (object)['name' => 'CNY', 'symbol' => '¥', 'id' => 1];
-            
-            try {
-                $currencys = $this->currencyService->getActive();
-                if ($currencys && $currencys->count() > 0) {
-                    $currency = $currencys->first();
-                }
-            } catch (\Exception $e) {
-                $currencys = collect([]);
-            }
-            
-            // 获取语言列表（通过 Service）
-            $languages = collect([]);
-            $language = (object)['name' => '简体中文', 'code' => 'zh-CN', 'id' => 1];
-            
-            try {
-                $languages = $this->languageService->getActive();
-                if ($languages && $languages->count() > 0) {
-                    $language = $this->languageService->getCurrentLanguage() ?? $languages->first();
-                }
-            } catch (\Exception $e) {
-                $languages = collect([]);
-            }
-            
-            // 获取订单统计（通过 Service/Repository）
-            $physical_product_order_count = 0;
-            $digital_product_order_count = 0;
-            
-            try {
-                $appId = $this->admin['app_id'] ?? 0;
-                // 通过 Service 获取待处理订单数量
-                // 暂时简化：如果 OrderService 没有对应方法，设为 0
-                $physical_product_order_count = 0;
-                $digital_product_order_count = 0;
-            } catch (\Exception $e) {
-            }
-            
-            // OpenAI 配置（如果需要）
-            $openAi = (object)[
-                'status' => 0,
-                'model' => 'gpt-3.5-turbo',
-                'api_key' => ''
-            ];
-            
-            try {
-                // 尝试从配置或数据库获取 OpenAI 设置
-                $openAiStatus = site_settings('openai_status') ?? 0;
-                if ($openAiStatus) {
-                    $openAi->status = 1;
-                    $openAi->model = site_settings('openai_model') ?? 'gpt-3.5-turbo';
-                    $openAi->api_key = site_settings('openai_api_key') ?? '';
-                }
-            } catch (\Exception $e) {
-            }
-            
-            // 卖家新品统计（默认 0，后续可由 Service 填充）
-            $seller_new_digital_product_count = 0;
-            $seller_new_physical_product_count = 0;
-            $physical_product_seller_order_count = 0;
-            $digital_product_seller_order_count = 0;
-
-            $currentPath = trim($request->path(), '/');
-            $menuTree = $this->menu($currentPath);
-
-            // 输出到view
-            View::assign([
-                'base_url' => $baseUrl,
-                'admin_url' => '/admin',
-                'group' => $this->group,
-                'url' => $request->path(),
-                'menu' => $menuTree,
-                'admin' => $this->admin,
-                'currencys' => $currencys,
-                'currency' => $currency,
-                'languages' => $languages,
-                'language' => $language,
-                'physical_product_order_count' => $physical_product_order_count,
-                'digital_product_order_count' => $digital_product_order_count,
-                'seller_new_digital_product_count' => $seller_new_digital_product_count,
-                'seller_new_physical_product_count' => $seller_new_physical_product_count,
-                'physical_product_seller_order_count' => $physical_product_seller_order_count,
-                'digital_product_seller_order_count' => $digital_product_seller_order_count,
-                'openAi' => $openAi,
-                // 避免与全局 helper request() 冲突
-                'http_request' => $request
-            ]);
         }
     }
 
@@ -271,7 +157,7 @@ class BaseController
                 'name' => '仪表盘',
                 'model' => 'dashboard',
                 'icon' => 'fas fa-tachometer-alt',
-                'url' => '/admin',
+                'url' => '/dashboard',
                 'children' => [],
             ],
             [
@@ -281,12 +167,12 @@ class BaseController
                 'children' => [
                     [
                         'name' => '订单列表',
-                        'url' => '/admin/order',
+                        'url' => '/order',
                         'icon' => 'fa fa-shopping-cart'
                     ],
                     [
                         'name' => '订单跟踪',
-                        'url' => '/admin/order/tracking',
+                        'url' => '/order',
                         'icon' => 'fa fa-map-marker-alt'
                     ]
                 ]
@@ -298,18 +184,43 @@ class BaseController
                 'children' => [
                     [
                         'name' => '商品列表',
-                        'url' => '/admin/item',
+                        'url' => '/item',
                         'icon' => 'fas fa-boxes'
                     ],
                     [
-                        'name' => '添加商品',
-                        'url' => '/admin/item/create',
-                        'icon' => 'fas fa-plus-square'
+                        'name' => '商品分类',
+                        'url' => '/category',
+                        'icon' => 'fas fa-bullseye'
                     ],
                     [
-                        'name' => '商品分类',
-                        'url' => '/admin/category',
-                        'icon' => 'fas fa-bullseye'
+                        'name' => '品牌管理',
+                        'url' => '/brand',
+                        'icon' => 'fas fa-tag'
+                    ],
+                    [
+                        'name' => '规格管理',
+                        'url' => '/specs',
+                        'icon' => 'fas fa-th-list'
+                    ],
+                    [
+                        'name' => '商品标签',
+                        'url' => '/item-tags',
+                        'icon' => 'fas fa-tags'
+                    ],
+                    [
+                        'name' => '商品类型',
+                        'url' => '/item-types',
+                        'icon' => 'fas fa-layer-group'
+                    ],
+                    [
+                        'name' => '商品属性',
+                        'url' => '/item-attributes',
+                        'icon' => 'fas fa-attributes'
+                    ],
+                    [
+                        'name' => '评价管理',
+                        'url' => '/comment',
+                        'icon' => 'fas fa-comments'
                     ]
                 ]
             ],
@@ -320,13 +231,38 @@ class BaseController
                 'children' => [
                     [
                         'name' => '用户列表',
-                        'url' => '/admin/user',
+                        'url' => '/user',
                         'icon' => 'fas fa-users'
                     ],
                     [
+                        'name' => '用户等级',
+                        'url' => '/user-levels',
+                        'icon' => 'fas fa-medal'
+                    ],
+                    [
                         'name' => '用户地址',
-                        'url' => '/admin/user/addresses',
+                        'url' => '/user-addresses',
                         'icon' => 'far fa-address-book'
+                    ],
+                    [
+                        'name' => '用户优惠券',
+                        'url' => '/user-coupons',
+                        'icon' => 'fas fa-ticket-alt'
+                    ],
+                    [
+                        'name' => '余额日志',
+                        'url' => '/user-money-logs',
+                        'icon' => 'fas fa-yen-sign'
+                    ],
+                    [
+                        'name' => '用户日志',
+                        'url' => '/user-logs',
+                        'icon' => 'fas fa-history'
+                    ],
+                    [
+                        'name' => '用户反馈',
+                        'url' => '/user-feedback',
+                        'icon' => 'fas fa-comment-dots'
                     ]
                 ]
             ],
@@ -334,7 +270,7 @@ class BaseController
                 'name' => '优惠券管理',
                 'model' => 'coupon',
                 'icon' => 'fa fa-puzzle-piece text-warning',
-                'url' => '/admin/coupon',
+                'url' => '/coupon',
                 'children' => [],
             ],
             [
@@ -343,14 +279,24 @@ class BaseController
                 'icon' => 'fas fa-chart-line text-info',
                 'children' => [
                     [
+                        'name' => '营销概览',
+                        'url' => '/marketing',
+                        'icon' => 'fas fa-bullhorn'
+                    ],
+                    [
                         'name' => '促销活动',
-                        'url' => '/admin/marketing/promotions',
+                        'url' => '/promotions',
                         'icon' => 'fas fa-gift'
                     ],
                     [
-                        'name' => '消息推送',
-                        'url' => '/admin/marketing/notifications',
-                        'icon' => 'fas fa-bell'
+                        'name' => '商品促销',
+                        'url' => '/prom-items',
+                        'icon' => 'fas fa-tags'
+                    ],
+                    [
+                        'name' => '订单促销',
+                        'url' => '/prom-orders',
+                        'icon' => 'fas fa-shopping-bag'
                     ]
                 ]
             ],
@@ -360,14 +306,61 @@ class BaseController
                 'icon' => 'fas fa-calculator text-danger',
                 'children' => [
                     [
-                        'name' => '事务记录',
-                        'url' => '/admin/finance/transactions',
-                        'icon' => 'fas fa-money-bill-wave'
+                        'name' => '财务统计',
+                        'url' => '/finance',
+                        'icon' => 'fas fa-chart-pie'
                     ],
                     [
-                        'name' => '财务统计',
-                        'url' => '/admin/finance/statistics',
-                        'icon' => 'fas fa-chart-pie'
+                        'name' => '支付记录',
+                        'url' => '/payment',
+                        'icon' => 'fas fa-credit-card'
+                    ],
+                    [
+                        'name' => '支付日志',
+                        'url' => '/payment-logs',
+                        'icon' => 'fas fa-receipt'
+                    ],
+                    [
+                        'name' => '充值套餐',
+                        'url' => '/recharge-package',
+                        'icon' => 'fas fa-wallet'
+                    ]
+                ]
+            ],
+            [
+                'name' => '内容管理',
+                'model' => 'content',
+                'icon' => 'fas fa-newspaper text-info',
+                'children' => [
+                    [
+                        'name' => '文章列表',
+                        'url' => '/article',
+                        'icon' => 'fas fa-file-alt'
+                    ],
+                    [
+                        'name' => '文章分类',
+                        'url' => '/article-category',
+                        'icon' => 'fas fa-folder'
+                    ],
+                    [
+                        'name' => '内容页面',
+                        'url' => '/content-pages',
+                        'icon' => 'fas fa-file'
+                    ],
+                    [
+                        'name' => '页面SEO',
+                        'url' => '/page-seo',
+                        'icon' => 'fas fa-search'
+                    ],
+                    [
+                        'name' => '友情链接',
+                        'url' => '/friendly-link',
+                        'icon' => 'fas fa-link'
+                    ],
+                    [
+                        'name' => '广告管理',
+                        'url' => '/advertisements',
+                        'icon' => 'fas fa-bullhorn'
                     ]
                 ]
             ],
@@ -378,23 +371,92 @@ class BaseController
                 'children' => [
                     [
                         'name' => '基本设置',
-                        'url' => '/admin/setting',
+                        'url' => '/setting',
                         'icon' => 'fas fa-store'
                     ],
                     [
-                        'name' => '支付设置',
-                        'url' => '/admin/setting/payment',
-                        'icon' => 'fas fa-credit-card'
-                    ],
-                    [
-                        'name' => '配送设置',
-                        'url' => '/admin/setting/shipping',
+                        'name' => '配送模板',
+                        'url' => '/deliveries',
                         'icon' => 'fas fa-shipping-fast'
                     ],
                     [
-                        'name' => '通知设置',
-                        'url' => '/admin/setting/notification',
-                        'icon' => 'fa fa-bell'
+                        'name' => '配送规则',
+                        'url' => '/delivery-rule',
+                        'icon' => 'fas fa-truck'
+                    ],
+                    [
+                        'name' => '快递管理',
+                        'url' => '/express',
+                        'icon' => 'fas fa-box'
+                    ],
+                    [
+                        'name' => '地区管理',
+                        'url' => '/regions',
+                        'icon' => 'fas fa-map'
+                    ],
+                    [
+                        'name' => '货币管理',
+                        'url' => '/currencies',
+                        'icon' => 'fas fa-coins'
+                    ],
+                    [
+                        'name' => '语言管理',
+                        'url' => '/language',
+                        'icon' => 'fas fa-language'
+                    ]
+                ]
+            ],
+            [
+                'name' => '通知管理',
+                'model' => 'notification',
+                'icon' => 'fas fa-bell text-warning',
+                'children' => [
+                    [
+                        'name' => '通知模板',
+                        'url' => '/notification-template',
+                        'icon' => 'fas fa-file-code'
+                    ],
+                    [
+                        'name' => '通知场景',
+                        'url' => '/notification-scenes',
+                        'icon' => 'fas fa-broadcast-tower'
+                    ],
+                    [
+                        'name' => '发送记录',
+                        'url' => '/notification-sends',
+                        'icon' => 'fas fa-paper-plane'
+                    ],
+                    [
+                        'name' => '通知配置',
+                        'url' => '/notification-configs',
+                        'icon' => 'fas fa-cog'
+                    ]
+                ]
+            ],
+            [
+                'name' => '日志管理',
+                'model' => 'log',
+                'icon' => 'fas fa-history text-info',
+                'children' => [
+                    [
+                        'name' => '操作日志',
+                        'url' => '/log',
+                        'icon' => 'fas fa-file-alt'
+                    ],
+                    [
+                        'name' => '短信日志',
+                        'url' => '/sms-logs',
+                        'icon' => 'fas fa-sms'
+                    ],
+                    [
+                        'name' => '邮件日志',
+                        'url' => '/email-logs',
+                        'icon' => 'fas fa-envelope'
+                    ],
+                    [
+                        'name' => '文件日志',
+                        'url' => '/file-logs',
+                        'icon' => 'fas fa-file'
                     ]
                 ]
             ],
@@ -405,30 +467,18 @@ class BaseController
                 'children' => [
                     [
                         'name' => '管理员',
-                        'url' => '/admin/admin',
+                        'url' => '/admin',
                         'icon' => 'fas fa-user-tie'
                     ],
                     [
                         'name' => '角色管理',
-                        'url' => '/admin/role',
+                        'url' => '/role',
                         'icon' => 'fas fa-user-tag'
-                    ]
-                ]
-            ],
-            [
-                'name' => '数据统计',
-                'model' => 'report',
-                'icon' => 'fas fa-chart-pie text-primary',
-                'children' => [
-                    [
-                        'name' => '销售报表',
-                        'url' => '/admin/report/sales',
-                        'icon' => 'fa fa-chart-line'
                     ],
                     [
-                        'name' => '用户统计',
-                        'url' => '/admin/report/user',
-                        'icon' => 'fa fa-users'
+                        'name' => '菜单管理',
+                        'url' => '/menu',
+                        'icon' => 'fas fa-list'
                     ]
                 ]
             ]

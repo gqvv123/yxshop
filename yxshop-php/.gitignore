@@ -79,22 +79,23 @@
 /database/seed_home_enterprise.sql
 /database/templates/home_enterprise.json
 
-# 商业版/企业版 Blade 视图（孤儿视图，对应 Controller 已移除）
-/app/admin/view/admin/customer/
-/app/admin/view/admin/seller/
-/app/admin/view/admin/seller_order/
-/app/admin/view/admin/seller_product/
-/app/admin/view/admin/seller_shop.blade.php
-/app/admin/view/admin/delivery_man/
-/app/admin/view/admin/digital_product/
-/app/admin/view/admin/shipping/
-/app/admin/view/admin/setting/shipping.blade.php
-/app/admin/view/admin/report/kyc_log.blade.php
-/app/admin/view/admin/report/kyc_log_details.blade.php
-/app/admin/view/admin/setting/delivery_app_setting.blade.php
-/app/admin/view/admin/setting/seller_kyc_settings.blade.php
-/app/admin/view/admin/setting/partials/customer_setting.blade.php
-/app/admin/view/admin/setting/partials/analytical_tool.blade.php
+# 商业版/企业版 Blade 视图已清理（管理后台已改为 Vue3 SPA，不再使用 Blade）
+# 以下旧路径已不存在，保留注释供历史参考
+# /app/admin/view/admin/customer/
+# /app/admin/view/admin/seller/
+# /app/admin/view/admin/seller_order/
+# /app/admin/view/admin/seller_product/
+# /app/admin/view/admin/seller_shop.blade.php
+# /app/admin/view/admin/delivery_man/
+# /app/admin/view/admin/digital_product/
+# /app/admin/view/admin/shipping/
+# /app/admin/view/admin/setting/shipping.blade.php
+# /app/admin/view/admin/report/kyc_log.blade.php
+# /app/admin/view/admin/report/kyc_log_details.blade.php
+# /app/admin/view/admin/setting/delivery_app_setting.blade.php
+# /app/admin/view/admin/setting/seller_kyc_settings.blade.php
+# /app/admin/view/admin/setting/partials/customer_setting.blade.php
+# /app/admin/view/admin/setting/partials/analytical_tool.blade.php
 
 # 商业版编译产物
 /public/yxadmin/assets/community-*.js

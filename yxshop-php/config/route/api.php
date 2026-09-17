@@ -411,42 +411,19 @@ Route::group('/api/v1', function () {
 ]); 
 
 
-// V2版本API路由（新版本，可能包含破坏性变更）
-Route::group('/api/v2', function () {
-    // 认证相关（V2版本可能使用新的认证方式）
-    Route::post('/auth/login', [app\api\v2\controller\AuthController::class, 'login']);
-    Route::post('/auth/register', [app\api\v2\controller\AuthController::class, 'register']);
-    Route::post('/auth/logout', [app\api\v2\controller\AuthController::class, 'logout']);
-    Route::post('/auth/refresh-token', [app\api\v2\controller\AuthController::class, 'refreshToken']);
-    Route::post('/auth/wx-login', [app\api\v2\controller\AuthController::class, 'wxLogin']);
-    
-    // 用户相关（V2版本可能包含新的字段或方法）
-    Route::group('/user', function () {
-        Route::get('/info', [app\api\v2\controller\UserController::class, 'getInfo']);
-        Route::post('/update-info', [app\api\v2\controller\UserController::class, 'updateInfo']);
-        Route::post('/update-avatar', [app\api\v2\controller\UserController::class, 'updateAvatar']);
-        Route::post('/change-password', [app\api\v2\controller\UserController::class, 'changePassword']);
-        Route::get('/orders', [app\api\v2\controller\UserController::class, 'getOrders']);
-        Route::get('/favorites', [app\api\v2\controller\UserController::class, 'getFavorites']);
-        // V2新增功能
-        // Route::get('/preferences', [app\api\v2\controller\UserController::class, 'getPreferences']);
-        // Route::post('/update-preferences', [app\api\v2\controller\UserController::class, 'updatePreferences']);
-    })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
-    // 其他V2版本路由...
-})->middleware([app\middleware\ApiCorsMiddleware::class]);
+// V2 API 路由已移除（V2 控制器仅为 V1 的空壳继承，无独立功能，避免混淆）
+// 未来如需 V2 破坏性变更，请新建 app/api/v2/controller/ 目录并实现独立逻辑后重新启用
 
 
 // 默认版本（重定向到V1）
 Route::get('/api', function () {
     return json([
-        'message' => '请指定API版本，例如: /api/v1 或 /api/v2',
+        'message' => '请指定API版本，例如: /api/v1',
         'versions' => [
             'v1' => '/api/v1',
-            'v2' => '/api/v2'
         ],
         'current_stable' => 'v1',
-        'latest' => 'v2'
+        'latest' => 'v1'
     ]);
 });
 
@@ -458,16 +435,10 @@ Route::get('/api/versions', function () {
                 'status' => 'stable',
                 'deprecated' => false,
                 'sunset_date' => null,
-                'features' => ['基础功能', '用户管理', '订单管理']
+                'features' => ['基础功能', '用户管理', '订单管理', '购物车', '优惠券', '支付', '通知']
             ],
-            'v2' => [
-                'status' => 'beta',
-                'deprecated' => false,
-                'sunset_date' => null,
-                'features' => ['基础功能', '用户管理', '订单管理', '高级功能', 'AI推荐']
-            ]
         ],
-        'recommendation' => '建议新项目使用V2版本，现有项目可继续使用V1版本'
+        'recommendation' => '当前稳定版本为 V1'
     ]);
 });
 
