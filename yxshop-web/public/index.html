@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="盈锐商贸 · 一套后端，连接小程序、H5 与管理后台。商品、购物车、订单、会员等级全链路打通。" />
+  <title>盈锐商贸 · 把生意装进每一个屏幕</title>
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/base.css" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="盈锐商贸首页">
+        <img src="assets/img/logo.svg" alt="" width="36" height="36" />
+        <span>盈锐商贸</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="#products">精选商品</a>
+        <a href="#capability">平台能力</a>
+        <a href="#channels">多端体验</a>
+        <a href="#about">关于我们</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn ghost small" href="h5.html">登录 / 注册</a>
+        <a class="btn small" href="h5.html#/home">打开 H5 商城</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 首屏：非居中分屏 -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">一套系统 · 三个终端</span>
+          <h1>把生意，<br />装进每一个屏幕。</h1>
+          <p class="hero-lead">
+            盈锐商贸用同一套后端连接微信小程序、移动 H5 与管理后台。
+            商品、购物车、订单、会员等级与支付，数据实时同源，
+            不用在多个系统之间来回搬运。
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="h5.html#/home">进入移动商城</a>
+            <a class="btn ghost" href="#products">看看在售商品</a>
+          </div>
+          <div class="hero-meta" id="heroMeta" aria-live="polite">
+            <div class="meta-item"><strong>—</strong><span>在售商品</span></div>
+            <div class="meta-item"><strong>—</strong><span>商品分类</span></div>
+            <div class="meta-item"><strong>实时</strong><span>数据对接</span></div>
+          </div>
+        </div>
+        <div class="hero-visual reveal">
+          <img src="assets/img/hero.svg" alt="抽象的商品陈列视觉" />
+          <div class="visual-note">
+            <span class="dot"></span>
+            <span>页面商品来自现有商城接口</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 精选商品 -->
+    <section class="section products" id="products">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <span class="eyebrow">精选商品</span>
+            <h2>此刻在售，全部来自真实库存</h2>
+          </div>
+          <p class="section-desc">下面的名称、售价与库存都从现有商城接口读取；后台改价或上下架，这里会同步变化。</p>
+        </div>
+        <div class="product-grid" id="productGrid" aria-live="polite">
+          <div class="product-card skeleton" style="height:320px"></div>
+          <div class="product-card skeleton" style="height:320px"></div>
+          <div class="product-card skeleton" style="height:320px"></div>
+          <div class="product-card skeleton" style="height:320px"></div>
+        </div>
+        <div class="products-foot">
+          <a class="btn ghost" href="h5.html#/home">在 H5 里查看全部商品</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 平台能力：Bento 非等分 -->
+    <section class="section capability" id="capability">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <span class="eyebrow">平台能力</span>
+            <h2>该有的链路，一条都没省</h2>
+          </div>
+          <p class="section-desc">从选品到履约，能力都建立在现有后端服务之上，不是静态展示页。</p>
+        </div>
+        <div class="bento">
+          <article class="bento-item bento-lg reveal">
+            <span class="bento-index">01</span>
+            <h3>商品与分类</h3>
+            <p>多级分类、品牌、规格与库存统一管理。后台一次维护，小程序与 H5 同时生效。</p>
+            <div class="bento-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+          </article>
+          <article class="bento-item reveal">
+            <span class="bento-index">02</span>
+            <h3>购物车与结算</h3>
+            <p>勾选、改数量、结算预览，运费与优惠在提交前算清楚。</p>
+          </article>
+          <article class="bento-item reveal">
+            <span class="bento-index">03</span>
+            <h3>订单与支付</h3>
+            <p>下单即扣库存、生成订单地址快照，订单状态全程可查。</p>
+          </article>
+          <article class="bento-item bento-wide reveal">
+            <span class="bento-index">04</span>
+            <h3>会员等级与营销</h3>
+            <p>会员折扣直接参与实付金额计算，优惠券、促销、积分与签到在同一套账户体系里运转。</p>
+            <div class="chip-row" aria-hidden="true"><span>会员折扣</span><span>优惠券</span><span>促销</span><span>积分签到</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 多端引导 -->
+    <section class="section channels" id="channels">
+      <div class="wrap channels-grid">
+        <div class="channels-visual reveal">
+          <img src="assets/img/phone.svg" alt="移动端商城界面示意" />
+        </div>
+        <div class="channels-copy reveal">
+          <span class="eyebrow">多端体验</span>
+          <h2>手机上，体验更完整</h2>
+          <p>
+            移动 H5 商城支持浏览、搜索、加购、结算、下单与订单追踪；
+            微信小程序保留原生支付与登录体验；管理后台负责商品、订单与配置。
+            三端共用同一份数据。
+          </p>
+          <ul class="channel-list">
+            <li><span class="channel-dot"></span><div><strong>移动 H5</strong><small>浏览器打开即可购物，无需安装</small></div></li>
+            <li><span class="channel-dot"></span><div><strong>微信小程序</strong><small>在微信内搜索小程序名称进入</small></div></li>
+            <li><span class="channel-dot"></span><div><strong>管理后台</strong><small>商品、订单、会员与系统配置</small></div></li>
+          </ul>
+          <div class="hero-actions">
+            <a class="btn" href="h5.html#/home">立即打开 H5 商城</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 关于 / CTA -->
+    <section class="section about" id="about">
+      <div class="wrap about-grid reveal">
+        <div>
+          <span class="eyebrow">关于盈锐</span>
+          <h2>一套稳定的底座，<br />留给业务慢慢长。</h2>
+        </div>
+        <div class="about-side">
+          <p>这套系统以 Webman 常驻服务、MySQL 与 Redis 为底座，采用控制器 / 服务 / 仓储 / 模型四层结构。前端站点只负责呈现，不复制业务规则。</p>
+          <div class="about-cta">
+            <a class="btn" href="h5.html#/home">开始浏览商品</a>
+            <a class="btn ghost" href="h5.html#/login">创建体验账号</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <img src="assets/img/logo.svg" alt="" width="32" height="32" />
+        <div><strong>盈锐商贸</strong><small>同一套数据，连接每一个终端</small></div>
+      </div>
+      <div class="footer-links">
+        <a href="#products">精选商品</a>
+        <a href="#capability">平台能力</a>
+        <a href="h5.html">H5 商城</a>
+        <a href="#top">回到顶部</a>
+      </div>
+      <p class="footer-note">页面数据由现有商城服务实时提供 · 本站为项目演示用途</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="assets/api.js"></script>
+  <script src="assets/site.js"></script>
+</body>
+</html>

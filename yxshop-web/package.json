@@ -1,0 +1,13 @@
+{
+  "name": "yxshop-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "盈锐商贸 PC 品牌官网 + H5 移动商城（零依赖，直连现有 Webman 后端）",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
