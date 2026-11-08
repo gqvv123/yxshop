@@ -1,0 +1,1 @@
+import{h as t}from"./index-BMko6wC9.js";function i(e){return t({url:"/admin/api/regions",method:"get",params:e})}function n(e){return t({url:"/admin/api/regions/tree",method:"get",params:e})}export{i as a,n as g};

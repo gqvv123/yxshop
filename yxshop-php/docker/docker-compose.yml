@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: yxshop-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-yxshop}
+      MYSQL_USER: ${MYSQL_USER:-yxshop}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - yxshop-net
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: yxshop-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - yxshop-net
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+
+  # Nginx 网关
+  nginx:
+    image: nginx:alpine
+    container_name: yxshop-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf
+      - ./gateway/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - yxshop-php
+      - yxshop-admin
+      - yxshop-h5
+    networks:
+      - yxshop-net
+
+  # yxshop-php API服务
+  yxshop-php:
+    build: .
+    image: yxtech/yxshop-php:1.0
+    container_name: yxshop-php
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    volumes:
+      - ../yxshop-php:/app
+      - ../yxshop-shared:/app/shared
+      - ./config/application.yml:/app/config/application.yml
+      - ./config/yxshop-common.yml:/app/config/yxshop-common.yml
+    environment:
+      TZ: Asia/Shanghai
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${MYSQL_DATABASE:-yxshop}
+      DB_USERNAME: ${MYSQL_USER:-yxshop}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR:-localhost:8848}
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-yxshop}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - yxshop-net
+
+  # yxshop-admin 后台管理
+  yxshop-admin:
+    build: .
+    image: yxtech/yxshop-admin:1.0
+    container_name: yxshop-admin
+    restart: unless-stopped
+    ports:
+      - "8788:8788"
+    volumes:
+      - ../yxshop-admin:/app
+      - ../yxshop-shared:/app/shared
+      - ./config/yxshop-admin.yml:/app/config/application.yml
+      - ./config/yxshop-common.yml:/app/config/yxshop-common.yml
+    environment:
+      TZ: Asia/Shanghai
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${MYSQL_DATABASE:-yxshop}
+      DB_USERNAME: ${MYSQL_USER:-yxshop}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      API_BASE_URL: http://yxshop-php:8787
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR:-localhost:8848}
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-yxshop}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+    depends_on:
+      - mysql
+      - redis
+      - yxshop-php
+    networks:
+      - yxshop-net
+
+  # yxshop-h5 H5端
+  yxshop-h5:
+    build: .
+    image: yxtech/yxshop-h5:1.0
+    container_name: yxshop-h5
+    restart: unless-stopped
+    ports:
+      - "8789:8789"
+    volumes:
+      - ../yxshop-h5:/app
+      - ../yxshop-shared:/app/shared
+      - ./config/yxshop-h5.yml:/app/config/application.yml
+      - ./config/yxshop-common.yml:/app/config/yxshop-common.yml
+    environment:
+      TZ: Asia/Shanghai
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${MYSQL_DATABASE:-yxshop}
+      DB_USERNAME: ${MYSQL_USER:-yxshop}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      API_BASE_URL: http://yxshop-php:8787
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR:-localhost:8848}
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-yxshop}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+    depends_on:
+      - mysql
+      - redis
+      - yxshop-php
+    networks:
+      - yxshop-net
+
+networks:
+  yxshop-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  nginx-logs:
+    driver: local
