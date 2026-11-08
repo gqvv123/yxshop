@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#faf9f5" />
+  <meta name="description" content="盈锐商贸移动版 · 浏览商品、加购、下单、查订单" />
+  <title>盈锐商贸 · 移动版</title>
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/base.css" />
+  <link rel="stylesheet" href="assets/h5.css" />
+</head>
+<body>
+  <div class="phone-shell">
+    <header class="h5-header" id="h5Header">
+      <div class="h5-header-inner">
+        <a class="h5-brand" href="#/home">
+          <img src="assets/img/logo.svg" alt="" width="28" height="28" />
+          <span>盈锐商贸</span>
+        </a>
+        <a class="h5-header-link" href="index.html" aria-label="返回品牌官网">官网</a>
+      </div>
+    </header>
+
+    <main class="h5-main" id="h5Main" aria-live="polite">
+      <div class="h5-loading"><div class="skeleton" style="height:180px"></div><div class="skeleton" style="height:120px;margin-top:16px"></div></div>
+    </main>
+
+    <nav class="tabbar" id="tabbar" aria-label="主导航">
+      <a data-tab="home" href="#/home"><span class="tab-icon" data-icon="home"></span><span>首页</span></a>
+      <a data-tab="category" href="#/category"><span class="tab-icon" data-icon="category"></span><span>分类</span></a>
+      <a data-tab="cart" href="#/cart"><span class="tab-icon" data-icon="cart"></span><span>购物车</span><i class="tab-badge" id="cartBadge" hidden></i></a>
+      <a data-tab="me" href="#/me"><span class="tab-icon" data-icon="me"></span><span>我的</span></a>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="assets/api.js"></script>
+  <script src="assets/icons.js"></script>
+  <script src="assets/h5.js"></script>
+</body>
+</html>
