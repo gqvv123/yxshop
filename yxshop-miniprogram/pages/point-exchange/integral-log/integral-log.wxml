@@ -1,0 +1,63 @@
+<view class="log-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">积分明细</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <!-- 统计卡片 -->
+    <view class="stats-card">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.totalGain}}</text>
+        <text class="stat-label">累计获得</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.totalUsed}}</text>
+        <text class="stat-label">累计消耗</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.monthGain}}</text>
+        <text class="stat-label">本月获得</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view
+      class="tab-item {{activeTab === index ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="value"
+      data-idx="{{index}}"
+      bindtap="onTabChange"
+    >{{item.label}}</view>
+  </view>
+
+  <!-- 流水列表 -->
+  <view class="log-list" wx:if="{{list.length}}">
+    <view class="log-item" wx:for="{{list}}" wx:key="id">
+      <view class="li-icon {{item.isGain ? 'li-icon--gain' : 'li-icon--used'}}">
+        <mp-icon name="{{item.isGain ? 'arrow-down' : 'arrow-up'}}" size="16" color="#fff"></mp-icon>
+      </view>
+      <view class="li-info">
+        <text class="li-title">{{item.description || item.remark || item.title || '积分变动'}}</text>
+        <text class="li-date">{{item.created_at}}</text>
+      </view>
+      <text class="li-change {{item.isGain ? 'li-change--gain' : 'li-change--used'}}">{{item.changeText}}</text>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{loading}}">加载中...</view>
+  <view class="load-more" wx:if="{{!loading && !hasMore && list.length}}">没有更多了</view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty emoji="📊" text="暂无积分记录"></empty>
+  </view>
+</view>

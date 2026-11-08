@@ -1,0 +1,101 @@
+/* coupon-receive — 企业级领券中心 */
+.coupon-receive {
+  background: #fff;
+  margin: 12rpx 24rpx 0;
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.03);
+}
+.cr-header {
+  padding: 0 0 16rpx;
+}
+.cr-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.cr-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #0f172a;
+}
+.cr-tag {
+  background: rgba(37,99,235,0.1);
+  color: #2563eb;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.cr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.cr-card {
+  display: flex;
+  align-items: stretch;
+  border-radius: 14rpx;
+  overflow: hidden;
+}
+.cr-card-0 { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.cr-card-1 { background: linear-gradient(135deg, #dc2626, #f87171); }
+.cr-card-2 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+
+.cr-left {
+  color: #fff;
+  padding: 20rpx 24rpx;
+  text-align: center;
+  min-width: 140rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.cr-amount {
+  display: flex;
+  align-items: baseline;
+}
+.cr-symbol {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.cr-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  margin-left: 2rpx;
+}
+.cr-condition {
+  font-size: 20rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 4rpx;
+}
+.cr-right {
+  flex: 1;
+  background: #fff;
+  padding: 16rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
+}
+.cr-name {
+  font-size: 26rpx;
+  color: #0f172a;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 240rpx;
+}
+.cr-btn {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 28rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 10rpx rgba(37,99,235,0.2);
+}

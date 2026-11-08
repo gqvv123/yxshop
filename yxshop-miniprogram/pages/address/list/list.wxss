@@ -1,0 +1,169 @@
+/* address-list — 企业级收货地址（蓝色渐变风格） */
+.addr-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 180rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%);
+  padding: 0 0 40rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+.addr-count {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 40rpx 0 40rpx;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.7);
+  position: relative;
+  z-index: 2;
+}
+
+/* ========== 地址列表 ========== */
+.addr-list {
+  padding: 24rpx;
+}
+.addr-card {
+  background: var(--card);
+  border-radius: 28rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.03);
+}
+.addr-card--default {
+  border: 2rpx solid var(--primary);
+}
+.addr-main {
+  padding: 32rpx;
+}
+.addr-top {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.addr-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.addr-phone {
+  font-size: 28rpx;
+  color: var(--text-2);
+}
+.addr-badge {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 2rpx 14rpx;
+  border-radius: 10rpx;
+}
+.addr-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.addr-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 2rpx solid var(--bg-soft);
+  padding: 20rpx 32rpx;
+}
+.addr-act {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+.addr-act--active {
+  color: var(--primary);
+  font-weight: 600;
+}
+.addr-act--danger {
+  color: #dc2626;
+}
+.addr-act-group {
+  display: flex;
+  gap: 32rpx;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-3);
+  padding: 24rpx 0;
+}
+
+/* 空状态 */
+.empty-wrap { padding: 100rpx 0; }
+
+/* ========== 底部按钮 ========== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  padding: 20rpx 40rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.04);
+  z-index: 100;
+}
+.add-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(37,99,235,0.25);
+}

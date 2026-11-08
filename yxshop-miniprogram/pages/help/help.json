@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "帮助中心",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "empty": "/components/empty/index"
+  }
+}

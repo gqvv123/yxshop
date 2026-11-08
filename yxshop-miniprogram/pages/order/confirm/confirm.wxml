@@ -1,0 +1,198 @@
+<view class="confirm-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">确认订单</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="address-card" bindtap="onPickAddress">
+    <block wx:if="{{address}}">
+      <view class="addr-main">
+        <view class="addr-top">
+          <mp-icon name="map-pin" size="16" color="var(--primary)"></mp-icon>
+          <text class="addr-name">{{address.name}}</text>
+          <text class="addr-phone">{{address.phone}}</text>
+        </view>
+        <view class="addr-detail">
+          {{address.province_name}}{{address.city_name}}{{address.district_name}} {{address.detail}}
+        </view>
+      </view>
+    </block>
+    <view wx:else class="addr-empty">
+      <mp-icon name="map-pin" size="20" color="var(--text-3)"></mp-icon>
+      <text>点击选择收货地址</text>
+    </view>
+    <mp-icon name="chevron-right" size="16" color="var(--text-3)"></mp-icon>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-card" wx:if="{{goods.length}}">
+    <view class="gc-header">
+      <mp-icon name="package" size="16" color="var(--primary)"></mp-icon>
+      <text>商品信息</text>
+    </view>
+    <view class="goods-item" wx:for="{{goods}}" wx:key="id">
+      <image class="goods-cover" src="{{item.main_image || item.cover || ''}}" mode="aspectFill" lazy-load></image>
+      <view class="goods-info">
+        <view class="goods-name ellipsis-2">{{item.goods_name || item.name}}</view>
+        <view wx:if="{{item.spec_key_name}}" class="goods-spec">{{item.spec_key_name}}</view>
+        <view class="goods-bottom">
+          <text class="goods-price">¥{{item.price || item.sale_price || '0.00'}}</text>
+          <text class="goods-qty">×{{item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优惠券 + 会员权益 -->
+  <view class="form-card">
+    <view class="coupon-row" bindtap="onOpenCouponSheet">
+      <view class="cr-left">
+        <mp-icon name="ticket" size="16" color="var(--primary)"></mp-icon>
+        <text class="cr-label">优惠券</text>
+      </view>
+      <view class="cr-right">
+        <text wx:if="{{couponName}}" class="cr-value">{{couponName}}</text>
+        <text wx:elif="{{coupons.length}}" class="cr-value">{{coupons.length}} 张可用</text>
+        <text wx:else class="cr-placeholder">暂无可用</text>
+        <mp-icon name="chevron-right" size="14" color="var(--text-3)"></mp-icon>
+      </view>
+    </view>
+
+    <view class="coupon-row" wx:if="{{member && member.has_discount}}">
+      <view class="cr-left">
+        <mp-icon name="crown" size="16" color="#f59e0b"></mp-icon>
+        <text class="cr-label">会员权益</text>
+      </view>
+      <view class="cr-right">
+        <text class="cr-value">{{member.level_name}} · {{member.discount}} 折</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 配送方式（对应管理端「物流配送 → 配送模板」） -->
+  <view class="form-card" wx:if="{{deliveries.length}}">
+    <view class="fc-label">配送方式</view>
+    <view class="delivery-list">
+      <view class="delivery-item {{deliveryId === item.id ? 'active' : ''}}" wx:for="{{deliveries}}" wx:key="id" data-id="{{item.id}}" bindtap="onDeliveryChange">
+        <view class="di-info">
+          <text class="di-name">{{item.name}}</text>
+          <text class="di-desc" wx:if="{{item.method === 10}}">按件计费</text>
+          <text class="di-desc" wx:else>按重量计费</text>
+        </view>
+        <mp-icon wx:if="{{deliveryId === item.id}}" name="check" size="18" color="var(--primary)"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="form-card">
+    <view class="fc-label">订单备注</view>
+    <input class="fc-input" placeholder="选填，50字以内" placeholder-class="ph" maxlength="50" bindinput="onRemarkInput" />
+  </view>
+
+  <!-- 支付方式 -->
+  <view class="form-card">
+    <view class="fc-label">支付方式</view>
+    <radio-group class="pay-options" bindchange="onPaymentChange">
+      <label class="pay-option">
+        <radio value="wechat" checked="{{paymentMethod === 'wechat'}}" color="var(--primary)"/>
+        <view class="po-info">
+          <mp-icon name="message" size="18" color="#10b981"></mp-icon>
+          <text>微信支付</text>
+        </view>
+      </label>
+      <label class="pay-option">
+        <radio value="alipay" checked="{{paymentMethod === 'alipay'}}" color="var(--primary)"/>
+        <view class="po-info">
+          <mp-icon name="credit-card" size="18" color="#3b82f6"></mp-icon>
+          <text>支付宝</text>
+        </view>
+      </label>
+    </radio-group>
+  </view>
+
+  <!-- 合计 -->
+  <view class="summary-card">
+    <view class="sum-row">
+      <text>商品合计</text>
+      <text class="sum-price">¥{{goodsAmount}}</text>
+    </view>
+    <view class="sum-row" wx:if="{{member && member.has_discount}}">
+      <text>会员折扣（{{member.discount}} 折）</text>
+      <text class="sum-discount">-¥{{memberDiscount}}</text>
+    </view>
+    <view class="sum-row" wx:if="{{couponId}}">
+      <text>优惠券</text>
+      <text class="sum-discount">-¥{{couponDiscount}}</text>
+    </view>
+    <view class="sum-row">
+      <text>运费</text>
+      <text class="sum-price">{{freightFree ? '包邮' : '¥' + shippingFee}}</text>
+    </view>
+    <view class="sum-row sub">
+      <text>共 {{totalQty}} 件商品</text>
+      <text wx:if="{{previewing}}" class="calc-hint">金额计算中…</text>
+    </view>
+  </view>
+
+  <!-- 底部 -->
+  <view class="bottom-bar safe-area-bottom">
+    <view class="bb-total">
+      <text>合计</text>
+      <text class="bb-price">¥{{payTotal}}</text>
+    </view>
+    <view class="bb-submit {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '处理中…' : '提交订单'}}
+    </view>
+  </view>
+
+  <!-- ===== 优惠券选择弹层 ===== -->
+  <view class="sheet-mask {{showCouponSheet ? 'show' : ''}}" bindtap="onCloseCouponSheet"></view>
+  <view class="coupon-sheet {{showCouponSheet ? 'show' : ''}}" catchtap="noop">
+    <view class="cs-header">
+      <text class="cs-title">选择优惠券</text>
+      <view class="cs-close" bindtap="onCloseCouponSheet">
+        <mp-icon name="close" size="18" color="var(--text-3)"></mp-icon>
+      </view>
+    </view>
+
+    <scroll-view class="cs-body" scroll-y>
+      <view class="cs-item {{couponId === item.coupon_id ? 'active' : ''}}"
+            wx:for="{{coupons}}" wx:key="coupon_id"
+            data-id="{{item.coupon_id}}" bindtap="onSelectCoupon">
+        <view class="ci-left">
+          <view class="ci-amount">
+            <text class="ci-symbol">¥</text>
+            <text class="ci-num">{{item.amountText}}</text>
+          </view>
+          <text class="ci-threshold" wx:if="{{item.hasThreshold}}">满 {{item.minText}} 可用</text>
+          <text class="ci-threshold" wx:else>无门槛</text>
+        </view>
+        <view class="ci-mid">
+          <text class="ci-name">{{item.name}}</text>
+          <text class="ci-tip">本单可抵扣 ¥{{item.amountText}}</text>
+        </view>
+        <mp-icon wx:if="{{couponId === item.coupon_id}}" name="check-circle" size="20" color="var(--primary)"></mp-icon>
+      </view>
+
+      <view class="cs-item none {{couponId === 0 ? 'active' : ''}}" bindtap="onClearCoupon">
+        <view class="ci-mid">
+          <text class="ci-name">不使用优惠券</text>
+        </view>
+        <mp-icon wx:if="{{couponId === 0}}" name="check-circle" size="20" color="var(--primary)"></mp-icon>
+      </view>
+    </scroll-view>
+
+    <view class="cs-footer">
+      <text class="cs-count">共 {{coupons.length}} 张可用</text>
+    </view>
+  </view>
+</view>

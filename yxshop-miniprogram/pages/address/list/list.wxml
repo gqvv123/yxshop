@@ -1,0 +1,75 @@
+<view class="addr-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">收货地址</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <view class="addr-count" wx:if="{{list.length}}">
+      <mp-icon name="map-pin" size="14" color="rgba(255,255,255,0.7)"></mp-icon>
+      <text>共 {{list.length}} 个收货地址</text>
+    </view>
+  </view>
+
+  <!-- ===== 地址列表 ===== -->
+  <view class="addr-list" wx:if="{{list.length}}">
+    <view
+      class="addr-card {{item.is_default == 1 ? 'addr-card--default' : ''}}"
+      wx:for="{{list}}"
+      wx:key="id"
+      data-item="{{item}}"
+      bindtap="onPick"
+    >
+      <view class="addr-main">
+        <view class="addr-top">
+          <text class="addr-name">{{item.name}}</text>
+          <text class="addr-phone">{{item.phone}}</text>
+          <view wx:if="{{item.is_default == 1}}" class="addr-badge">默认</view>
+        </view>
+        <view class="addr-detail">
+          <mp-icon name="map-pin" size="14" color="#94a3b8"></mp-icon>
+          <text>{{item.province_name}}{{item.city_name}}{{item.district_name}} {{item.detail}}</text>
+        </view>
+      </view>
+      <view wx:if="{{!picker}}" class="addr-actions">
+        <view
+          class="addr-act {{item.is_default == 1 ? 'addr-act--active' : ''}}"
+          data-id="{{item.id}}"
+          catchtap="onSetDefault"
+        >
+          <mp-icon name="check-circle" size="14" color="{{item.is_default == 1 ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+          <text>{{item.is_default == 1 ? '默认地址' : '设为默认'}}</text>
+        </view>
+        <view class="addr-act-group">
+          <view class="addr-act" data-id="{{item.id}}" catchtap="onEdit">
+            <mp-icon name="settings" size="14" color="#475569"></mp-icon>
+            <text>编辑</text>
+          </view>
+          <view class="addr-act addr-act--danger" data-id="{{item.id}}" catchtap="onDelete">
+            <mp-icon name="trash" size="14" color="#dc2626"></mp-icon>
+            <text>删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 加载中 -->
+    <view class="load-more" wx:if="{{loading}}">加载中...</view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view wx:if="{{!loading && !list.length}}" class="empty-wrap">
+    <empty text="还没有收货地址" actionText="新增地址" bind:action="onAdd"></empty>
+  </view>
+
+  <!-- ===== 底部新增按钮 ===== -->
+  <view class="bottom-bar">
+    <view class="add-btn" bindtap="onAdd">
+      <mp-icon name="plus" size="18" color="#fff"></mp-icon>
+      <text>新增收货地址</text>
+    </view>
+  </view>
+</view>

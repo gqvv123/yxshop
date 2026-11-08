@@ -1,0 +1,12 @@
+/* rich-text — 企业级富文本卡片 */
+.mp-rich-text {
+  background: #fff;
+  margin: 12rpx 24rpx 0;
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #475569;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.03);
+}

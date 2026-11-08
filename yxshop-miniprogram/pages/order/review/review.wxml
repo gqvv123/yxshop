@@ -1,0 +1,84 @@
+<view class="review-page" wx:if="{{order}}">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">发表评价</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- ===== 评分卡片 ===== -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="star" size="16" color="var(--primary)"></mp-icon>
+      <text>商品评分</text>
+    </view>
+    <view class="stars">
+      <view
+        wx:for="{{[1,2,3,4,5]}}"
+        wx:key="*this"
+        class="star {{rating >= item ? 'star--active' : ''}}"
+        data-score="{{item}}"
+        bindtap="onRate"
+      >
+        <mp-icon name="star" size="32" color="{{rating >= item ? '#f59e0b' : '#e2e8f0'}}"></mp-icon>
+      </view>
+    </view>
+    <text class="rating-text">{{rating === 5 ? '非常满意' : rating === 4 ? '满意' : rating === 3 ? '一般' : rating === 2 ? '不满意' : '很不满意'}}</text>
+  </view>
+
+  <!-- ===== 评价内容 ===== -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="edit" size="16" color="var(--primary)"></mp-icon>
+      <text>评价内容</text>
+    </view>
+    <textarea
+      class="content-textarea"
+      placeholder="请输入评价内容（至少5个字）"
+      placeholder-class="ph"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="500"
+    />
+    <view class="char-count">{{content.length}}/500</view>
+  </view>
+
+  <!-- ===== 上传图片 ===== -->
+  <view class="section-card">
+    <view class="card-header">
+      <mp-icon name="image" size="16" color="var(--primary)"></mp-icon>
+      <text>上传截图（可选）</text>
+    </view>
+    <view class="img-grid">
+      <view wx:for="{{images}}" wx:key="*this" class="img-wrap">
+        <image src="{{item}}" mode="aspectFill" class="img-item"></image>
+        <view class="img-del" data-index="{{index}}" bindtap="onRemoveImage">
+          <mp-icon name="x" size="14" color="#fff"></mp-icon>
+        </view>
+      </view>
+      <view wx:if="{{images.length < 9}}" class="img-add" bindtap="onChooseImage">
+        <mp-icon name="plus" size="28" color="var(--text-3)"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 匿名评价 ===== -->
+  <view class="section-card row-card">
+    <text>匿名评价</text>
+    <switch checked="{{isAnonymous}}" bindchange="onToggleAnonymous" color="var(--primary)" />
+  </view>
+
+  <!-- ===== 提交按钮 ===== -->
+  <view class="submit-area">
+    <button class="submit-btn {{submitting ? 'disabled' : ''}}" loading="{{submitting}}" bindtap="onSubmit">
+      提交评价
+    </button>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

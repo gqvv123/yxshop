@@ -1,0 +1,145 @@
+/* records — 兑换记录页面 */
+.records-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+.top-bar {
+  background: linear-gradient(160deg, #4c1d95 0%, #6b21a8 45%, #8b5cf6 100%);
+  padding: 0 40rpx 32rpx 40rpx;
+  position: relative;
+  overflow: hidden;
+}
+.nav-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder {
+  width: 64rpx;
+}
+
+.record-list {
+  padding: 24rpx;
+}
+.record-card {
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow-sm);
+}
+.rc-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+}
+.rc-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+.rc-img--placeholder {
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rc-info {
+  flex: 1;
+  min-width: 0;
+}
+.rc-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+.rc-meta {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+.rc-points {
+  font-size: 26rpx;
+  color: var(--purple);
+  font-weight: 700;
+}
+.rc-money {
+  font-size: 24rpx;
+  color: var(--danger);
+}
+.rc-date {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+  display: block;
+}
+.rc-status {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+.rc-status--pending {
+  background: #fffbeb;
+  color: var(--accent);
+}
+.rc-status--shipped {
+  background: var(--primary-50);
+  color: var(--primary);
+}
+.rc-status--done {
+  background: #ecfdf5;
+  color: var(--success);
+}
+.rc-status--cancelled {
+  background: #f1f5f9;
+  color: var(--text-3);
+}
+.rc-express {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--line-light);
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+
+.load-more {
+  text-align: center;
+  padding: 24rpx;
+  color: var(--text-3);
+  font-size: 24rpx;
+}
+.empty-wrap {
+  padding-top: 120rpx;
+}

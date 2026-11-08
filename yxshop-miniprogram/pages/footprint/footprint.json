@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "浏览记录",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "empty": "/components/empty/index"
+  }
+}

@@ -1,0 +1,53 @@
+<view class="tasks-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">积分任务</text>
+      <view class="nav-placeholder"></view>
+    </view>
+    <view class="points-bar">
+      <view class="pb-icon">
+        <mp-icon name="crown" size="24" color="#fff"></mp-icon>
+      </view>
+      <text class="pb-text">我的积分</text>
+      <text class="pb-num">{{points}}</text>
+    </view>
+  </view>
+
+  <!-- 任务列表 -->
+  <view class="task-section" wx:if="{{tasks.length}}">
+    <view class="task-card" wx:for="{{tasks}}" wx:key="id">
+      <view class="tc-icon tc-icon--{{index % 4}}">
+        <mp-icon name="{{item.iconType}}" size="22" color="#fff"></mp-icon>
+      </view>
+      <view class="tc-info">
+        <text class="tc-name">{{item.name || item.task_name}}</text>
+        <text class="tc-desc" wx:if="{{item.condition_desc || item.description || item.desc}}">{{item.condition_desc || item.description || item.desc}}</text>
+        <view class="tc-progress" wx:if="{{item.progress !== undefined}}">
+          <view class="tc-progress-bar">
+            <view class="tc-progress-fill" style="width: {{item.progress}}%;"></view>
+          </view>
+          <text class="tc-progress-text">{{item.current || 0}}/{{item.target || 0}}</text>
+        </view>
+      </view>
+      <view class="tc-right">
+        <text class="tc-points">+{{item.reward_points || item.points || 0}}分</text>
+        <view
+          class="tc-btn tc-btn--{{item.statusClass}}"
+          data-id="{{item.id}}"
+          data-can-claim="{{item.can_claim}}"
+          bindtap="onClaim"
+        >{{item.statusText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && !tasks.length}}" class="empty-wrap">
+    <empty emoji="📋" text="暂无积分任务"></empty>
+  </view>
+</view>

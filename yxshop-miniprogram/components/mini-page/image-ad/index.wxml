@@ -1,0 +1,13 @@
+<view class="image-ad" wx:if="{{images.length}}">
+  <view class="image-ad-inner layout-{{layout}}">
+    <view
+      wx:for="{{images}}"
+      wx:key="index"
+      class="image-ad-item"
+      bindtap="onImageTap"
+      data-index="{{index}}"
+    >
+      <image class="ad-img" src="{{item.url}}" mode="aspectFill" lazy-load></image>
+    </view>
+  </view>
+</view>

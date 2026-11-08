@@ -1,0 +1,68 @@
+.page { min-height: 100vh; background: #f5f6f8; padding-bottom: 40rpx; }
+.tab-bar { display: flex; background: #fff; }
+.tab-item {
+  flex: 1; text-align: center; padding: 26rpx 0;
+  font-size: 28rpx; color: #888; position: relative;
+}
+.tab-item.active { color: #ff5b28; font-weight: 600; }
+.tab-item.active::after {
+  content: ''; position: absolute; left: 30%; right: 30%; bottom: 8rpx;
+  height: 6rpx; background: #ff5b28; border-radius: 4rpx;
+}
+.sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28rpx 24rpx 16rpx;
+}
+.sec-title { font-size: 30rpx; font-weight: 600; color: #222; }
+.add-btn {
+  display: flex; align-items: center; gap: 6rpx;
+  background: #ff5b28; color: #fff; font-size: 24rpx;
+  padding: 10rpx 24rpx; border-radius: 999rpx;
+}
+.hdr-list, .rec-list { padding: 0 24rpx; }
+.hdr-card, .rec-card {
+  background: #fff; border-radius: 14rpx; padding: 26rpx; margin-bottom: 18rpx;
+}
+.hdr-head, .rec-head { display: flex; align-items: center; gap: 14rpx; }
+.hdr-name, .rec-no { font-size: 30rpx; font-weight: 600; color: #222; }
+.hdr-default {
+  font-size: 20rpx; color: #fff; background: #ff5b28;
+  padding: 2rpx 12rpx; border-radius: 6rpx;
+}
+.hdr-type, .rec-status {
+  margin-left: auto; font-size: 22rpx; color: #888; background: #f2f3f5;
+  padding: 4rpx 14rpx; border-radius: 999rpx;
+}
+.hdr-line, .rec-line { font-size: 24rpx; color: #666; margin-top: 12rpx; }
+.rec-line.danger { color: #ff4d4f; }
+.hdr-actions { display: flex; justify-content: flex-end; gap: 28rpx; margin-top: 20rpx; }
+.hdr-act { font-size: 24rpx; color: #ff5b28; }
+.hdr-act.danger { color: #999; }
+.form-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: flex-end; z-index: 100;
+}
+.form-panel {
+  width: 100%; background: #fff; border-radius: 24rpx 24rpx 0 0;
+  padding: 36rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
+  max-height: 86vh; overflow-y: auto;
+}
+.form-title { font-size: 32rpx; font-weight: 700; text-align: center; color: #222; }
+.form-row { margin-top: 24rpx; }
+.form-label { font-size: 24rpx; color: #666; display: block; margin-bottom: 10rpx; }
+.form-input {
+  background: #f5f6f8; border-radius: 10rpx; height: 76rpx;
+  padding: 0 20rpx; font-size: 27rpx;
+}
+.type-group { display: flex; gap: 16rpx; }
+.type-opt {
+  padding: 12rpx 36rpx; background: #f5f6f8; border-radius: 999rpx;
+  font-size: 26rpx; color: #666;
+}
+.type-opt.active { background: #ff5b28; color: #fff; }
+.form-actions { display: flex; gap: 20rpx; margin-top: 40rpx; }
+.form-btn {
+  flex: 1; text-align: center; padding: 22rpx 0;
+  border-radius: 999rpx; font-size: 28rpx; background: #f2f3f5; color: #666;
+}
+.form-btn.primary { background: #ff5b28; color: #fff; }

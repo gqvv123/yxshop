@@ -1,0 +1,32 @@
+function num(v) {
+  var n = parseFloat(v);
+  if (n != n) return 0;
+  return n;
+}
+
+// px in admin -> rpx in miniprogram (design width 375px = 750rpx)
+function toRpx(v) {
+  return (num(v) * 2) + 'rpx';
+}
+
+function blockStyle(props) {
+  if (!props || !props._style) return '';
+  var s = props._style;
+  var css = '';
+  css += 'margin:' + toRpx(s.margin_top) + ' ' + toRpx(s.margin_right) + ' ' + toRpx(s.margin_bottom) + ' ' + toRpx(s.margin_left) + ';';
+  css += 'padding:' + toRpx(s.padding_top) + ' ' + toRpx(s.padding_right) + ' ' + toRpx(s.padding_bottom) + ' ' + toRpx(s.padding_left) + ';';
+  if (num(s.border_width) > 0) {
+    css += 'border:' + toRpx(s.border_width) + ' ' + (s.border_style || 'solid') + ' ' + (s.border_color || '#e5e5e5') + ';';
+  }
+  if (num(s.border_radius) > 0) {
+    css += 'border-radius:' + toRpx(s.border_radius) + ';overflow:hidden;';
+  }
+  if (s.background_color) {
+    css += 'background-color:' + s.background_color + ';';
+  }
+  return css;
+}
+
+module.exports = {
+  blockStyle: blockStyle
+};

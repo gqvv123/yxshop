@@ -1,0 +1,39 @@
+<view class="mp-swiper-wrap">
+  <swiper
+    wx:if="{{images.length}}"
+    class="mp-swiper"
+    autoplay="{{autoplay}}"
+    interval="{{interval}}"
+    circular="{{circular}}"
+    indicator-dots="{{indicatorDots}}"
+    indicator-color="rgba(255,255,255,.4)"
+    indicator-active-color="#fff"
+  >
+    <swiper-item
+      wx:for="{{images}}"
+      wx:key="index"
+    >
+      <image
+        class="swiper-img"
+        src="{{item.image || item.url}}"
+        mode="aspectFill"
+        lazy-load
+        bindtap="onImageTap"
+        binderror="onImageError"
+        data-index="{{index}}"
+      ></image>
+    </swiper-item>
+  </swiper>
+
+  <!-- 无图片时的占位 Banner -->
+  <view wx:else class="mp-swiper swiper-placeholder" bindtap="onPlaceholderTap">
+    <view class="placeholder-inner">
+      <text class="placeholder-text">企业采购节 · 预热</text>
+      <text class="placeholder-sub">满 10000 减 800 · 认证再享 95 折</text>
+      <view class="placeholder-tag">
+        <text class="tag-text">立即抢购</text>
+      </view>
+    </view>
+    <view class="placeholder-deco"></view>
+  </view>
+</view>

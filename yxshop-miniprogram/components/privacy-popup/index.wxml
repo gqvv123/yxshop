@@ -1,0 +1,14 @@
+<view wx:if="{{visible}}" class="privacy-mask" catchtap="">
+  <view class="privacy-panel">
+    <view class="privacy-title">隐私保护指引</view>
+    <view class="privacy-content">
+      <text>在使用本服务前，请仔细阅读</text>
+      <text class="privacy-link" bindtap="onViewContract">{{privacyContractName}}</text>
+      <text>。如您同意，请点击"同意并继续"。</text>
+    </view>
+    <view class="privacy-actions">
+      <view class="privacy-btn privacy-btn--disagree" bindtap="onDisagree">拒绝</view>
+      <view class="privacy-btn privacy-btn--agree" bindtap="onAgree">同意并继续</view>
+    </view>
+  </view>
+</view>

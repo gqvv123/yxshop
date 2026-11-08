@@ -1,0 +1,195 @@
+<view class="vfy-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <!-- 导航栏 -->
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">企业认证</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 认证状态 -->
+    <view class="hero-status">
+      <view class="hs-icon {{status === 2 ? 'hs-icon-success' : (status === 1 ? 'hs-icon-pending' : (status === 3 ? 'hs-icon-reject' : ''))}}">
+        <mp-icon name="{{status === 2 ? 'check-circle' : (status === 1 ? 'clock' : (status === 3 ? 'alert-circle' : 'shield'))}}" size="28" color="#fff"></mp-icon>
+      </view>
+      <text class="hs-text">{{statusText}}</text>
+      <text class="hs-sub" wx:if="{{status === 1}}">预计1-3个工作日完成审核</text>
+      <text class="hs-sub" wx:if="{{status === 3}}">请修改资料后重新提交</text>
+      <text class="hs-sub" wx:if="{{status === 0}}">完成认证后享专属权益</text>
+    </view>
+  </view>
+
+  <!-- ===== 认证权益（未认证时显示） ===== -->
+  <view wx:if="{{status === 0 || status === 3}}" class="section-card benefits-card">
+    <view class="card-header">
+      <mp-icon name="gift" size="18" color="#2563eb"></mp-icon>
+      <text>认证权益</text>
+    </view>
+    <view class="benefits-grid">
+      <view class="benefit-item" wx:for="{{benefits}}" wx:key="title">
+        <view class="bi-icon bi-icon-{{index + 1}}">
+          <mp-icon name="{{item.icon}}" size="20" color="#fff"></mp-icon>
+        </view>
+        <text class="bi-title">{{item.title}}</text>
+        <text class="bi-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 拒绝原因 ===== -->
+  <view wx:if="{{status === 3 && detail && detail.reject_reason}}" class="section-card reject-card">
+    <view class="reject-warn">
+      <mp-icon name="alert-circle" size="20" color="#dc2626"></mp-icon>
+      <text class="reject-title">审核未通过</text>
+    </view>
+    <text class="reject-reason">{{detail.reject_reason}}</text>
+  </view>
+
+  <!-- ===== 已认证信息展示 ===== -->
+  <view wx:if="{{status === 2 && detail}}" class="section-card">
+    <view class="card-header">
+      <mp-icon name="file-text" size="18" color="#2563eb"></mp-icon>
+      <text>认证信息</text>
+    </view>
+    <view class="info-list">
+      <view class="info-row">
+        <text class="ir-label">企业名称</text>
+        <text class="ir-value">{{detail.company_name}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">信用代码</text>
+        <text class="ir-value">{{detail.credit_code}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">法定代表人</text>
+        <text class="ir-value">{{detail.legal_person}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">联系电话</text>
+        <text class="ir-value">{{detail.contact_phone}}</text>
+      </view>
+      <view class="info-row" wx:if="{{detail.created_at}}">
+        <text class="ir-label">认证日期</text>
+        <text class="ir-value">{{detail.created_at}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 审核中信息展示 ===== -->
+  <view wx:if="{{status === 1 && detail}}" class="section-card">
+    <view class="card-header">
+      <mp-icon name="file-text" size="18" color="#2563eb"></mp-icon>
+      <text>提交信息</text>
+    </view>
+    <view class="info-list">
+      <view class="info-row">
+        <text class="ir-label">企业名称</text>
+        <text class="ir-value">{{detail.company_name}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">信用代码</text>
+        <text class="ir-value">{{detail.credit_code}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">法定代表人</text>
+        <text class="ir-value">{{detail.legal_person}}</text>
+      </view>
+      <view class="info-row">
+        <text class="ir-label">联系电话</text>
+        <text class="ir-value">{{detail.contact_phone}}</text>
+      </view>
+    </view>
+    <view class="license-preview" wx:if="{{licensePreview}}">
+      <image class="lp-img" src="{{licensePreview}}" mode="aspectFit"></image>
+    </view>
+  </view>
+
+  <!-- ===== 认证表单（未认证 / 被拒绝时显示） ===== -->
+  <view wx:if="{{status === 0 || status === 3}}">
+    <view class="section-card form-card">
+      <view class="card-header">
+        <mp-icon name="edit" size="18" color="#2563eb"></mp-icon>
+        <text>企业资料</text>
+      </view>
+      <view class="form-list">
+        <view class="form-row">
+          <text class="form-label">企业名称 <text class="required">*</text></text>
+          <input class="form-input" placeholder="请输入企业全称" value="{{form.company_name}}" data-field="company_name" bindinput="onInput" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">统一社会信用代码 <text class="required">*</text></text>
+          <input class="form-input" placeholder="18位信用代码" value="{{form.credit_code}}" data-field="credit_code" bindinput="onInput" maxlength="18" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">法定代表人 <text class="required">*</text></text>
+          <input class="form-input" placeholder="请输入法定代表人姓名" value="{{form.legal_person}}" data-field="legal_person" bindinput="onInput" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">联系人姓名</text>
+          <input class="form-input" placeholder="不填则默认为法人" value="{{form.contact_name}}" data-field="contact_name" bindinput="onInput" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">联系电话 <text class="required">*</text></text>
+          <input class="form-input" type="number" placeholder="请输入手机号码" value="{{form.contact_phone}}" data-field="contact_phone" bindinput="onInput" maxlength="11" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 证件上传 -->
+    <view class="section-card form-card">
+      <view class="card-header">
+        <mp-icon name="image" size="18" color="#2563eb"></mp-icon>
+        <text>证件上传</text>
+      </view>
+      <view class="upload-list">
+        <!-- 营业执照 -->
+        <view class="upload-item">
+          <text class="upload-label">营业执照 <text class="required">*</text></text>
+          <view class="upload-box" bindtap="onUploadLicense">
+            <image wx:if="{{licensePreview}}" class="upload-preview" src="{{licensePreview}}" mode="aspectFit"></image>
+            <view wx:else class="upload-placeholder">
+              <mp-icon name="image" size="32" color="#cbd5e1"></mp-icon>
+              <text class="upload-tip">上传营业执照</text>
+            </view>
+          </view>
+        </view>
+        <!-- 身份证正面 -->
+        <view class="upload-item">
+          <text class="upload-label">法人身份证（正面）</text>
+          <view class="upload-box" bindtap="onUploadIdCard" data-field="id_card_front">
+            <image wx:if="{{idFrontPreview}}" class="upload-preview" src="{{idFrontPreview}}" mode="aspectFit"></image>
+            <view wx:else class="upload-placeholder">
+              <mp-icon name="image" size="32" color="#cbd5e1"></mp-icon>
+              <text class="upload-tip">上传身份证正面</text>
+            </view>
+          </view>
+        </view>
+        <!-- 身份证反面 -->
+        <view class="upload-item">
+          <text class="upload-label">法人身份证（反面）</text>
+          <view class="upload-box" bindtap="onUploadIdCard" data-field="id_card_back">
+            <image wx:if="{{idBackPreview}}" class="upload-preview" src="{{idBackPreview}}" mode="aspectFit"></image>
+            <view wx:else class="upload-placeholder">
+              <mp-icon name="image" size="32" color="#cbd5e1"></mp-icon>
+              <text class="upload-tip">上传身份证反面</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-area">
+      <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+        <text>{{submitting ? '提交中...' : '提交认证'}}</text>
+      </view>
+      <text class="submit-tip">提交后将在1-3个工作日内完成审核</text>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

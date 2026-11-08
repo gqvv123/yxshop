@@ -1,0 +1,74 @@
+<view class="product-list">
+  <!-- 标题 -->
+  <view wx:if="{{title}}" class="pl-header">
+    <view class="pl-title-wrap">
+      <mp-icon wx:if="{{icon}}" name="{{icon}}" size="16" color="#0f172a"></mp-icon>
+      <text class="pl-title">{{title}}</text>
+      <view wx:if="{{tagText}}" class="pl-tag">{{tagText}}</view>
+    </view>
+    <view wx:if="{{showMore}}" class="pl-more" bindtap="onMoreTap">
+      <text class="pl-more-text">查看全部</text>
+      <text class="pl-more-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 加载中骨架 -->
+  <view wx:if="{{loading}}" class="pl-loading">
+    <view class="pl-skeleton-row" style="grid-template-columns: repeat({{columns}}, 1fr);">
+      <view class="pl-skeleton-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+        <view class="pl-skeleton-img skeleton-anim"></view>
+        <view class="pl-skeleton-line skeleton-anim" style="width: 80%;"></view>
+        <view class="pl-skeleton-line skeleton-anim" style="width: 50%;"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 有数据时 -->
+  <block wx:elif="{{items.length}}">
+    <view class="grid-wrap" style="grid-template-columns: repeat({{columns}}, 1fr);">
+      <view
+        wx:for="{{items}}"
+        wx:key="id"
+        class="product-item"
+        bindtap="onItemTap"
+        data-id="{{item.id}}"
+      >
+        <view class="cover-wrap">
+          <image wx:if="{{item.cover}}" class="cover" src="{{item.cover}}" mode="aspectFill" lazy-load binderror="onCoverError" data-index="{{index}}"></image>
+          <view wx:else class="cover cover-fallback">
+            <mp-icon name="package" size="40" color="#94a3b8"></mp-icon>
+            <text class="cover-fallback-text">暂无图片</text>
+          </view>
+          <view wx:if="{{item.badge}}" class="item-badge">{{item.badge}}</view>
+        </view>
+        <view class="info">
+          <view class="title ellipsis-2">{{item.name}}</view>
+          <view class="tags" wx:if="{{item.tags.length}}">
+            <view wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="mini-tag tag-{{tag.type}}">{{tag.text}}</view>
+          </view>
+          <view class="bottom">
+            <view class="price-area">
+              <text class="symbol">¥</text>
+              <text class="price">{{item.price}}</text>
+              <text wx:if="{{item.original_price}}" class="origin-price">¥{{item.original_price}}</text>
+            </view>
+            <view wx:if="{{showCart}}" class="cart-btn" catchtap="onAddCart" data-id="{{item.id}}">
+              <mp-icon name="plus" size="14" color="#fff"></mp-icon>
+            </view>
+            <text wx:elif="{{showSales && item.sales}}" class="sold">已售{{item.sales}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 加载失败 -->
+  <view wx:elif="{{loadError}}" class="load-error" bindtap="onRetry">
+    <text class="load-error-text">加载失败，点击重试</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:else class="pl-empty">
+    <text class="pl-empty-text">暂无商品</text>
+  </view>
+</view>

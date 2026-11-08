@@ -1,0 +1,8 @@
+.mp-icon {
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  pointer-events: none;
+}

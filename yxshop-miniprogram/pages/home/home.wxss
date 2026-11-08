@@ -1,0 +1,148 @@
+.page {
+  padding-bottom: 160rpx;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ===== Hero 渐变区 ===== */
+.hero-zone {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 32rpx;
+}
+.hero-zone::before {
+  content: '';
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-zone::after {
+  content: '';
+  position: absolute;
+  bottom: 60rpx;
+  left: -120rpx;
+  width: 320rpx;
+  height: 320rpx;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== 内容区（白色圆角顶部） ===== */
+.content-body {
+  background: var(--bg);
+  border-radius: 32rpx 32rpx 0 0;
+  margin-top: -16rpx;
+  position: relative;
+  z-index: 3;
+  padding-top: 4rpx;
+  min-height: 200rpx;
+}
+
+/* 组件块间距 — 对照设计稿 12px(24rpx) 间距 */
+.mp-block {
+  margin-bottom: 12rpx;
+}
+.mp-block:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== 骨架屏 ===== */
+.skeleton { padding: 0; }
+.sk-header {
+  height: 120rpx;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+}
+.sk-header-bar {
+  height: 100%;
+}
+.sk-search {
+  height: 72rpx;
+  margin: 16rpx 24rpx;
+  border-radius: 36rpx;
+  background: var(--line);
+}
+.sk-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+  padding: 20rpx 24rpx;
+  background: var(--card);
+}
+.sk-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+.sk-grid-circle {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: var(--line);
+}
+.sk-grid-line {
+  width: 60rpx;
+  height: 16rpx;
+  border-radius: 8rpx;
+  background: var(--line);
+}
+.sk-banner {
+  height: 280rpx;
+  margin: 16rpx 24rpx;
+  border-radius: 20rpx;
+  background: var(--line);
+}
+.sk-product-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  padding: 16rpx 24rpx;
+}
+.sk-product-card {
+  background: var(--card);
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+.sk-product-img {
+  width: 100%;
+  height: 300rpx;
+  background: var(--line);
+}
+.sk-product-line {
+  height: 24rpx;
+  margin: 14rpx 18rpx 0;
+  border-radius: 6rpx;
+  background: var(--line);
+}
+.sk-product-line-short {
+  width: 50%;
+  height: 24rpx;
+  margin: 8rpx 18rpx 14rpx;
+  border-radius: 6rpx;
+  background: var(--line);
+}
+.skeleton-anim {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 空状态 */
+.fallback-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}

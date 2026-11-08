@@ -1,0 +1,18 @@
+<view class="promo-banner style-{{style}}" wx:if="{{title || subtitle}}" style="--bg1: {{bg1}}; --bg2: {{bg2}};" bindtap="onBtnTap">
+  <view class="pb-glass-overlay" wx:if="{{style === 'glass'}}"></view>
+
+  <view class="pb-pulse" wx:if="{{showPulse}}"></view>
+
+  <view class="pb-icon-wrap" wx:if="{{icon}}" style="{{iconBg ? 'background:' + iconBg + ';' : ''}}">
+    <mp-icon name="{{icon}}" size="18" color="#fff"></mp-icon>
+  </view>
+
+  <view class="pb-content">
+    <text class="pb-title">{{title}}</text>
+    <text class="pb-subtitle" wx:if="{{subtitle}}">{{subtitle}}</text>
+  </view>
+
+  <view class="pb-btn" wx:if="{{btnText}}">
+    <text>{{btnText}}</text>
+  </view>
+</view>

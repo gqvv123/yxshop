@@ -1,0 +1,39 @@
+<view class="page">
+  <!-- 类型筛选 -->
+  <view class="type-bar">
+    <view
+      wx:for="{{types}}"
+      wx:key="key"
+      class="type-item {{type === item.key ? 'active' : ''}}"
+      data-type="{{item.key}}"
+      bindtap="onTypeChange"
+    >{{item.label}}</view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view wx:if="{{list.length}}" class="prom-list">
+    <view wx:for="{{list}}" wx:key="id" class="prom-card" data-id="{{item.id}}" bindtap="onTapItem">
+      <view class="prom-head">
+        <text class="prom-title">{{item.title || '促销活动'}}</text>
+        <text class="prom-status {{item.status_text === '进行中' ? 'ing' : ''}}">{{item.status_text}}</text>
+      </view>
+      <view class="prom-meta">
+        <text wx:if="{{item.type}}" class="prom-type">{{item.type}}</text>
+        <text class="prom-count">{{item.prom_item_count || 0}} 件促销商品</text>
+      </view>
+      <view wx:if="{{item.start_time}}" class="prom-time">
+        <mp-icon name="clock" size="12" color="#999"></mp-icon>
+        <text class="prom-time-text">{{item.start_time}} ~ {{item.end_time}}</text>
+      </view>
+      <view class="prom-arrow">
+        <text>查看详情</text>
+        <mp-icon name="chevron-right" size="14" color="#c0c4cc"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <empty wx:if="{{!list.length && !loading}}" text="暂无进行中的促销活动"></empty>
+
+  <view wx:if="{{loading}}" class="loading-tip">加载中…</view>
+  <view wx:if="{{!hasMore && list.length}}" class="loading-tip">没有更多了</view>
+</view>

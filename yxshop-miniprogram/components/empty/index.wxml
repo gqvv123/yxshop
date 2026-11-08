@@ -1,0 +1,9 @@
+<view class="empty">
+  <view class="empty-icon-wrap">
+    <mp-icon wx:if="{{icon}}" name="{{icon}}" size="48" color="#cbd5e1"></mp-icon>
+    <view wx:else class="empty-emoji">{{emoji}}</view>
+  </view>
+  <view class="empty-text">{{text}}</view>
+  <view wx:if="{{subText}}" class="empty-sub">{{subText}}</view>
+  <view wx:if="{{actionText}}" class="empty-btn" bindtap="onAction">{{actionText}}</view>
+</view>

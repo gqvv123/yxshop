@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "账号安全",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "empty": "/components/empty/index"
+  }
+}

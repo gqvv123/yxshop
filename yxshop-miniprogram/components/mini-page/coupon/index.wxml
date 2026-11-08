@@ -1,0 +1,30 @@
+<view class="coupon-section" wx:if="{{coupons.length}}">
+  <view class="cs-header">
+    <view class="cs-title-wrap">
+      <mp-icon name="ticket" size="16" color="#2563eb"></mp-icon>
+      <text class="cs-title">优惠券中心</text>
+      <view class="cs-tag">每日领取</view>
+    </view>
+  </view>
+  <scroll-view class="coupon-scroll" scroll-x>
+    <view
+      wx:for="{{coupons}}"
+      wx:key="id"
+      class="coupon-card cc-{{index % 3}}"
+      bindtap="onCouponTap"
+      data-id="{{item.id}}"
+    >
+      <view class="coupon-amount">
+        <text class="coupon-symbol">¥</text>
+        <text class="coupon-value">{{item.discount || item.amount || '0'}}</text>
+      </view>
+      <view class="coupon-info">
+        <text class="coupon-name ellipsis">{{item.name || item.coupon_name || '优惠券'}}</text>
+        <text class="coupon-condition">{{item.min_amount ? '满' + item.min_amount + '可用' : '无门槛'}}</text>
+      </view>
+      <view class="coupon-claim">
+        <text class="claim-text">立即领取</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

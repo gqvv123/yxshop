@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "商品详情",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "empty": "/components/empty/index",
+    "sku-picker": "/components/sku-picker/index",
+    "mp-icon": "/components/mp-icon/index",
+    "goods-card": "/components/goods-card/index"
+  }
+}

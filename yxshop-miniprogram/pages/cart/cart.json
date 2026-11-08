@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "购物车",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "empty": "/components/empty/index",
+    "mp-icon": "/components/mp-icon/index",
+    "goods-card": "/components/goods-card/index"
+  }
+}

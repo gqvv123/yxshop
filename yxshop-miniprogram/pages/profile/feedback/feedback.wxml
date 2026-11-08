@@ -1,0 +1,142 @@
+<view class="fb-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">意见反馈</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'submit' ? 'active' : ''}}" bindtap="onTabChange" data-tab="submit">
+      <text>提交反馈</text>
+    </view>
+    <view class="tab-item {{currentTab === 'history' ? 'active' : ''}}" bindtap="onTabChange" data-tab="history">
+      <text>我的反馈</text>
+      <view wx:if="{{unreadReply > 0}}" class="tab-dot"></view>
+    </view>
+  </view>
+
+  <!-- ===== 提交反馈 ===== -->
+  <view wx:if="{{currentTab === 'submit'}}" class="submit-area">
+    <!-- 反馈类型 -->
+    <view class="section-card">
+      <view class="card-label">反馈类型</view>
+      <view class="type-grid">
+        <view
+          class="type-item {{form.feedback_type === item.value ? 'active' : ''}}"
+          wx:for="{{feedbackTypes}}"
+          wx:key="value"
+          data-value="{{item.value}}"
+          bindtap="onTypeSelect"
+        >
+          <mp-icon name="{{item.icon}}" size="20" color="{{form.feedback_type === item.value ? '#2563eb' : '#94a3b8'}}"></mp-icon>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 反馈内容 -->
+    <view class="section-card">
+      <view class="card-label">反馈内容</view>
+      <textarea
+        class="content-input"
+        placeholder="请详细描述您遇到的问题或建议（10-500字）"
+        maxlength="500"
+        value="{{form.content}}"
+        bindinput="onContentInput"
+      ></textarea>
+      <view class="char-count">{{form.content.length}}/500</view>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="section-card">
+      <view class="card-label">上传截图（可选）</view>
+      <view class="img-grid">
+        <image
+          wx:for="{{form.images}}"
+          wx:key="*this"
+          class="img-preview"
+          src="{{item}}"
+          mode="aspectFill"
+          data-index="{{index}}"
+          bindtap="onPreviewImage"
+        ></image>
+        <view wx:if="{{form.images.length < 4}}" class="img-add" bindtap="onChooseImage">
+          <mp-icon name="plus" size="28" color="#cbd5e1"></mp-icon>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="section-card">
+      <view class="card-label">联系方式（可选）</view>
+      <input
+        class="contact-input"
+        placeholder="手机号/微信号，方便我们联系您"
+        value="{{form.contact}}"
+        bindinput="onContactInput"
+      ></input>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+      <text>{{submitting ? '提交中...' : '提交反馈'}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 历史记录 ===== -->
+  <view wx:if="{{currentTab === 'history'}}" class="history-area">
+    <view wx:if="{{history.length}}" class="history-list">
+      <view class="history-card" wx:for="{{history}}" wx:key="id">
+        <!-- 头部 -->
+        <view class="hc-header">
+          <view class="hc-type type-{{item.feedback_type}}">{{item.type_text}}</view>
+          <view class="hc-status status-{{item.status}}">{{item.status_text}}</view>
+        </view>
+        <!-- 内容 -->
+        <view class="hc-content">{{item.content}}</view>
+        <!-- 图片 -->
+        <view wx:if="{{item.imageList.length}}" class="hc-images">
+          <image
+            wx:for="{{item.imageList}}"
+            wx:for-item="img"
+            wx:key="*this"
+            class="hc-img"
+            src="{{img}}"
+            mode="aspectFill"
+            data-src="{{img}}"
+            data-urls="{{item.imageList}}"
+            bindtap="onPreviewHistoryImage"
+          ></image>
+        </view>
+        <!-- 回复 -->
+        <view wx:if="{{item.reply_content}}" class="hc-reply">
+          <view class="reply-label">
+            <mp-icon name="message" size="14" color="#2563eb"></mp-icon>
+            <text>官方回复</text>
+          </view>
+          <view class="reply-content">{{item.reply_content}}</view>
+        </view>
+        <!-- 时间 -->
+        <view class="hc-time">{{item.time_text}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{!loading && !history.length}}" class="empty-wrap">
+      <empty text="暂无反馈记录"></empty>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <view style="height: 60rpx;"></view>
+</view>

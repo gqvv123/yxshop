@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "搜索",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index"
+  }
+}

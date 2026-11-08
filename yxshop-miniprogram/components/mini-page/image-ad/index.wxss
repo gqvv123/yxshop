@@ -1,0 +1,44 @@
+/* image-ad — 企业级图片广告 */
+.image-ad {
+  margin: 12rpx 24rpx 0;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.image-ad-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+.layout-single .image-ad-item { width: 100%; }
+.layout-single .ad-img { width: 100%; height: 360rpx; }
+
+.layout-two_col .image-ad-item { width: calc(50% - 3rpx); }
+.layout-two_col .ad-img { width: 100%; height: 280rpx; }
+
+.layout-three_col .image-ad-item { width: calc(33.33% - 4rpx); }
+.layout-three_col .ad-img { width: 100%; height: 220rpx; }
+
+.layout-four_col .image-ad-item { width: calc(25% - 5rpx); }
+.layout-four_col .ad-img { width: 100%; height: 180rpx; }
+
+.layout-left1_right2 { flex-wrap: nowrap; }
+.layout-left1_right2 .image-ad-item:first-child { width: 50%; }
+.layout-left1_right2 .image-ad-item:first-child .ad-img { height: 360rpx; }
+.layout-left1_right2 .image-ad-item:not(:first-child) { width: calc(25% - 3rpx); }
+.layout-left1_right2 .image-ad-item:not(:first-child) .ad-img { height: 178rpx; }
+
+.layout-left2_right1 { flex-wrap: nowrap; }
+.layout-left2_right1 .image-ad-item:last-child { width: 50%; }
+.layout-left2_right1 .image-ad-item:last-child .ad-img { height: 360rpx; }
+.layout-left2_right1 .image-ad-item:not(:last-child) { width: calc(25% - 3rpx); }
+.layout-left2_right1 .image-ad-item:not(:last-child) .ad-img { height: 178rpx; }
+
+.image-ad-item {
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.ad-img {
+  width: 100%;
+  display: block;
+}

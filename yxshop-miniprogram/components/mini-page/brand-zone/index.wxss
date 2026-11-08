@@ -1,0 +1,63 @@
+.brand-zone {
+  margin: 0 24rpx 24rpx 24rpx;
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.03);
+}
+
+.bz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.bz-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.bz-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bz-more {
+  font-size: 24rpx;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.bz-arrow {
+  font-size: 28rpx;
+}
+
+.bz-grid {
+  display: grid;
+  gap: 16rpx;
+}
+
+.bz-item {
+  background: #f1f5f9;
+  border-radius: 20rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bz-logo {
+  width: 80%;
+  height: 56rpx;
+}
+
+.bz-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: -1rpx;
+}

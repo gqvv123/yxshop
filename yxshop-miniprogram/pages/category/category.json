@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "全部分类",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "goods-card": "/components/goods-card/index",
+    "empty": "/components/empty/index"
+  }
+}

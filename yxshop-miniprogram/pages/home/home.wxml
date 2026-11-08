@@ -1,0 +1,66 @@
+<wxs src="./style.wxs" module="st" />
+<view class="page" style="--color-primary: {{theme.primary_color || '#2563eb'}}; --color-secondary: {{theme.secondary_color || '#3b82f6'}};">
+  <!-- 骨架屏 -->
+  <block wx:if="{{loading && !components.length}}">
+    <view class="skeleton">
+      <view class="sk-header skeleton-anim" style="padding-top: {{statusBarHeight + 8}}px;">
+        <view class="sk-header-bar"></view>
+      </view>
+      <view class="sk-search skeleton-anim"></view>
+      <view class="sk-grid">
+        <view class="sk-grid-item skeleton-anim" wx:for="{{[1,2,3,4,5,6,7,8]}}" wx:key="*this">
+          <view class="sk-grid-circle"></view>
+          <view class="sk-grid-line"></view>
+        </view>
+      </view>
+      <view class="sk-banner skeleton-anim"></view>
+      <view class="sk-product-row">
+        <view class="sk-product-card skeleton-anim" wx:for="{{[1,2]}}" wx:key="*this">
+          <view class="sk-product-img"></view>
+          <view class="sk-product-line"></view>
+          <view class="sk-product-line-short"></view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 动态组件渲染 -->
+  <block wx:elif="{{components.length}}">
+    <!-- Hero 渐变区（搜索栏 + 公告 + 会员卡） -->
+    <view class="hero-zone" wx:if="{{heroComponents.length}}" style="background: linear-gradient(160deg, {{theme.nav_background_color || '#1e3a8a'}} 0%, {{theme.primary_color || '#2563eb'}} 45%, {{theme.secondary_color || '#3b82f6'}} 100%); padding-top: {{statusBarHeight + 8}}px;">
+      <view class="hero-inner">
+        <block wx:for="{{heroComponents}}" wx:key="component_id">
+          <mp-search-bar wx:if="{{item.component_type === 'search_bar'}}" props="{{item.props}}" theme="{{theme}}"></mp-search-bar>
+          <mp-notice-bar wx:elif="{{item.component_type === 'notice_bar'}}" props="{{item.props}}" theme="{{theme}}"></mp-notice-bar>
+          <mp-promo-banner wx:elif="{{item.component_type === 'promo_banner'}}" props="{{item.props}}" theme="{{theme}}"></mp-promo-banner>
+        </block>
+      </view>
+    </view>
+
+    <!-- 内容区（白色圆角顶部） -->
+    <view class="content-body" wx:if="{{bodyComponents.length}}">
+      <block wx:for="{{bodyComponents}}" wx:key="component_id">
+        <view class="mp-block" style="{{st.blockStyle(item.props)}}">
+          <mp-swiper wx:if="{{item.component_type === 'swiper'}}" props="{{item.props}}" theme="{{theme}}"></mp-swiper>
+          <mp-rich-text wx:elif="{{item.component_type === 'rich_text'}}" props="{{item.props}}" theme="{{theme}}"></mp-rich-text>
+          <mp-image-ad wx:elif="{{item.component_type === 'image_ad'}}" props="{{item.props}}" theme="{{theme}}"></mp-image-ad>
+          <mp-grid-nav wx:elif="{{item.component_type === 'grid_nav'}}" props="{{item.props}}" theme="{{theme}}"></mp-grid-nav>
+          <mp-product-list wx:elif="{{item.component_type === 'product_list'}}" props="{{item.props}}" theme="{{theme}}"></mp-product-list>
+          <mp-coupon wx:elif="{{item.component_type === 'coupon'}}" props="{{item.props}}" theme="{{theme}}"></mp-coupon>
+          <mp-coupon-receive wx:elif="{{item.component_type === 'coupon_receive'}}" props="{{item.props}}" theme="{{theme}}"></mp-coupon-receive>
+          <mp-point-exchange wx:elif="{{item.component_type === 'point_exchange'}}" props="{{item.props}}" theme="{{theme}}"></mp-point-exchange>
+          <mp-promo-banner wx:elif="{{item.component_type === 'promo_banner'}}" props="{{item.props}}" theme="{{theme}}"></mp-promo-banner>
+          <mp-promo-grid wx:elif="{{item.component_type === 'promo_grid'}}" props="{{item.props}}" theme="{{theme}}"></mp-promo-grid>
+          <mp-brand-zone wx:elif="{{item.component_type === 'brand_zone'}}" props="{{item.props}}" theme="{{theme}}"></mp-brand-zone>
+        </view>
+      </block>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <view wx:if="{{isFallback && !components.length}}" class="fallback-wrap" style="padding-top: {{statusBarHeight + 40}}px;">
+    <text class="text-3 fz-28">暂无页面数据</text>
+  </view>
+
+  <privacy-popup visible="{{showPrivacy}}" bind:agree="onPrivacyAgree" bind:disagree="onPrivacyDisagree"></privacy-popup>
+</view>

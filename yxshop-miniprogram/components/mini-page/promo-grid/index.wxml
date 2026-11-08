@@ -1,0 +1,19 @@
+<view class="promo-grid layout-{{layout}}" wx:if="{{cards.length}}">
+  <view
+    wx:for="{{cards}}"
+    wx:key="index"
+    class="pg-card {{layout === 'one_big_two_small' && index === 0 ? 'pg-big' : ''}}"
+    style="background: linear-gradient(135deg, {{item.bg_color1 || '#fef3c7'}}, {{item.bg_color2 || '#fde68a'}}); color: {{item.text_color || '#92400e'}};"
+    bindtap="onCardTap"
+    data-index="{{index}}"
+  >
+    <view class="pg-card-body">
+      <text class="pg-title" wx:if="{{item.title}}">{{item.title}}</text>
+      <text class="pg-sub" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
+    </view>
+    <view class="pg-btn" wx:if="{{item.btn_text}}">{{item.btn_text}}</view>
+    <view class="pg-deco" wx:if="{{item.icon}}">
+      <mp-icon name="{{item.icon}}" size="48" color="{{item.text_color || '#92400e'}}"></mp-icon>
+    </view>
+  </view>
+</view>
