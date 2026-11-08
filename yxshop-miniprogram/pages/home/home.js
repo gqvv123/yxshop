@@ -16,6 +16,10 @@ Page({
     isFallback: false,
     showPrivacy: false,
     statusBarHeight: 20,
+    // 管理端「广告管理」配置的广告位（position=home_banner）
+    banners: [],
+    // 管理端「营销管理 → 促销活动」配置的进行中活动
+    activities: [],
   },
 
   onLoad() {
@@ -55,6 +59,9 @@ Page({
   async loadPageData() {
     this.setData({ loading: true, isFallback: false });
 
+    // 广告位与促销活动独立于装修数据，单独并行加载
+    const marketing = this.loadMarketing();
+
     try {
       const res = await api.miniPage.getHomePage({ app_id: getApp().globalData.appId || 1 });
       const pageData = (res && res.page && res.page.page_data) || [];
@@ -66,11 +73,17 @@ Page({
         .map((c) => Object.assign({}, c, { props: (c.props && typeof c.props === 'object') ? c.props : {} }))
         .sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
+      // 后端 fallback / 空装修页只含搜索栏时，使用前端内置首页保持页面可用。
+      const components = sorted.length > 1 ? sorted : this.getFallbackComponents();
       const { heroComponents, bodyComponents } = this.splitHeroBody(sorted, theme);
-      this.setData({ components: sorted, heroComponents, bodyComponents, theme, tabbar, loading: false, isFallback: false });
+      const resolved = sorted.length > 1
+        ? { heroComponents, bodyComponents }
+        : this.splitHeroBody(components, theme);
+      this.setData({ components, heroComponents: resolved.heroComponents, bodyComponents: resolved.bodyComponents, theme, tabbar, loading: false, isFallback: false });
       this.applyTheme(theme);
       this.syncTabBar();
       this.cacheData(res);
+      marketing.then(() => this.injectMarketing());
     } catch (e) {
       const cached = this.getCachedData();
       if (cached) {
@@ -83,14 +96,99 @@ Page({
         this.setData({ components: sorted, heroComponents, bodyComponents, theme: cached.theme || {}, tabbar: cached.tabbar || null, loading: false, isFallback: true });
         this.applyTheme(cached.theme || {});
         this.syncTabBar();
+        marketing.then(() => this.injectMarketing());
       } else {
         const fbComponents = this.getFallbackComponents();
         const { heroComponents, bodyComponents } = this.splitHeroBody(fbComponents, this.getFallbackTheme());
         this.setData({ components: fbComponents, heroComponents, bodyComponents, theme: this.getFallbackTheme(), tabbar: null, loading: false, isFallback: true });
         this.applyTheme(this.getFallbackTheme());
         this.syncTabBar();
+        marketing.then(() => this.injectMarketing());
       }
     }
+  },
+
+  /**
+   * 拉取广告位与促销活动（对应管理端「广告管理」「促销活动」）
+   */
+  async loadMarketing() {
+    const appId = getApp().globalData.appId || 0;
+    const [adsRes, promRes] = await Promise.all([
+      api.advertisement.getList('home_banner', 10).catch(() => null),
+      api.promotion.getList({ page: 1, page_size: 6, app_id: appId }).catch(() => null),
+    ]);
+
+    const banners = (adsRes && (adsRes.list || adsRes.data)) || [];
+    const promotions = (promRes && (promRes.list || promRes.data)) || [];
+
+    this.setData({
+      banners: Array.isArray(banners) ? banners : [],
+      activities: Array.isArray(promotions) ? promotions : [],
+    });
+  },
+
+  /**
+   * 把广告位注入到首页轮播、把促销活动入口追加到内容区
+   */
+  injectMarketing() {
+    const { banners, activities } = this.data;
+    if (!banners.length && !activities.length) return;
+
+    const components = this.data.components.slice();
+
+    // 广告位 → 轮播组件（装修里没配轮播则补一个）
+    if (banners.length) {
+      const images = banners.map((ad) => ({
+        image: ad.image || '',
+        url: ad.image || '',
+        link: ad.link || '',
+        title: ad.title || '',
+      }));
+      const swiperIndex = components.findIndex((c) => c.component_type === 'swiper');
+      if (swiperIndex >= 0) {
+        const swiper = components[swiperIndex];
+        const props = Object.assign({}, swiper.props || {});
+        // 装修已配图则不覆盖，只在没有图时用广告位兜底
+        if (!props.images || !props.images.length) {
+          props.images = images;
+          components[swiperIndex] = Object.assign({}, swiper, { props });
+        }
+      } else {
+        components.splice(3, 0, {
+          component_type: 'swiper',
+          component_id: 'ad_swiper',
+          sort: 3,
+          is_visible: true,
+          props: { images, autoplay: true, interval: 3000, circular: true, indicator_dots: true },
+        });
+      }
+    }
+
+    // 促销活动入口 → grid_nav 追加
+    if (activities.length) {
+      const gridIndex = components.findIndex((c) => c.component_type === 'grid_nav');
+      const activityItems = activities.slice(0, 2).map((p) => ({
+        text: p.title || '限时活动',
+        icon_name: 'flame',
+        icon: '',
+        link: `/pages/promotion/detail/detail?id=${p.id}`,
+        badge: p.status_text === '进行中' ? 'HOT' : '',
+      }));
+      if (gridIndex >= 0) {
+        const grid = components[gridIndex];
+        const props = Object.assign({}, grid.props || {});
+        const items = (props.items || []).slice();
+        // 用活动入口替换最后两个普通入口，保证活动可点
+        while (items.length > 2 && items.length > activityItems.length) items.pop();
+        items.push.apply(items, activityItems);
+        props.items = items;
+        components[gridIndex] = Object.assign({}, grid, { props });
+      }
+    }
+
+    const sorted = components.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    const { heroComponents, bodyComponents } = this.splitHeroBody(sorted, this.data.theme || {});
+    this.setData({ components: sorted, heroComponents, bodyComponents });
   },
 
   applyTheme(theme) {

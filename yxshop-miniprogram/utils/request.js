@@ -120,6 +120,7 @@ function request(url, options = {}) {
     silent = false,
     skipAuth = false,
     showError = true,
+    retried = false,
   } = options;
 
   if (!silent) showLoading();
@@ -137,6 +138,26 @@ function request(url, options = {}) {
   }
 
   return new Promise((resolve, reject) => {
+    // 登录失效：先尝试静默刷新，失败再跳登录（每个请求最多重试一次）
+    const recoverAuth = () => {
+      if (skipAuth || retried || !auth.getRefreshToken()) {
+        handleAuthRequired(showError);
+        const err = new Error('请先登录');
+        err.code = 401;
+        err.authRequired = true;
+        return reject(err);
+      }
+      tryRefreshToken()
+        .then(() => resolve(request(url, { ...options, retried: true })))
+        .catch(() => {
+          handleAuthRequired(showError);
+          const err = new Error('请先登录');
+          err.code = 401;
+          err.authRequired = true;
+          reject(err);
+        });
+    };
+
     wx.request({
       url: buildUrl(url),
       method,
@@ -147,11 +168,7 @@ function request(url, options = {}) {
 
         // 401: 登录失效
         if (status === 401) {
-          handleAuthRequired(showError);
-          const err = new Error('请先登录');
-          err.code = 401;
-          err.authRequired = true;
-          return reject(err);
+          return recoverAuth();
         }
 
         // 其它 HTTP 错误
@@ -180,12 +197,7 @@ function request(url, options = {}) {
           || msg === '用户未登录';
 
         if (isAuthError) {
-          handleAuthRequired(showError);
-          const err = new Error('请先登录');
-          err.code = 401;
-          err.authRequired = true;
-          err.body = body;
-          return reject(err);
+          return recoverAuth();
         }
 
         if (showError) wx.showToast({ title: msg, icon: 'none' });

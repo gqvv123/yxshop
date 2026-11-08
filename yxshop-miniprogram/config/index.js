@@ -35,9 +35,13 @@ try {
 module.exports = {
   ...ENV[envKey],
   /** 业务 app_id（多租户场景），用户未指定时用此值兜底 */
-  appId: 10001,
+  // 单租户商城统一使用 0（后端所有商品/订单数据 app_id 均为 0）
+  appId: 0,
   /** 默认分页大小 */
   pageSize: 20,
   /** 当前 yxshop-php API 版本 */
   apiVersion: 'v1',
+  /** 当前小程序业务版本号（与「管理端 → 应用版本管理」联动，升级时同步递增） */
+  versionName: '1.0.0',
+  versionCode: 1,
 };

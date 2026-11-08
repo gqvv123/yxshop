@@ -1,5 +1,5 @@
 {
-  "description": "yxshop-miniprogram - 远讯小程序商城",
+  "description": "yxshop-miniprogram - 盈锐小程序商城",
   "packOptions": {
     "ignore": [
       {
@@ -57,7 +57,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.0.0",
-  "appid": "wxf9a1d1e3331090f0",
+  "appid": "wxf42fb90c7655286c",
   "projectname": "yxshop-miniprogram",
   "condition": {},
   "editorSetting": {

@@ -34,4 +34,11 @@ module.exports = {
   sign: require('./sign'),
   point: require('./point'),
   task: require('./task'),
+  // P3 补齐：对应管理端缺失的 C 端能力
+  promotion: require('./promotion'),
+  delivery: require('./delivery'),
+  article: require('./article'),
+  advertisement: require('./advertisement'),
+  region: require('./region'),
+  invoice: require('./invoice'),
 }

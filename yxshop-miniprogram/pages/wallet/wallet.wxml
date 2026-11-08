@@ -64,6 +64,12 @@
       </view>
       <text class="qi-text">银行卡</text>
     </view>
+    <view class="quick-item" bindtap="onRechargeRecords">
+      <view class="qi-icon qi-icon-5">
+        <mp-icon name="zap" size="18" color="#fff"></mp-icon>
+      </view>
+      <text class="qi-text">充值记录</text>
+    </view>
     <view class="quick-item" bindtap="onSecurity">
       <view class="qi-icon qi-icon-4">
         <mp-icon name="shield" size="18" color="#fff"></mp-icon>

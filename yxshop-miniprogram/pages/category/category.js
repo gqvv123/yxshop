@@ -159,6 +159,15 @@ Page({
     wx.navigateTo({ url: '/pages/search/search' });
   },
 
+  /** 品牌专区（对应管理端「商品品牌」） */
+  onBrandZone() {
+    const cat = this.data.currentCategory || {};
+    const url = cat.id
+      ? `/pages/brand/list/list?category_id=${cat.id}`
+      : '/pages/brand/list/list';
+    wx.navigateTo({ url });
+  },
+
   /** 下拉刷新 */
   onPullDownRefresh() {
     this.loadCategories().then(() => {

@@ -25,7 +25,7 @@
         <view class="user-detail">
           <view class="user-name">
             <text>{{user.nickname || '微信用户'}}</text>
-            <view class="vip-badge" wx:if="{{user.is_vip || user.level >= 1}}">
+            <view class="vip-badge" wx:if="{{user.is_vip || user.level_id > 0 || user.level >= 1}}" bindtap="onGoLevel">
               <mp-icon name="crown" size="12" color="#fff"></mp-icon>
               <text class="vip-badge-text">{{user.level_name || 'PRO'}}</text>
             </view>
@@ -224,6 +224,24 @@
           </view>
           <text class="fi-text">积分任务</text>
         </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/promotion/list/list">
+          <view class="fi-icon fi-icon-11">
+            <mp-icon name="gift" size="20" color="#dc2626"></mp-icon>
+          </view>
+          <text class="fi-text">促销活动</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/help/help">
+          <view class="fi-icon fi-icon-12">
+            <mp-icon name="help-circle" size="20" color="#0369a1"></mp-icon>
+          </view>
+          <text class="fi-text">帮助中心</text>
+        </view>
+        <view class="func-item" bindtap="onMenu" data-url="/pages/user-level/user-level">
+          <view class="fi-icon fi-icon-13">
+            <mp-icon name="crown" size="20" color="#b45309"></mp-icon>
+          </view>
+          <text class="fi-text">会员中心</text>
+        </view>
       </view>
     </view>
 
@@ -235,6 +253,32 @@
         </view>
         <text class="svc-name">物流查询</text>
         <text class="svc-desc">{{orderCounts.pending_receive > 0 ? orderCounts.pending_receive + '件在途' : ''}}</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/invoice/invoice">
+        <view class="svc-icon svc-icon-7">
+          <mp-icon name="file-text" size="16" color="#0f766e"></mp-icon>
+        </view>
+        <text class="svc-name">我的发票</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/verify/verify">
+        <view class="svc-icon svc-icon-8">
+          <mp-icon name="shield" size="16" color="#1e40af"></mp-icon>
+        </view>
+        <text class="svc-name">企业认证</text>
+        <text wx:if="{{verifyStatus === 2}}" class="svc-tag svc-tag-success">{{verifyStatusText}}</text>
+        <text wx:elif="{{verifyStatus === 3}}" class="svc-tag svc-tag-danger">{{verifyStatusText}}</text>
+        <text wx:elif="{{verifyStatus === 1}}" class="svc-tag svc-tag-pending">{{verifyStatusText}}</text>
+        <text wx:else class="svc-desc">享企业专属价</text>
+        <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
+      </view>
+      <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/contract/contract">
+        <view class="svc-icon svc-icon-9">
+          <mp-icon name="clipboard" size="16" color="#6b21a8"></mp-icon>
+        </view>
+        <text class="svc-name">我的合同</text>
+        <text wx:if="{{contractDesc}}" class="svc-desc">{{contractDesc}}</text>
         <mp-icon name="chevron-right" size="12" color="#94a3b8"></mp-icon>
       </view>
       <view class="svc-item" bindtap="onMenu" data-url="/pages/profile/feedback/feedback">
@@ -308,7 +352,7 @@
     <view class="profile-copyright">
       <text class="pc-version">v{{version}} · 开源版</text>
       <view class="pc-link" bindtap="onCopyLink">
-        <text>Powered by 珠海远讯科技</text>
+        <text>Powered by 珠海盈锐商贸</text>
       </view>
     </view>
 

@@ -44,6 +44,9 @@ Component({
   pageLifetimes: {
     show() {
       this.setSelected();
+      // 每次回到 tab 页都刷新购物车角标（历史缺陷：refreshCartCount 已实现但从未被调用，
+      // 导致角标永远不显示）
+      this.refreshCartCount();
     },
   },
 
@@ -221,6 +224,13 @@ Component({
         return;
       }
 
+      // 节流：3 秒内不重复请求（tab 切换频繁时避免打满接口）
+      var now = Date.now();
+      if (this._lastCartFetch && now - this._lastCartFetch < 3000) {
+        return;
+      }
+      this._lastCartFetch = now;
+
       var config = require('../config/index');
       var { get } = require('../utils/request');
       get('/api/v1/cart/count', { app_id: config.appId }, { silent: true, showError: false })
@@ -230,6 +240,7 @@ Component({
         })
         .catch(function () {
           // 静默失败，不影响用户操作
+          self._lastCartFetch = 0;
         });
     },
   },

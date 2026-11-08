@@ -198,28 +198,46 @@ Page({
     };
   },
 
+  /**
+   * 规格参数表
+   *
+   * 数据源优先级：attributes（属性定义 + 值，权威）> specs（早期平铺格式兜底）。
+   * 两者在后端可能来自同一份 item_attrs，同时渲染会重复，所以只在没有 attributes 时才用 specs。
+   * 空值一律跳过——历史上 specs 会出现 {name:'某个值', values:['']} 导致 "精选纸品:" 这种空行。
+   */
   buildSpecList(item) {
     const list = [];
-    // 从 specs 数组构建
-    if (Array.isArray(item.specs)) {
+    const seen = {};
+
+    const push = function (label, value) {
+      const l = (label || '').toString().trim();
+      let v = (value === undefined || value === null) ? '' : value.toString().trim();
+      if (!l || !v) return;
+      const key = l + '\u0000' + v;
+      if (seen[key]) return;
+      seen[key] = 1;
+      list.push({ label: l, value: v });
+    };
+
+    const attrs = Array.isArray(item.attributes) ? item.attributes : [];
+    if (attrs.length) {
+      attrs.forEach(function (attr) {
+        push(attr.name, attr.value);
+      });
+    } else if (Array.isArray(item.specs)) {
       item.specs.forEach(function (spec) {
-        if (spec.name && spec.values && spec.values.length) {
-          list.push({ label: spec.name, value: spec.values.join(' / ') });
-        }
+        if (!spec || !spec.name) return;
+        const vals = (spec.values || []).filter(function (v) {
+          return v !== undefined && v !== null && String(v).trim() !== '';
+        });
+        push(spec.name, vals.join(' / '));
       });
     }
-    // 从 attributes / params 构建
-    if (item.attributes && Array.isArray(item.attributes)) {
-      item.attributes.forEach(function (attr) {
-        if (attr.name && attr.value) {
-          list.push({ label: attr.name, value: attr.value });
-        }
-      });
-    }
+
     // 基础信息补充
-    if (item.brand && item.brand.name) list.push({ label: '品牌', value: item.brand.name });
-    if (item.unit) list.push({ label: '单位', value: item.unit });
-    if (item.weight) list.push({ label: '重量', value: item.weight + 'kg' });
+    if (item.brand && item.brand.name) push('品牌', item.brand.name);
+    if (item.unit) push('单位', item.unit);
+    if (item.weight) push('重量', item.weight + 'kg');
     return list;
   },
 

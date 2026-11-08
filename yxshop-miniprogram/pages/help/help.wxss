@@ -1,0 +1,40 @@
+.page { min-height: 100vh; background: #f5f6f8; padding-bottom: 30rpx; }
+.search-bar { background: #fff; padding: 20rpx 24rpx; }
+.search-input {
+  background: #f2f3f5; border-radius: 999rpx; height: 68rpx;
+  padding: 0 28rpx; font-size: 26rpx;
+}
+.cat-bar { background: #fff; white-space: nowrap; padding: 0 24rpx 16rpx; }
+.cat-item {
+  display: inline-block; padding: 10rpx 26rpx; margin-right: 14rpx;
+  background: #f2f3f5; border-radius: 999rpx; font-size: 26rpx; color: #666;
+}
+.cat-item.active { background: #ff5b28; color: #fff; }
+.art-list { padding: 20rpx 24rpx; }
+.art-item {
+  background: #fff; border-radius: 14rpx; padding: 26rpx; margin-bottom: 18rpx;
+}
+.art-title { font-size: 30rpx; font-weight: 600; color: #222; }
+.art-desc {
+  font-size: 24rpx; color: #888; margin-top: 12rpx; line-height: 1.6;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.art-meta { display: flex; gap: 24rpx; font-size: 22rpx; color: #aaa; margin-top: 14rpx; }
+.loading-tip { text-align: center; font-size: 24rpx; color: #999; padding: 30rpx 0; }
+.detail-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.detail-panel {
+  width: 620rpx; max-height: 70vh; background: #fff; border-radius: 20rpx;
+  padding: 32rpx; display: flex; flex-direction: column;
+}
+.detail-title { font-size: 34rpx; font-weight: 700; color: #222; text-align: center; }
+.detail-body {
+  flex: 1; overflow-y: auto; margin-top: 24rpx;
+  font-size: 28rpx; color: #444; line-height: 1.8;
+}
+.detail-close {
+  margin-top: 24rpx; text-align: center; font-size: 28rpx;
+  color: #ff5b28; padding: 16rpx;
+}

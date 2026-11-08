@@ -57,7 +57,7 @@
     <view class="card goods-card">
       <view class="gc-header">
         <mp-icon name="home" size="14" color="#2563eb"></mp-icon>
-        <text class="gc-store">{{order.store_name || '远讯商城'}}</text>
+        <text class="gc-store">{{order.store_name || '盈锐商贸'}}</text>
       </view>
       <view class="gc-list">
         <view class="gc-item" wx:for="{{order.decoratedItems || []}}" wx:for-item="g" wx:key="gkey">

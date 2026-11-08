@@ -1,0 +1,114 @@
+<view class="ul-page">
+  <!-- ===== 顶部渐变区 ===== -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco-1"></view>
+    <view class="hero-deco-2"></view>
+
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">会员中心</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 当前等级卡 -->
+    <view class="level-card" wx:if="{{currentLevel}}">
+      <view class="lc-top">
+        <view class="lc-badge">
+          <mp-icon name="crown" size="24" color="#fbbf24"></mp-icon>
+        </view>
+        <view class="lc-info">
+          <view class="lc-name">{{currentLevel.name}}</view>
+          <view class="lc-desc">{{currentLevel.description || '注册即可享受会员权益'}}</view>
+        </view>
+        <view class="lc-discount" wx:if="{{currentLevel.discount < 10}}">
+          {{currentLevel.discount}} <text class="lc-unit">折</text>
+        </view>
+        <view class="lc-discount lc-discount--none" wx:else>原价</view>
+      </view>
+
+      <!-- 升级进度 -->
+      <view class="lc-progress" wx:if="{{nextLevel}}">
+        <view class="lp-text">
+          <text>再消费 ¥{{needExp}} 升级 {{nextLevel.name}}</text>
+          <text class="lp-pct">{{progress}}%</text>
+        </view>
+        <view class="lp-bar">
+          <view class="lp-fill" style="width: {{progress}}%;"></view>
+        </view>
+        <view class="lp-foot">
+          <text>累计消费 ¥{{userExp}}</text>
+          <text>目标 ¥{{nextLevel.experience}}</text>
+        </view>
+      </view>
+      <view class="lc-max" wx:else>
+        <mp-icon name="trophy" size="16" color="#fbbf24"></mp-icon>
+        <text>已达最高等级，尊享全部权益</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 等级权益 ===== -->
+  <view class="section" wx:if="{{benefits.length}}">
+    <view class="sec-header">
+      <mp-icon name="gift" size="16" color="var(--primary)"></mp-icon>
+      <text>当前等级权益</text>
+    </view>
+    <view class="benefit-grid">
+      <view class="benefit-item" wx:for="{{benefits}}" wx:key="title">
+        <view class="bi-icon">
+          <mp-icon name="{{item.icon === 'discount' ? 'ticket' : (item.icon === 'points' ? 'star' : (item.icon === 'truck' ? 'truck' : (item.icon === 'gift' ? 'gift' : 'headphones')))}}"
+                   size="20" color="var(--primary)"></mp-icon>
+        </view>
+        <view class="bi-title">{{item.title}}</view>
+        <view class="bi-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 等级体系 ===== -->
+  <view class="section">
+    <view class="sec-header">
+      <mp-icon name="layers" size="16" color="var(--primary)"></mp-icon>
+      <text>等级体系</text>
+    </view>
+
+    <view class="level-list">
+      <view class="level-row {{item.isCurrent ? 'current' : ''}}" wx:for="{{levels}}" wx:key="id">
+        <view class="lr-left">
+          <view class="lr-dot"></view>
+          <view class="lr-main">
+            <view class="lr-name">
+              {{item.name}}
+              <text class="lr-tag" wx:if="{{item.isCurrent}}">当前</text>
+            </view>
+            <view class="lr-cond">累计消费满 ¥{{item.experienceText}}</view>
+          </view>
+        </view>
+        <view class="lr-right">
+          <view class="lr-discount">{{item.discountText}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空 / 错误状态 -->
+  <view class="state-box" wx:if="{{!loading && loadError}}">
+    <mp-icon name="alert-circle" size="28" color="var(--text-3)"></mp-icon>
+    <text class="sb-text">{{loadError}}</text>
+    <view class="sb-btn" bindtap="load">重新加载</view>
+  </view>
+
+  <view class="state-box" wx:if="{{loading}}">
+    <text class="sb-text">加载中…</text>
+  </view>
+
+  <!-- ===== 底部提示 ===== -->
+  <view class="tip-card">
+    <view class="tip-title">如何升级</view>
+    <view class="tip-line">会员等级按「累计消费金额」自动升级，无需申请。</view>
+    <view class="tip-line">等级折扣在下单结算时自动抵扣商品金额（不含运费）。</view>
+    <view class="go-btn" bindtap="onGoShopping">去逛逛，赚取成长值</view>
+  </view>
+</view>

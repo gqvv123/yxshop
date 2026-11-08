@@ -5,8 +5,8 @@
 const { get } = require('../utils/request');
 
 module.exports = {
-  getLatest: () => get('/api/v1/version/latest'),
+  getLatest: (params) => get('/api/v1/version/latest', params),
   checkUpdate: (params) => get('/api/v1/version/check-update', params),
-  getForceUpdate: () => get('/api/v1/version/force-update'),
-  getInfo: () => get('/api/v1/version/info'),
+  getForceUpdate: (params) => get('/api/v1/version/force-update', params),
+  getInfo: (params) => get('/api/v1/version/info', params),
 };

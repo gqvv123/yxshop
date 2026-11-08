@@ -25,4 +25,10 @@ module.exports = {
   // P1 新增：商品咨询/问答
   getConsultations: (params) => get('/api/v1/item/consultations', params),
   consult: (data) => post('/api/v1/item/consult', data),
+
+  // P3 补齐：商品标签 / 属性 / 类型（对应管理端「商品管理 → 商品标签/商品属性/商品类型」）
+  getTags: () => get('/api/v1/item/tags'),
+  getHotTags: (limit = 10) => get('/api/v1/item/hot-tags', { limit }),
+  getAttributes: () => get('/api/v1/item/attributes'),
+  getTypes: () => get('/api/v1/item/types'),
 };

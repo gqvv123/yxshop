@@ -1,6 +1,7 @@
 // pages/order/detail/detail.js
 const api = require('../../../api/index');
 const imageUtil = require('../../../utils/image');
+const { callWxPay } = require('../../../utils/pay');
 const { fmtOrderStatus, fmtPrice, fmtDate, getOrderFlowStatus } = require('../../../utils/format');
 
 /** 状态 -> 图标映射 */
@@ -266,9 +267,9 @@ Page({
         payment_method: 'wechat',
       });
       if (res && res.timeStamp && res.nonceStr) {
-        await this._callWxPay(res);
+        await callWxPay(res);
       } else if (res && res.pay_params) {
-        await this._callWxPay(res.pay_params);
+        await callWxPay(res.pay_params);
       }
       wx.showToast({ title: '支付成功', icon: 'success' });
       this.loadDetail();
@@ -276,20 +277,6 @@ Page({
       if (e && e.errMsg && e.errMsg.indexOf('cancel') >= 0) return;
       wx.showToast({ title: e.message || '支付失败', icon: 'none' });
     }
-  },
-
-  _callWxPay(params) {
-    return new Promise((resolve, reject) => {
-      wx.requestPayment({
-        timeStamp: params.timeStamp,
-        nonceStr: params.nonceStr,
-        package: params.package,
-        signType: params.signType || 'MD5',
-        paySign: params.paySign,
-        success: resolve,
-        fail: reject,
-      });
-    });
   },
 
   _cancelOrder() {

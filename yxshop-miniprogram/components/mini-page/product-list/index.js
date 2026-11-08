@@ -48,7 +48,11 @@ Component({
         const p = this.properties.props || {};
         const sourceType = p.source_type || 'hot';
         const limit = p.limit || p.display_count || 6;
-        const appId = (getApp() && getApp().globalData && getApp().globalData.appId) || 10001;
+        // 单租户商城 app_id 合法值就是 0，不能用 `|| 10001` 兜底（0 是 falsy 会被改写）
+        const g = getApp();
+        const appId = (g && g.globalData && typeof g.globalData.appId === 'number')
+          ? g.globalData.appId
+          : 0;
         let rawItems = [];
 
         if (sourceType === 'manual' && p.item_ids && p.item_ids.length) {

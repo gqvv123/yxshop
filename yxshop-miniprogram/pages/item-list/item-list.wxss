@@ -38,6 +38,34 @@
   font-size: 32rpx;
 }
 
+/* ===== 商品标签筛选栏 ===== */
+.tag-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: var(--card);
+  padding: 16rpx 24rpx;
+  border-bottom: 1rpx solid var(--line-light);
+  white-space: nowrap;
+  position: sticky;
+  top: 68rpx;
+  z-index: 9;
+}
+.tag-item {
+  flex-shrink: 0;
+  padding: 8rpx 24rpx;
+  border-radius: 999rpx;
+  background: var(--bg-soft);
+  color: var(--text-2);
+  font-size: 24rpx;
+  transition: all 0.15s;
+}
+.tag-item.active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
 /* ===== 商品容器 ===== */
 .goods-container {
   padding: 16rpx;

@@ -17,7 +17,7 @@
       <view class="brand-logo">
         <mp-icon name="shopping-cart" size="40" color="#fff"></mp-icon>
       </view>
-      <view class="brand-name">远讯商城</view>
+      <view class="brand-name">盈锐商贸</view>
       <view class="brand-slogan">企业级采购 · 一站式服务</view>
     </view>
   </view>

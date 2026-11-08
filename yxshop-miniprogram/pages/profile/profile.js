@@ -34,6 +34,11 @@ Page({
       couponCount: 0,
       giftCount: 0,
     },
+    /** 企业认证状态: 0=未申请 1=审核中 2=已认证 3=已拒绝 */
+    verifyStatus: 0,
+    verifyStatusText: '',
+    /** 合同入口描述，如「2 份待签」 */
+    contractDesc: '',
     /** 编辑面板 */
     showEdit: false,
     editForm: { nickname: '', avatar_url: '' },
@@ -69,6 +74,8 @@ Page({
       this.loadWalletStats();
       this.loadFavoriteCount();
       this.loadFootprintCount();
+      this.loadVerifyStatus();
+      this.loadContractStats();
     }
     // 同步自定义 tabbar 选中状态
     const tabBar = this.getTabBar && this.getTabBar();
@@ -178,6 +185,32 @@ Page({
     } catch (e) { /* ignore */ }
   },
 
+  /** 企业认证状态（入口右侧标签） */
+  async loadVerifyStatus() {
+    try {
+      const r = await api.verify.getInfo();
+      const status = Number((r && r.status) || 0);
+      this.setData({
+        verifyStatus: status,
+        verifyStatusText: (r && r.status_text) || (status === 2 ? '已认证' : '未认证'),
+      });
+    } catch (e) { /* ignore */ }
+  },
+
+  /** 合同数量（入口右侧提示） */
+  async loadContractStats() {
+    try {
+      const r = await api.contract.stats();
+      const s = r || {};
+      const total = Number(s.total || 0);
+      const pending = Number(s.pending || 0);
+      let desc = '';
+      if (pending > 0) desc = pending + ' 份待签';
+      else if (total > 0) desc = '共 ' + total + ' 份';
+      this.setData({ contractDesc: desc, 'stats.contractCount': total });
+    } catch (e) { /* ignore */ }
+  },
+
 
   // ===== 事件处理 =====
 
@@ -220,6 +253,12 @@ wx.switchTab({ url: path, fail: function () { wx.navigateTo({ url: url, fail: fu
 wx.navigateTo({ url: url, fail: function (err) { wx.showToast({ title: '页面暂未开放', icon: 'none' }); } });
 }
 },
+
+  /** 会员等级中心（等级徽章 / 常用功能入口） */
+  onGoLevel() {
+    if (!this.data.isLoggedIn) return this.onLogin();
+    wx.navigateTo({ url: '/pages/user-level/user-level' });
+  },
 
   onNotification() {
     if (!this.data.isLoggedIn) return this.onLogin();

@@ -162,7 +162,8 @@ Page({
         wx.switchTab({ url: '/pages/home/home' });
         break;
       case 'comment':
-        wx.navigateTo({ url: '/pages/order/list/list' });
+        // 去评价：订单页是 tabBar 页面，必须用 switchTab
+        wx.switchTab({ url: '/pages/order/list/list' });
         break;
     }
   },

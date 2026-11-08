@@ -6,6 +6,14 @@ const { get, post } = require('../utils/request');
 
 module.exports = {
   create: (data) => post('/api/v1/order/create', data),
+
+  /**
+   * 结算试算
+   * 与服务端 createOrder 共用同一套金额算法，返回商品金额/会员折扣/优惠券折扣/运费/实付/可用券
+   * @param {{items: Array, coupon_id?: number, address_id?: number, delivery_id?: number}} data
+   */
+  preview: (data) => post('/api/v1/order/preview', data),
+
   getList: (params) => get('/api/v1/order/list', params),
   statusCounts: () => get('/api/v1/order/status-counts'),
   getDetail: (id) => get('/api/v1/order/detail', { id }),

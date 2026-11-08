@@ -1,0 +1,181 @@
+/* pages/wallet/records — 资金记录 */
+.rec-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+.top-hero {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  padding: 0 0 8rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco {
+  position: absolute;
+  top: -100rpx;
+  right: -80rpx;
+  width: 380rpx;
+  height: 380rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+
+/* Tab */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  margin-top: 24rpx;
+  position: relative;
+  z-index: 2;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 0 18rpx;
+  font-size: 27rpx;
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+}
+.tab-item.active {
+  color: #fff;
+  font-weight: 700;
+}
+.tab-underline {
+  width: 0;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  margin-top: 10rpx;
+  transition: width 0.2s;
+}
+.tab-item.active .tab-underline {
+  width: 48rpx;
+}
+
+/* 列表 */
+.rec-list {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  margin: 24rpx;
+  padding: 8rpx 28rpx;
+  box-shadow: var(--shadow-sm);
+}
+.rec-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 26rpx 0;
+}
+.rec-item + .rec-item {
+  border-top: 2rpx solid var(--line-light);
+}
+.ri-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.ri-title {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.ri-status {
+  font-size: 19rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+}
+.ri-status.ok {
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+.ri-status.pending {
+  color: var(--accent);
+  background: rgba(245, 158, 11, 0.12);
+}
+.ri-sub {
+  font-size: 22rpx;
+  color: var(--text-2);
+  max-width: 380rpx;
+}
+.ri-time {
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+.ri-right {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.ri-amount {
+  font-size: 30rpx;
+  font-weight: 800;
+}
+.ri-amount.in { color: var(--price); }
+.ri-amount.out { color: var(--text-1); }
+.ri-balance {
+  font-size: 20rpx;
+  color: var(--text-3);
+}
+
+/* 状态 */
+.state-box {
+  margin: 100rpx 32rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+.sb-text {
+  font-size: 26rpx;
+  color: var(--text-3);
+}
+.sb-btn {
+  margin-top: 8rpx;
+  padding: 14rpx 44rpx;
+  border-radius: var(--r-full);
+  border: 2rpx solid var(--primary);
+  color: var(--primary);
+  font-size: 26rpx;
+}
+.list-foot {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-3);
+  padding: 24rpx 0 40rpx;
+}

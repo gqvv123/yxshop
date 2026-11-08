@@ -14,18 +14,56 @@ Page({
     sortType: 'default', // default | sales | price
     sortPriceAsc: false,
     isGridLayout: true, // true=双列, false=单列
+    tags: [], // 商品标签（对应管理端「商品标签」）
+    activeTag: 0, // 选中的标签 id，0=全部
+    brandId: 0, // 品牌筛选（对应管理端「商品品牌」）
+    brandName: '',
   },
 
   onLoad(options) {
     const type = options.type || '';
     const keyword = options.keyword || '';
+    const brandId = Number(options.brand_id || 0);
     const map = { hot: '热销爆款', new: '上新好物', recommend: '为你推荐' };
+    const title = brandId
+      ? (options.brand_name ? decodeURIComponent(options.brand_name) : '品牌商品')
+      : (keyword ? `搜索：${keyword}` : (map[type] || '商品列表'));
     this.setData({
       type,
       keyword,
-      title: keyword ? `搜索：${keyword}` : (map[type] || '商品列表'),
+      brandId,
+      brandName: brandId ? title : '',
+      title,
     });
-    wx.setNavigationBarTitle({ title: this.data.title });
+    wx.setNavigationBarTitle({ title });
+    this.loadTags();
+    this.refresh();
+  },
+
+  async loadTags() {
+    try {
+      const res = await api.item.getTags();
+      const list = Array.isArray(res)
+        ? res
+        : (res && Array.isArray(res.list) ? res.list : (res && Array.isArray(res.data) ? res.data : []));
+      this.setData({
+        tags: list
+          .map((t) => ({
+            id: t.id,
+            name: t.tag_name || t.name || '',
+          }))
+          .filter((t) => t.name !== ''),
+      });
+    } catch (e) {
+      // 标签接口不可用时静默降级，不影响主列表
+      this.setData({ tags: [] });
+    }
+  },
+
+  onTagSelect(e) {
+    const id = Number(e.currentTarget.dataset.id || 0);
+    if (id === this.data.activeTag) return;
+    this.setData({ activeTag: id });
     this.refresh();
   },
 
@@ -56,7 +94,18 @@ Page({
       const page = this.data.page;
       const pageSize = this.data.pageSize;
 
-      const appId = (getApp() && getApp().globalData && getApp().globalData.appId) || 10001;
+      // 注意：单租户商城 app_id 合法值就是 0，不能用 `|| 10001` 兜底
+      // （0 是 falsy，会被改成 10001，导致商品 app_id=0 时永远查不到数据）
+      const g = getApp();
+      const appId = (g && g.globalData && typeof g.globalData.appId === 'number')
+        ? g.globalData.appId
+        : 0;
+
+      // 排序交给服务端，避免只对当前页排序导致跨页顺序错乱
+      const sortParams = this.data.sortType === 'price'
+        ? { sort: 'price', order: this.data.sortPriceAsc ? 'asc' : 'desc' }
+        : (this.data.sortType === 'sales' ? { sort: 'sales' } : {});
+
       if (this.data.type === 'hot') {
         res = await api.item.getHot({ page, limit: pageSize, app_id: appId });
       } else if (this.data.type === 'new') {
@@ -64,21 +113,18 @@ Page({
       } else if (this.data.type === 'recommend') {
         res = await api.item.getRecommended({ page, limit: pageSize, app_id: appId });
       } else {
-        res = await api.item.getList({ page, page_size: pageSize, keyword: this.data.keyword, app_id: appId });
-      }
-
-      let list = this.normalizeList(res);
-
-      // 前端排序
-      if (this.data.sortType === 'sales') {
-        list = list.sort((a, b) => Number(b.total_sales || b.sales || 0) - Number(a.total_sales || a.sales || 0));
-      } else if (this.data.sortType === 'price') {
-        list = list.sort((a, b) => {
-          const pa = Number(a.sale_price || a.price || 0);
-          const pb = Number(b.sale_price || b.price || 0);
-          return this.data.sortPriceAsc ? pa - pb : pb - pa;
+        res = await api.item.getList({
+          page,
+          page_size: pageSize,
+          keyword: this.data.keyword,
+          app_id: appId,
+          tag_id: this.data.activeTag || undefined,
+          brand_id: this.data.brandId || undefined,
+          ...sortParams,
         });
       }
+
+      const list = this.normalizeList(res);
 
       this.setData({
         items: this.data.items.concat(list),

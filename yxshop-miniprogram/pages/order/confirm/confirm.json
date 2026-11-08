@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "确认订单",
+  "navigationStyle": "custom",
   "usingComponents": {
     "mp-icon": "/components/mp-icon/index"
   }

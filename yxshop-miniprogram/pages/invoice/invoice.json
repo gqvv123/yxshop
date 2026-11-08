@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的发票",
+  "usingComponents": {
+    "mp-icon": "/components/mp-icon/index",
+    "empty": "/components/empty/index"
+  }
+}

@@ -1,0 +1,55 @@
+<view class="rec-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">资金记录</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- Tab -->
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === index ? 'active' : ''}}"
+            wx:for="{{tabs}}" wx:key="key" data-idx="{{index}}" bindtap="onTabChange">
+        <text>{{item.label}}</text>
+        <view class="tab-underline"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="rec-list" wx:if="{{list.length}}">
+    <view class="rec-item" wx:for="{{list}}" wx:key="id">
+      <view class="ri-left">
+        <view class="ri-title">
+          <text>{{item.title}}</text>
+          <text wx:if="{{item.statusText}}" class="ri-status {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+        <text class="ri-sub ellipsis" wx:if="{{item.sub}}">{{item.sub}}</text>
+        <text class="ri-time">{{item.timeText}}</text>
+      </view>
+      <view class="ri-right">
+        <text class="ri-amount {{item.positive ? 'in' : 'out'}}">{{item.amountText}}</text>
+        <text class="ri-balance" wx:if="{{item.balanceText}}">{{item.balanceText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空 / 错误 -->
+  <view class="state-box" wx:if="{{!loading && !list.length}}">
+    <mp-icon name="wallet" size="32" color="var(--text-3)"></mp-icon>
+    <text class="sb-text">{{loadError || '暂无记录'}}</text>
+    <view class="sb-btn" bindtap="onGoRecharge" wx:if="{{!loadError}}">去充值</view>
+  </view>
+
+  <view class="state-box" wx:if="{{loading}}">
+    <text class="sb-text">加载中…</text>
+  </view>
+
+  <view class="list-foot" wx:if="{{list.length}}">
+    <text>{{hasMore ? '上拉加载更多' : '没有更多了'}}</text>
+  </view>
+</view>

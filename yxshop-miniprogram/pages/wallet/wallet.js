@@ -1,5 +1,6 @@
 // pages/wallet/wallet.js
 const api = require('../../api/index');
+const { callWxPay } = require('../../utils/pay');
 
 Page({
   data: {
@@ -189,9 +190,9 @@ Page({
 
       // 如果返回了支付参数，调起微信支付
       if (res && res.pay_params) {
-        await this._callWxPay(res.pay_params);
+        await callWxPay(res.pay_params);
       } else if (res && res.payment) {
-        await this._callWxPay(res.payment);
+        await callWxPay(res.payment);
       }
 
       wx.showToast({ title: '充值成功', icon: 'success' });
@@ -202,20 +203,6 @@ Page({
     } finally {
       this.setData({ recharging: false });
     }
-  },
-
-  _callWxPay(params) {
-    return new Promise((resolve, reject) => {
-      wx.requestPayment({
-        timeStamp: params.timeStamp,
-        nonceStr: params.nonceStr,
-        package: params.package,
-        signType: params.signType || 'MD5',
-        paySign: params.paySign,
-        success: resolve,
-        fail: reject,
-      });
-    });
   },
 
   // ===== 交易明细 =====
@@ -446,5 +433,10 @@ Page({
 
   onSecurity() {
     wx.navigateTo({ url: '/pages/profile/security/security' });
+  },
+
+  /** 充值记录（对应管理端「系统设置 → 充值套餐」的账务侧） */
+  onRechargeRecords() {
+    wx.navigateTo({ url: '/pages/wallet/records/records?tab=recharge' });
   },
 });

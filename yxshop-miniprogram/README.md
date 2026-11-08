@@ -1,4 +1,4 @@
-# yxshop-miniprogram · 远讯小程序商城（前端）
+# yxshop-miniprogram · 盈锐小程序商城（前端）
 
 基于原生微信小程序的商城前端，对接 [yxshop-php](../yxshop-php) Webman 后端 `/api/v1/*` 接口。
 
@@ -8,17 +8,26 @@
 
 | 模块 | 页面 | 后端接口 |
 |---|---|---|
-| 入口 | 首页 / 分类 / 搜索 / 商品列表 | `item.getHot/getRecommended/getNew/getList/getCategories` |
-| 商品 | 商品详情、SKU 选择、加购、立即购买 | `item.getDetail`、`favorite.*` |
-| 购物车 | 列表、勾选、改数、删除、结算 | `cart.*` |
-| 下单 | 订单确认、地址、支付方式、提交 | `order.create`、`payment.create` |
-| 支付 | `wx.requestPayment` 微信支付 | `payment.*` |
-| 订单 | 列表（4 个状态 tab）、详情、取消 / 确认收货 / 退款 | `order.*` |
+| 入口 | 首页（装修页组件化）/ 分类 / 搜索 / 商品列表 | `mini-page.home`、`item.*`、`category.*` |
+| 商品 | 商品详情、SKU 选择、加购、立即购买、产品参数、评价、咨询 | `item.getDetail`、`item.getReviews`、`item.getConsultations` |
+| 品牌 | 品牌专区（网格 + 搜索）、按品牌筛选商品 | `brand.list`、`category.brands`、`item.getList?brand_id=` |
+| 标签 | 商品列表标签筛选 | `item.getTags` |
+| 购物车 | 列表、勾选、改数、删除、结算预览、tabbar 角标 | `cart.*`、`cart.count` |
+| 下单 | 订单确认、优惠券选择、会员折扣、配送方式与运费、提交 | `order.preview`、`order.create`、`delivery.*` |
+| 支付 | `wx.requestPayment` 微信支付、余额充值 | `payment.*`、`recharge.*` |
+| 订单 | 列表（多状态 tab）、详情、取消 / 确认收货 / 退款 / 再次购买 / 评价 | `order.*` |
+| 售后 | 申请退款、售后进度 | `order.refund`、`order.refund-detail` |
+| 物流 | 物流轨迹 | `order.logistics`、`delivery.*` |
 | 地址 | 列表、新增、编辑、设默认、`chooseAddress` 一键导入 | `address.*` |
-| 收藏 | 收藏列表、移除 | `favorite.*` |
+| 会员 | 会员中心（等级体系、升级进度、等级权益） | `user.level` |
+| 资产 | 钱包（充值套餐 / 提现）、资金记录（充值 / 提现 / 余额流水） | `balance.*`、`withdraw.*` |
+| 营销 | 优惠券（领券 + 我的券）、促销活动、积分商城 / 签到 / 任务 | `coupon.*`、`promotion.*`、`point.*`、`sign.*` |
+| 内容 | 帮助中心 / 公告（文章分类 + 详情）、用户反馈、关于我们 | `article.*`、`feedback.*` |
+| 发票 | 发票抬头管理、开票申请、开票记录 | `invoice.*` |
+| 收藏 / 足迹 | 收藏列表、浏览记录 | `favorite.*`、`user.footprint` |
 | 通知 | 站内消息、未读数、标记已读 | `notification.*` |
-| 个人 | 登录 / 注册 / 退出 / 个人资料 | `auth.*`、`user.*` |
-| 系统 | 应用版本、系统配置 | `version.*`、`config.*` |
+| 个人 | 登录 / 注册 / 退出 / 资料 / 安全设置 / 实名认证 / 合同 | `auth.*`、`user.*`、`security.*`、`verify.*` |
+| 系统 | 业务版本检查（启动时）、系统配置 | `version.*`、`config.*` |
 
 ---
 
@@ -63,7 +72,7 @@ yxshop-miniprogram/
 ```bash
 cd ../yxshop-php
 composer install
-cp .env.simple .env  # 调整数据库 / Redis / JWT_SECRET
+cp .env.example .env  # 调整数据库 / Redis / JWT_SECRET
 php start.php start
 ```
 
@@ -92,13 +101,13 @@ production: {
 ### 3. 用微信开发者工具打开
 
 1. 打开 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
-2. 「导入项目」→ 选择本目录 `d:/wwwroot/yxshop/yxshop-miniprogram`。
+2. 「导入项目」→ 选择本目录 `yxshop-miniprogram`（用你本机的实际路径）。
 3. AppID 选择「**测试号**」即可调试，正式发布前替换为自己的 AppID（修改 `project.config.json`）。
 4. 顶部「编译」即可看到首页。
 
 ### 4. 补充资源（可选）
 
-应用首次跑起来时 tabBar 图标位置会留白。请按 [assets/tabbar/README.md](assets/tabbar/README.md) 补 8 张 PNG。
+tabBar 图标已内置于 `assets/tabbar/`（10 张 81×81 单色 PNG），如需替换可直接覆盖同名文件。
 
 ---
 
@@ -191,7 +200,7 @@ POST /api/v1/auth/bind-phone（需登录）
 当前页所在路由要求登录但本地 token 已被清，回到 `/pages/login/login` 重新登录即可。
 
 **❓ 商品列表 / 分类返回空？**
-检查后端是否已经导入了商品数据：执行 `yxshop-php/database/seed_full_from_schema.sql` 与 `seed_sample_data.sql`。
+检查后端是否已完整导入 `yxshop-php/database/yxshop_open_source_default.sql`（含种子数据）。该仓库不提供独立的 seed_*.sql 脚本。
 
 **❓ 想换主题色？**
 在 [app.wxss](app.wxss) 顶部的 CSS 变量统一改：
@@ -206,4 +215,4 @@ POST /api/v1/auth/bind-phone（需登录）
 
 ## 📜 LICENSE
 
-Apache License 2.0（与后端项目一致）。
+MIT License（与后端项目一致）。

@@ -8,6 +8,7 @@
     "pages/login/login",
     "pages/item-detail/item-detail",
     "pages/item-list/item-list",
+    "pages/brand/list/list",
 
     "pages/order/confirm/confirm",
     "pages/order/list/list",
@@ -28,6 +29,7 @@
     "pages/coupon/coupon",
     "pages/point-exchange/point-exchange",
     "pages/wallet/wallet",
+    "pages/wallet/records/records",
     "pages/footprint/footprint",
     "pages/profile/feedback/feedback",
     "pages/profile/cooperation/cooperation",
@@ -37,15 +39,20 @@
     "pages/profile/verify/verify",
 
     "pages/sign/sign",
+    "pages/user-level/user-level",
     "pages/point-exchange/records/records",
     "pages/point-exchange/tasks/tasks",
     "pages/point-exchange/integral-log/integral-log",
-    "pages/logistics/logistics"
+    "pages/logistics/logistics",
+    "pages/promotion/list/list",
+    "pages/promotion/detail/detail",
+    "pages/help/help",
+    "pages/invoice/invoice"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTitleText": "远讯商城",
+    "navigationBarTitleText": "盈锐商贸",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#f5f6fa",
     "enablePullDownRefresh": false

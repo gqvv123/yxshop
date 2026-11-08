@@ -1,0 +1,32 @@
+.page { min-height: 100vh; background: #f5f6f8; padding-bottom: 30rpx; }
+.type-bar {
+  display: flex; gap: 16rpx; padding: 20rpx 24rpx;
+  background: #fff; position: sticky; top: 0; z-index: 10;
+}
+.type-item {
+  padding: 10rpx 28rpx; border-radius: 999rpx; background: #f2f3f5;
+  font-size: 26rpx; color: #666;
+}
+.type-item.active { background: #ff5b28; color: #fff; }
+.prom-list { padding: 20rpx 24rpx; }
+.prom-card {
+  background: #fff; border-radius: 16rpx; padding: 28rpx;
+  margin-bottom: 20rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,.04);
+}
+.prom-head { display: flex; align-items: center; justify-content: space-between; }
+.prom-title { font-size: 32rpx; font-weight: 600; color: #222; }
+.prom-status {
+  font-size: 22rpx; color: #999; background: #f2f3f5;
+  padding: 4rpx 16rpx; border-radius: 999rpx;
+}
+.prom-status.ing { color: #fff; background: #ff5b28; }
+.prom-meta { display: flex; align-items: center; gap: 16rpx; margin-top: 16rpx; }
+.prom-type { font-size: 22rpx; color: #ff5b28; background: #fff3ed; padding: 4rpx 14rpx; border-radius: 6rpx; }
+.prom-count { font-size: 24rpx; color: #888; }
+.prom-time { display: flex; align-items: center; gap: 6rpx; margin-top: 14rpx; }
+.prom-time-text { font-size: 22rpx; color: #999; }
+.prom-arrow {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 4rpx; margin-top: 16rpx; font-size: 24rpx; color: #c0c4cc;
+}
+.loading-tip { text-align: center; font-size: 24rpx; color: #999; padding: 30rpx 0; }

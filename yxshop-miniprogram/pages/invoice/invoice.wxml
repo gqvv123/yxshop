@@ -1,0 +1,109 @@
+<view class="page">
+  <!-- Tab -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" data-idx="0" bindtap="onTabChange">发票抬头</view>
+    <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" data-idx="1" bindtap="onTabChange">开票记录</view>
+  </view>
+
+  <!-- 发票抬头 -->
+  <block wx:if="{{activeTab === 0}}">
+    <view class="sec-head">
+      <text class="sec-title">我的发票抬头</text>
+      <view class="add-btn" bindtap="onAddHeader">
+        <mp-icon name="plus" size="13" color="#fff"></mp-icon>
+        <text>新增抬头</text>
+      </view>
+    </view>
+
+    <view wx:if="{{headers.length}}" class="hdr-list">
+      <view wx:for="{{headers}}" wx:key="id" class="hdr-card">
+        <view class="hdr-head">
+          <text class="hdr-name">{{item.header_name}}</text>
+          <text wx:if="{{item.is_default}}" class="hdr-default">默认</text>
+          <text class="hdr-type">{{item.type_text}}</text>
+        </view>
+        <view wx:if="{{item.tax_no}}" class="hdr-line">税号：{{item.tax_no}}</view>
+        <view wx:if="{{item.reg_address}}" class="hdr-line">地址：{{item.reg_address}}</view>
+        <view wx:if="{{item.reg_phone}}" class="hdr-line">电话：{{item.reg_phone}}</view>
+        <view wx:if="{{item.bank_name}}" class="hdr-line">开户行：{{item.bank_name}}</view>
+        <view class="hdr-actions">
+          <view class="hdr-act" data-id="{{item.id}}" bindtap="onEditHeader">编辑</view>
+          <view class="hdr-act danger" data-id="{{item.id}}" bindtap="onDeleteHeader">删除</view>
+        </view>
+      </view>
+    </view>
+
+    <empty wx:if="{{!headers.length && !loading}}" text="还没有发票抬头，点击右上角新增"></empty>
+  </block>
+
+  <!-- 开票记录 -->
+  <block wx:else>
+    <view class="sec-head">
+      <text class="sec-title">开票记录</text>
+    </view>
+    <view wx:if="{{records.length}}" class="rec-list">
+      <view wx:for="{{records}}" wx:key="id" class="rec-card">
+        <view class="rec-head">
+          <text class="rec-no">{{item.invoice_no || '待开票'}}</text>
+          <text class="rec-status">{{item.status_text}}</text>
+        </view>
+        <view class="rec-line">金额：¥{{item.invoice_amount}}</view>
+        <view class="rec-line">内容：{{item.invoice_content}}</view>
+        <view wx:if="{{item.fail_reason}}" class="rec-line danger">失败原因：{{item.fail_reason}}</view>
+      </view>
+    </view>
+    <empty wx:if="{{!records.length && !loading}}" text="暂无开票记录"></empty>
+  </block>
+
+  <!-- 抬头表单 -->
+  <view wx:if="{{showForm}}" class="form-mask" bindtap="onCloseForm">
+    <view class="form-panel" catchtap="noop">
+      <view class="form-title">{{editing ? '编辑发票抬头' : '新增发票抬头'}}</view>
+
+      <view class="form-row">
+        <text class="form-label">抬头名称</text>
+        <input class="form-input" placeholder="请输入抬头名称" value="{{form.header_name}}"
+               data-field="header_name" bindinput="onInput" />
+      </view>
+
+      <view class="form-row">
+        <text class="form-label">抬头类型</text>
+        <view class="type-group">
+          <view class="type-opt {{form.invoice_type === 1 ? 'active' : ''}}" data-type="1" bindtap="onTypeChange">个人</view>
+          <view class="type-opt {{form.invoice_type === 2 ? 'active' : ''}}" data-type="2" bindtap="onTypeChange">企业</view>
+        </view>
+      </view>
+
+      <view class="form-row">
+        <text class="form-label">税号</text>
+        <input class="form-input" placeholder="企业抬头必填" value="{{form.tax_no}}"
+               data-field="tax_no" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">注册地址</text>
+        <input class="form-input" placeholder="请输入注册地址" value="{{form.reg_address}}"
+               data-field="reg_address" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">注册电话</text>
+        <input class="form-input" placeholder="请输入注册电话" value="{{form.reg_phone}}"
+               data-field="reg_phone" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">开户银行</text>
+        <input class="form-input" placeholder="请输入开户银行" value="{{form.bank_name}}"
+               data-field="bank_name" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">银行账号</text>
+        <input class="form-input" placeholder="请输入银行账号" value="{{form.bank_account}}"
+               data-field="bank_account" bindinput="onInput" />
+      </view>
+
+      <view class="form-actions">
+        <view class="form-btn cancel" bindtap="onCloseForm">取消</view>
+        <view class="form-btn primary" bindtap="onSaveHeader">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

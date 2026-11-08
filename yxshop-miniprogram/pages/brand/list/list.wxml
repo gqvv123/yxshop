@@ -1,0 +1,45 @@
+<view class="brand-page">
+  <!-- 顶部渐变区 -->
+  <view class="top-hero" style="padding-top: {{statusBarHeight + 8}}px;">
+    <view class="hero-deco"></view>
+    <view class="top-nav">
+      <view class="nav-back" bindtap="onBack">
+        <mp-icon name="chevron-right" size="22" color="#fff"></mp-icon>
+      </view>
+      <text class="nav-title">品牌专区</text>
+      <view class="nav-placeholder"></view>
+    </view>
+
+    <!-- 搜索框 -->
+    <view class="search-bar">
+      <mp-icon name="search" size="16" color="rgba(255,255,255,0.7)"></mp-icon>
+      <input class="sb-input" placeholder="搜索品牌" placeholder-class="sb-ph"
+             value="{{keyword}}" bindinput="onSearchInput" />
+      <view wx:if="{{keyword}}" class="sb-clear" bindtap="onClearKeyword">
+        <mp-icon name="x" size="14" color="rgba(255,255,255,0.8)"></mp-icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- 品牌网格 -->
+  <view class="brand-grid" wx:if="{{brands.length}}">
+    <view class="brand-card" wx:for="{{brands}}" wx:key="id"
+          data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onTapBrand">
+      <image class="bc-logo" src="{{item.logo}}" mode="aspectFit" wx:if="{{item.logo}}"></image>
+      <view class="bc-logo bc-logo--text" wx:else>{{item.name ? item.name[0] : 'B'}}</view>
+      <text class="bc-name ellipsis">{{item.name}}</text>
+      <text class="bc-desc ellipsis" wx:if="{{item.desc}}">{{item.desc}}</text>
+    </view>
+  </view>
+
+  <!-- 空 / 错误 -->
+  <view class="state-box" wx:if="{{!loading && !brands.length}}">
+    <mp-icon name="briefcase" size="32" color="var(--text-3)"></mp-icon>
+    <text class="sb-text">{{loadError || (keyword ? '没有匹配的品牌' : '暂无品牌')}}</text>
+    <view class="sb-btn" bindtap="load" wx:if="{{!keyword}}">重新加载</view>
+  </view>
+
+  <view class="state-box" wx:if="{{loading}}">
+    <text class="sb-text">加载中…</text>
+  </view>
+</view>

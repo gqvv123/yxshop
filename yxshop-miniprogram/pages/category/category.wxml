@@ -27,6 +27,18 @@
 
     <!-- 右侧内容 -->
     <scroll-view class="right-panel" scroll-y enhanced show-scrollbar="{{false}}">
+      <!-- 品牌专区入口（对应管理端「商品品牌」） -->
+      <view class="brand-entry" bindtap="onBrandZone">
+        <view class="be-left">
+          <mp-icon name="briefcase" size="16" color="var(--primary)"></mp-icon>
+          <text class="be-text">品牌专区</text>
+        </view>
+        <view class="be-right">
+          <text class="be-sub">按品牌选购</text>
+          <mp-icon name="chevron-right" size="14" color="var(--text-3)"></mp-icon>
+        </view>
+      </view>
+
       <!-- 分类Banner -->
       <view class="cate-banner">
         <view class="cate-banner-text">

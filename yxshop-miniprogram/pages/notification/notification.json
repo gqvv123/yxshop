@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "消息通知",
+  "navigationStyle": "custom",
   "usingComponents": {
     "empty": "/components/empty/index",
     "mp-icon": "/components/mp-icon/index"

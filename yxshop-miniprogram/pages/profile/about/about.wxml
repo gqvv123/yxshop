@@ -154,7 +154,7 @@
   <view class="copyright">
     <text>{{appName}} v{{version}}</text>
     <view class="copyright-link" bindtap="onCopyLink">
-      <text class="copyright-sub">Powered by 珠海远讯科技</text>
+      <text class="copyright-sub">Powered by 珠海盈锐商贸</text>
     </view>
   </view>
 

@@ -1,0 +1,51 @@
+<view class="page">
+  <!-- 搜索 -->
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索帮助内容"
+      value="{{keyword}}"
+      confirm-type="search"
+      bindconfirm="onSearch"
+    />
+  </view>
+
+  <!-- 分类 -->
+  <scroll-view wx:if="{{categories.length}}" class="cat-bar" scroll-x="true">
+    <view
+      wx:for="{{categories}}"
+      wx:key="id"
+      class="cat-item {{activeCat === index ? 'active' : ''}}"
+      data-idx="{{index}}"
+      bindtap="onCatChange"
+    >{{item.name || '全部'}}</view>
+  </scroll-view>
+
+  <!-- 列表 -->
+  <view wx:if="{{list.length}}" class="art-list">
+    <view wx:for="{{list}}" wx:key="id" class="art-item" data-id="{{item.id}}" bindtap="onTapArticle">
+      <view class="art-title">{{item.title}}</view>
+      <view wx:if="{{item.description || item.excerpt}}" class="art-desc">{{item.description || item.excerpt}}</view>
+      <view class="art-meta">
+        <text>{{item.author || '商城'}}</text>
+        <text>{{item.view_count}} 次浏览</text>
+      </view>
+    </view>
+  </view>
+
+  <empty wx:if="{{!list.length && !loading}}" text="暂无帮助内容"></empty>
+  <view wx:if="{{loading}}" class="loading-tip">加载中…</view>
+  <view wx:if="{{!hasMore && list.length}}" class="loading-tip">没有更多了</view>
+
+  <!-- 详情浮层 -->
+  <view wx:if="{{showDetail}}" class="detail-mask" bindtap="onCloseDetail">
+    <view class="detail-panel" catchtap="noop">
+      <view class="detail-title">{{detail.title}}</view>
+      <view class="detail-body">
+        <rich-text wx:if="{{detail.content}}" nodes="{{detail.content}}"></rich-text>
+        <text wx:else>{{detail.description || detail.excerpt || '暂无正文'}}</text>
+      </view>
+      <view class="detail-close" bindtap="onCloseDetail">关闭</view>
+    </view>
+  </view>
+</view>

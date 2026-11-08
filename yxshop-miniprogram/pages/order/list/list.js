@@ -1,5 +1,6 @@
 // pages/order/list/list.js
 const api = require('../../../api/index');
+const { callWxPay } = require('../../../utils/pay');
 const auth = require('../../../utils/auth');
 const imageUtil = require('../../../utils/image');
 const { fmtOrderStatus, fmtPrice, fmtDate, getOrderFlowStatus } = require('../../../utils/format');
@@ -378,29 +379,15 @@ Page({
     try {
       const res = await api.payment.pay({ order_id: id });
       if (res && res.pay_params) {
-        await this._callWxPay(res.pay_params);
+        await callWxPay(res.pay_params);
       } else if (res && res.payment) {
-        await this._callWxPay(res.payment);
+        await callWxPay(res.payment);
       }
       wx.showToast({ title: '支付成功', icon: 'success' });
       this.refresh();
     } catch (e) {
       wx.showToast({ title: e.message || '支付失败', icon: 'none' });
     }
-  },
-
-  _callWxPay(params) {
-    return new Promise((resolve, reject) => {
-      wx.requestPayment({
-        timeStamp: params.timeStamp,
-        nonceStr: params.nonceStr,
-        package: params.package,
-        signType: params.signType || 'MD5',
-        paySign: params.paySign,
-        success: resolve,
-        fail: reject,
-      });
-    });
   },
 
   _cancelOrder(id) {

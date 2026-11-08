@@ -103,6 +103,37 @@
   height: 100%;
 }
 
+/* 品牌专区入口 */
+.brand-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 22rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow-sm);
+}
+.be-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.be-text {
+  font-size: 27rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.be-right {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+.be-sub {
+  font-size: 23rpx;
+  color: var(--text-3);
+}
+
 /* 分类Banner */
 .cate-banner {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));

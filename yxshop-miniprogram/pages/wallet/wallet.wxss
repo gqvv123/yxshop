@@ -208,6 +208,7 @@
 .qi-icon-2 { background: linear-gradient(135deg, #10b981, #34d399); }
 .qi-icon-3 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
 .qi-icon-4 { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.qi-icon-5 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
 .qi-text {
   font-size: 22rpx;
   color: var(--text-2);

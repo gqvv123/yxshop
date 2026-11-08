@@ -41,7 +41,7 @@
       <view class="oc-header">
         <view class="oc-store">
           <mp-icon name="home" size="14" color="#2563eb"></mp-icon>
-          <text class="oc-store-name">{{item.store_name || '远讯商城'}}</text>
+          <text class="oc-store-name">{{item.store_name || '盈锐商贸'}}</text>
         </view>
         <text class="oc-status oc-status-{{item.statusClass}}">{{item.statusText}}</text>
       </view>

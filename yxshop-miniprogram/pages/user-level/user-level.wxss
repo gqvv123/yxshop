@@ -1,0 +1,320 @@
+/* pages/user-level — 会员等级中心 */
+.ul-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 60rpx;
+}
+
+/* ========== 顶部渐变区 ========== */
+.top-hero {
+  background: linear-gradient(160deg, #1e3a8a 0%, var(--primary) 50%, var(--primary-light) 100%);
+  padding: 0 0 48rpx 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-deco-1 {
+  position: absolute;
+  top: -100rpx;
+  right: -80rpx;
+  width: 420rpx;
+  height: 420rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+.hero-deco-2 {
+  position: absolute;
+  bottom: -140rpx;
+  left: -60rpx;
+  width: 320rpx;
+  height: 320rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 40rpx 0 40rpx;
+  position: relative;
+  z-index: 2;
+}
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+.nav-title {
+  flex: 1;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-placeholder { width: 64rpx; }
+
+/* ========== 等级卡 ========== */
+.level-card {
+  position: relative;
+  z-index: 2;
+  margin: 28rpx 32rpx 0;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2rpx solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--r-lg);
+  padding: 32rpx;
+  backdrop-filter: blur(10rpx);
+}
+.lc-top {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+.lc-badge {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lc-info { flex: 1; min-width: 0; }
+.lc-name {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #fff;
+}
+.lc-desc {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.72);
+  margin-top: 6rpx;
+}
+.lc-discount {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+.lc-unit { font-size: 24rpx; }
+.lc-discount--none {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 升级进度 */
+.lc-progress { margin-top: 28rpx; }
+.lp-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.92);
+}
+.lp-pct { font-weight: 700; color: #fbbf24; }
+.lp-bar {
+  height: 12rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.2);
+  margin-top: 12rpx;
+  overflow: hidden;
+}
+.lp-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  transition: width 0.4s ease;
+}
+.lp-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 10rpx;
+}
+.lc-max {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #fbbf24;
+}
+
+/* ========== 区块 ========== */
+.section {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  margin: 24rpx 24rpx 0;
+  padding: 28rpx 32rpx;
+  box-shadow: var(--shadow-sm);
+}
+.sec-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 24rpx;
+}
+
+/* 权益网格 */
+.benefit-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+.benefit-item {
+  width: calc((100% - 40rpx) / 3);
+  background: var(--bg);
+  border-radius: var(--r-md);
+  padding: 24rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8rpx;
+}
+.bi-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--primary-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bi-title {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.bi-desc {
+  font-size: 20rpx;
+  color: var(--text-3);
+  line-height: 1.35;
+}
+
+/* 等级列表 */
+.level-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 20rpx;
+  border-radius: var(--r-md);
+  background: var(--bg);
+}
+.level-row.current {
+  background: var(--primary-50);
+  border: 2rpx solid var(--primary-100);
+}
+.lr-left {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  flex: 1;
+  min-width: 0;
+}
+.lr-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
+}
+.level-row.current .lr-dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 6rpx rgba(37, 99, 235, 0.15);
+}
+.lr-main { min-width: 0; }
+.lr-name {
+  font-size: 27rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.lr-tag {
+  font-size: 18rpx;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-100);
+  border-radius: 999rpx;
+  padding: 2rpx 12rpx;
+}
+.lr-cond {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+.lr-discount {
+  font-size: 25rpx;
+  font-weight: 700;
+  color: var(--price);
+  flex-shrink: 0;
+}
+
+/* 状态 */
+.state-box {
+  margin: 60rpx 32rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+.sb-text {
+  font-size: 26rpx;
+  color: var(--text-3);
+}
+.sb-btn {
+  margin-top: 8rpx;
+  padding: 14rpx 44rpx;
+  border-radius: var(--r-full);
+  border: 2rpx solid var(--primary);
+  color: var(--primary);
+  font-size: 26rpx;
+}
+
+/* 底部提示 */
+.tip-card {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  margin: 24rpx 24rpx 0;
+  padding: 28rpx 32rpx;
+  box-shadow: var(--shadow-sm);
+}
+.tip-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 14rpx;
+}
+.tip-line {
+  font-size: 23rpx;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+.go-btn {
+  margin-top: 24rpx;
+  height: 80rpx;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(37, 99, 235, 0.25);
+}
