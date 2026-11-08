@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\ItemAttributeRepository;
-use Exception;
 
 class ItemAttributeService extends BaseService
 {

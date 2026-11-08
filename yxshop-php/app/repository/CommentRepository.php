@@ -69,7 +69,7 @@ class CommentRepository extends BaseRepository
     /**
      * 获取商品评价统计
      */
-    public function getItemCommentStats($itemId, $appId = 0)
+    public function getItemCommentStats($itemId, $appId = 0): array
     {
         $base = $this->query()->where('item_id', $itemId);
 
@@ -89,7 +89,7 @@ class CommentRepository extends BaseRepository
     /**
      * 获取评价统计
      */
-    public function getCommentStats($appId = 0)
+    public function getCommentStats($appId = 0): array
     {
         $base = $this->query();
 

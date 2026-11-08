@@ -2,6 +2,12 @@
 
 namespace app\traits;
 
+/**
+ * 公共组件：批量操作通用 Trait。
+ *
+ * @package app\traits
+ */
+
 use support\Request;
 use app\exception\BusinessException;
 

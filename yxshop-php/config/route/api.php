@@ -5,18 +5,18 @@ use Webman\Route;
 
 // API接口端路由配置（小程序/APP）
 Route::group('/api/v1', function () {
-    
+
     // 应用版本管理
     Route::group('/version', function () {
         // 获取最新版本
         Route::get('/latest', [app\api\v1\controller\AppVersionController::class, 'getLatest']);
-        
+
         // 检查是否需要更新
         Route::get('/check-update', [app\api\v1\controller\AppVersionController::class, 'checkUpdate']);
-        
+
         // 获取强制更新版本
         Route::get('/force-update', [app\api\v1\controller\AppVersionController::class, 'getForceUpdate']);
-        
+
         // 获取版本信息
         Route::get('/info', [app\api\v1\controller\AppVersionController::class, 'getInfo']);
     });
@@ -55,7 +55,7 @@ Route::group('/api/v1', function () {
         Route::post('/bind-phone', [app\api\v1\controller\AuthController::class, 'bindPhone'])
             ->middleware([app\middleware\ApiAuthMiddleware::class]);
     });
-    
+
     // 商品管理
     Route::group('/item', function () {
         Route::get('/list', [app\api\v1\controller\ItemController::class, 'getList']);
@@ -74,25 +74,80 @@ Route::group('/api/v1', function () {
         Route::get('/consultations', [app\api\v1\controller\ItemController::class, 'getConsultations']);
         Route::post('/consult', [app\api\v1\controller\ItemController::class, 'consult'])
             ->middleware([app\middleware\ApiAuthMiddleware::class]);
+
+        // P3 补齐：商品标签 / 属性 / 类型（对应管理端「商品管理 → 商品标签/商品属性/商品类型」）
+        Route::get('/tags', [app\api\v1\controller\TagController::class, 'getTags']);
+        Route::get('/hot-tags', [app\api\v1\controller\TagController::class, 'getHotTags']);
+        Route::get('/attributes', [app\api\v1\controller\TagController::class, 'getAttributes']);
+        Route::get('/types', [app\api\v1\controller\TagController::class, 'getTypes']);
+    });
+
+    // P3 补齐：促销活动（对应管理端「营销管理 → 促销活动/商品促销/订单促销」）
+    Route::group('/promotion', function () {
+        Route::get('/list', [app\api\v1\controller\PromotionController::class, 'getList']);
+        Route::get('/detail', [app\api\v1\controller\PromotionController::class, 'getDetail']);
+        Route::get('/items', [app\api\v1\controller\PromotionController::class, 'getItems']);
+    });
+
+    // P3 补齐：物流配送（对应管理端「物流配送 → 物流公司/配送模板」）
+    Route::group('/delivery', function () {
+        Route::get('/expresses', [app\api\v1\controller\DeliveryController::class, 'getExpresses']);
+        Route::get('/list', [app\api\v1\controller\DeliveryController::class, 'getList']);
+        Route::get('/detail', [app\api\v1\controller\DeliveryController::class, 'getDetail']);
+        Route::get('/freight', [app\api\v1\controller\DeliveryController::class, 'getFreight']);
+    });
+
+    // P3 补齐：帮助中心 / 商城公告（对应管理端「内容管理 → 文章管理/文章分类」）
+    Route::group('/article', function () {
+        Route::get('/list', [app\api\v1\controller\ArticleController::class, 'getList']);
+        Route::get('/detail', [app\api\v1\controller\ArticleController::class, 'getDetail']);
+        Route::get('/categories', [app\api\v1\controller\ArticleController::class, 'getCategories']);
+    });
+
+    // P3 补齐：广告位（对应管理端「内容管理 → 广告管理」）
+    Route::group('/advertisement', function () {
+        Route::get('/list', [app\api\v1\controller\AdvertisementController::class, 'getList']);
+    });
+
+    // P3 补齐：地区数据（对应管理端「系统设置 → 地区管理」）
+    Route::group('/region', function () {
+        Route::get('/tree', [app\api\v1\controller\RegionController::class, 'getTree']);
+        Route::get('/provinces', [app\api\v1\controller\RegionController::class, 'getProvinces']);
+        Route::get('/cities', [app\api\v1\controller\RegionController::class, 'getCities']);
+        Route::get('/districts', [app\api\v1\controller\RegionController::class, 'getDistricts']);
+    });
+
+    // P3 补齐：发票（对应管理端「财务管理 → 发票管理」）
+    Route::group('/invoice', function () {
+        Route::get('/headers', [app\api\v1\controller\InvoiceController::class, 'getHeaders'])
+            ->middleware([app\middleware\ApiAuthMiddleware::class]);
+        Route::post('/header', [app\api\v1\controller\InvoiceController::class, 'saveHeader'])
+            ->middleware([app\middleware\ApiAuthMiddleware::class]);
+        Route::delete('/header/{id}', [app\api\v1\controller\InvoiceController::class, 'deleteHeader'])
+            ->middleware([app\middleware\ApiAuthMiddleware::class]);
+        Route::post('/apply', [app\api\v1\controller\InvoiceController::class, 'apply'])
+            ->middleware([app\middleware\ApiAuthMiddleware::class]);
+        Route::get('/records', [app\api\v1\controller\InvoiceController::class, 'getRecords'])
+            ->middleware([app\middleware\ApiAuthMiddleware::class]);
     });
 
     // 用户信息
     Route::group('/user', function () {
         // 获取用户信息
         Route::get('/info', [app\api\v1\controller\UserController::class, 'getInfo']);
-        
+
         // 更新用户信息
         Route::post('/update-info', [app\api\v1\controller\UserController::class, 'updateInfo']);
-        
+
         // 更新用户头像
         Route::post('/update-avatar', [app\api\v1\controller\UserController::class, 'updateAvatar']);
-        
+
         // 修改密码
         Route::post('/change-password', [app\api\v1\controller\UserController::class, 'changePassword']);
-        
+
         // 获取用户订单
         Route::get('/orders', [app\api\v1\controller\UserController::class, 'getOrders']);
-        
+
         // 获取用户收藏
         Route::get('/favorites', [app\api\v1\controller\UserController::class, 'getFavorites']);
 
@@ -112,11 +167,14 @@ Route::group('/api/v1', function () {
         // P3 新增：用户等级详情
         Route::get('/level', [app\api\v1\controller\UserLevelController::class, 'detail']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 订单管理
     Route::group('/order', function () {
         // 创建订单
         Route::post('/create', [app\api\v1\controller\OrderController::class, 'create']);
+
+        // 结算试算（与 create 共用金额算法，保证预览/实际一致）
+        Route::post('/preview', [app\api\v1\controller\OrderController::class, 'preview']);
 
         // 获取订单列表（支持 tab 过滤）
         Route::get('/list', [app\api\v1\controller\OrderController::class, 'getList']);
@@ -154,22 +212,22 @@ Route::group('/api/v1', function () {
         // P1 新增：删除订单
         Route::post('/delete', [app\api\v1\controller\OrderController::class, 'delete']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 支付管理
     Route::group('/payment', function () {
         // 创建支付订单
         Route::post('/create', [app\api\v1\controller\PaymentController::class, 'create']);
-        
+
         // 支付回调
         Route::post('/callback', [app\api\v1\controller\PaymentController::class, 'callback']);
-        
+
         // 查询支付状态
         Route::get('/status', [app\api\v1\controller\PaymentController::class, 'getStatus']);
-        
+
         // 申请退款
         Route::post('/refund', [app\api\v1\controller\PaymentController::class, 'refund']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 购物车
     Route::group('/cart', function () {
         // 获取购物车
@@ -199,66 +257,69 @@ Route::group('/api/v1', function () {
         // P0 新增：全选/取消全选
         Route::post('/select-all', [app\api\v1\controller\CartController::class, 'selectAll']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 收藏管理
     Route::group('/favorite', function () {
         // 获取收藏列表
         Route::get('/list', [app\api\v1\controller\FavoriteController::class, 'getList']);
-        
+
         // 添加收藏
         Route::post('/add', [app\api\v1\controller\FavoriteController::class, 'add']);
-        
+
         // 取消收藏
         Route::post('/remove', [app\api\v1\controller\FavoriteController::class, 'remove']);
-        
+
         // 检查是否已收藏
         Route::get('/check', [app\api\v1\controller\FavoriteController::class, 'check']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 地址管理
     Route::group('/address', function () {
         // 获取地址列表
         Route::get('/list', [app\api\v1\controller\AddressController::class, 'getList']);
-        
+
         // 添加地址
         Route::post('/add', [app\api\v1\controller\AddressController::class, 'add']);
-        
+
         // 更新地址
         Route::post('/update', [app\api\v1\controller\AddressController::class, 'update']);
-        
+
         // 删除地址
         Route::post('/delete', [app\api\v1\controller\AddressController::class, 'delete']);
-        
+
         // 设置默认地址
         Route::post('/set-default', [app\api\v1\controller\AddressController::class, 'setDefault']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 消息通知
     Route::group('/notification', function () {
         // 获取消息列表
         Route::get('/list', [app\api\v1\controller\NotificationController::class, 'getList']);
-        
+
         // 标记消息为已读
         Route::post('/mark-read', [app\api\v1\controller\NotificationController::class, 'markRead']);
-        
+
         // 批量标记消息为已读
         Route::post('/mark-multiple-read', [app\api\v1\controller\NotificationController::class, 'markMultipleRead']);
 
         // 获取未读消息数量
         Route::get('/unread-count', [app\api\v1\controller\NotificationController::class, 'getUnreadCount']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 文件上传
     Route::group('/upload', function () {
         // 上传图片
         Route::post('/image', [app\api\v1\controller\UploadController::class, 'uploadImage']);
-        
+
         // 上传文件
         Route::post('/file', [app\api\v1\controller\UploadController::class, 'uploadFile']);
     })->middleware([app\middleware\ApiAuthMiddleware::class]);
-    
+
     // 系统配置
     Route::group('/config', function () {
+        // 基础配置（站点名/标题/关键词/描述/LOGO/客服/版权，group=basic）
+        Route::get('/basic', [app\api\v1\controller\ConfigController::class, 'getBasicConfig']);
+
         // 获取系统配置
         Route::get('/system', [app\api\v1\controller\ConfigController::class, 'getSystemConfig']);
 
@@ -408,7 +469,7 @@ Route::group('/api/v1', function () {
     app\middleware\LicenseMiddleware::class,
     app\middleware\ApiCorsMiddleware::class,
     app\middleware\ApiRateLimitMiddleware::class
-]); 
+]);
 
 
 // V2 API 路由已移除（V2 控制器仅为 V1 的空壳继承，无独立功能，避免混淆）

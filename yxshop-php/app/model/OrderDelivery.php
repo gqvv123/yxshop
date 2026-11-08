@@ -75,19 +75,19 @@ class OrderDelivery extends BaseModel
     /**
      * 更新状态
      */
-    public function updateStatus($status, $remark = '')
+    public function updateStatus($status, $remark = ''): void
     {
         $this->status = $status;
         if ($remark) {
             $this->remark = $remark;
         }
-        
+
         if ($status == self::STATUS_SHIPPED) {
             $this->delivery_time = time();
         } elseif ($status == self::STATUS_RECEIVED) {
             $this->receive_time = time();
         }
-        
+
         $this->save();
     }
 }

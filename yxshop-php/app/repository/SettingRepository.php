@@ -89,7 +89,7 @@ class SettingRepository extends BaseRepository
     /**
      * 获取设置统计
      */
-    public function getSettingStats($appId = 0)
+    public function getSettingStats($appId = 0): array
     {
         $base = $this->query()->where('app_id', $appId);
 

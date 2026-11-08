@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Contract。
+ *
+ * @package app\model
+ */
 class UserContract extends BaseModel
 {
     protected $table = 'yxshop_user_contracts';

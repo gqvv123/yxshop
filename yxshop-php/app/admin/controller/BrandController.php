@@ -19,9 +19,8 @@ class BrandController extends BaseController
 
     public function index(Request $request)
     {
-        // 使用 $this->app_id（默认 0），而非 getAppId()（默认 10001）
-        // 当 app_id 为 0 时不按 app_id 过滤，返回全部品牌
-        $appId = (int) ($this->admin['app_id'] ?? 0);
+        // app_id 为 0 时不按 app_id 过滤，返回全部品牌
+        $appId = (int) ($this->getAppId($request));
         $pageSize = (int) $request->get('page_size', 20);
         $isHot = $request->get('is_hot');
 

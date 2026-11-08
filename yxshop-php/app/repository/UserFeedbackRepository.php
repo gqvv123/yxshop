@@ -103,7 +103,7 @@ class UserFeedbackRepository extends BaseRepository
     /**
      * 获取反馈统计
      */
-    public function getStats(array $conditions = [])
+    public function getStats(array $conditions = []): array
     {
         $appId = $conditions['app_id'] ?? 0;
         $base = $this->query();

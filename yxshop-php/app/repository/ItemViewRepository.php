@@ -104,7 +104,7 @@ class ItemViewRepository extends BaseRepository
     public function getItemViewStats($itemId, $days = 30)
     {
         $startTime = time() - ($days * 24 * 3600);
-        
+
         return $this->query()
             ->where('item_id', $itemId)
             ->where('created_at', '>=', $startTime)
@@ -114,7 +114,7 @@ class ItemViewRepository extends BaseRepository
     /**
      * 获取用户浏览统计
      */
-    public function getUserViewStats($userId, $appId = 0)
+    public function getUserViewStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
 
@@ -136,9 +136,23 @@ class ItemViewRepository extends BaseRepository
     public function cleanExpiredViews($days = 90)
     {
         $expiredTime = time() - ($days * 24 * 3600);
-        
+
         return $this->query()
             ->where('created_at', '<', $expiredTime)
             ->delete();
     }
+
+    /**
+     * 浏览次数原子自增（同时刷新最近浏览时间）
+     */
+    public function incrementViewCount(int $viewId): int
+    {
+        return $this->query()
+            ->where('id', $viewId)
+            ->update([
+                'view_count' => \support\Db::raw('view_count + 1'),
+                'created_at' => time(),
+            ]);
+    }
+
 }

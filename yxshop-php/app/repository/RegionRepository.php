@@ -23,13 +23,21 @@ class RegionRepository extends BaseRepository
             return $cached;
         }
 
+        // 说明：地区表的 pid 在历史数据里可能为 NULL，
+        // 直接 groupBy('pid') 会用 null 当数组键，PHP 8.5 下触发
+        // "Using null as an array offset is deprecated"，
+        // 而 webman 的错误处理器会把 deprecation 升级为 ErrorException，
+        // 导致整个建树过程失败（接口返回空）。
+        // 这里统一用 (int) 归一化，NULL 一律按 0（顶级）处理。
         $all = $this->model->newQuery()
             ->orderBy('id', 'asc')
             ->get()
-            ->groupBy('pid');
+            ->groupBy(static function ($region) {
+                return (int) ($region->pid ?? 0);
+            });
 
         $buildTree = function ($parentId) use (&$buildTree, &$all) {
-            $children = $all->get($parentId, collect());
+            $children = $all->get((int) $parentId, collect());
             foreach ($children as $region) {
                 $region->children = $buildTree($region->id);
             }
@@ -82,12 +90,12 @@ class RegionRepository extends BaseRepository
     {
         $path = [];
         $region = $this->find($regionId);
-        
+
         while ($region) {
             array_unshift($path, $region);
             $region = $region->pid > 0 ? $this->find($region->pid) : null;
         }
-        
+
         return $path;
     }
 

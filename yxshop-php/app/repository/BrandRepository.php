@@ -94,7 +94,7 @@ class BrandRepository extends BaseRepository
     /**
      * 品牌统计（每项 clone 防累加 where）
      */
-    public function getBrandStats($appId = 0)
+    public function getBrandStats($appId = 0): array
     {
         $base = $this->query();
         if ($appId > 0) {

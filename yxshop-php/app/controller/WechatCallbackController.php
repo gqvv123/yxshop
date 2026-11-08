@@ -6,6 +6,11 @@ use support\Request;
 use support\Response;
 use app\service\WechatAuthService;
 
+/**
+ * 组件：Wechat Callback Controller。
+ *
+ * @package app\controller
+ */
 class WechatCallbackController
 {
     protected $wechatAuthService;

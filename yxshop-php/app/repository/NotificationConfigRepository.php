@@ -68,7 +68,7 @@ class NotificationConfigRepository extends BaseRepository
     /**
      * 获取配置统计
      */
-    public function getConfigStats($appId = 0)
+    public function getConfigStats($appId = 0): array
     {
         $query = $this->query();
 

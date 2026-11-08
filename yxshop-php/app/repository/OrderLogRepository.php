@@ -22,10 +22,10 @@ class OrderLogRepository extends BaseRepository
     /**
      * 获取用户订单统计
      */
-    public function getUserOrderStats($userId, $appId = 0)
+    public function getUserOrderStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
-        
+
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }
@@ -41,7 +41,7 @@ class OrderLogRepository extends BaseRepository
     /**
      * 获取订单销售统计
      */
-    public function getSalesStats($startTime = null, $endTime = null, $appId = 0)
+    public function getSalesStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query()
             ->where('order_status', Order::ORDER_STATUS_COMPLETE)

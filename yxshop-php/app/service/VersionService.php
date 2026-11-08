@@ -82,7 +82,7 @@ class VersionService
         if (!$user) {
             return 'basic';
         }
-        
+
         return $user->version ?? 'basic';
     }
 
@@ -104,17 +104,17 @@ class VersionService
         if (in_array($feature, $this->versions['basic']['features'])) {
             return true;
         }
-        
+
         // 进阶功能
         if (in_array($feature, $this->versions['professional']['features'])) {
             return in_array($version, ['professional', 'enterprise']);
         }
-        
+
         // 高级功能
         if (in_array($feature, $this->versions['enterprise']['features'])) {
             return $version === 'enterprise';
         }
-        
+
         return false;
     }
 
@@ -143,14 +143,14 @@ class VersionService
         if (!$user) {
             return false;
         }
-        
+
         $user->version = $newVersion;
         $user->upgraded_at = date('Y-m-d H:i:s');
         $user->save();
-        
+
         // 记录升级日志
         $this->logUpgrade($userId, $user->version, $newVersion);
-        
+
         return true;
     }
 
@@ -161,7 +161,7 @@ class VersionService
     {
         $current = $this->getVersionInfo($currentVersion);
         $target = $this->getVersionInfo($targetVersion);
-        
+
         return [
             'can_upgrade' => $this->canUpgrade($currentVersion, $targetVersion),
             'current_version' => $current,
@@ -179,7 +179,7 @@ class VersionService
         $levels = ['basic', 'professional', 'enterprise'];
         $currentLevel = array_search($currentVersion, $levels);
         $targetLevel = array_search($targetVersion, $levels);
-        
+
         return $targetLevel > $currentLevel;
     }
 
@@ -190,10 +190,10 @@ class VersionService
     {
         $current = $this->getVersionInfo($currentVersion);
         $target = $this->getVersionInfo($targetVersion);
-        
+
         $currentFeatures = $current['features'];
         $targetFeatures = $target['features'];
-        
+
         return array_diff($targetFeatures, $currentFeatures);
     }
 
@@ -209,7 +209,7 @@ class VersionService
             'upgraded_at' => date('Y-m-d H:i:s'),
             'ip' => request()->getRealIp()
         ];
-        
+
         Redis::lpush('upgrade_logs', json_encode($log));
     }
 
@@ -220,13 +220,13 @@ class VersionService
     {
         $cacheKey = "feature_usage:{$feature}";
         $usage = Redis::get($cacheKey);
-        
+
         if (!$usage) {
             // 从数据库统计功能使用情况
             $usage = $this->calculateFeatureUsage($feature);
             Redis::setex($cacheKey, 3600, json_encode($usage));
         }
-        
+
         return json_decode($usage, true);
     }
 
@@ -250,7 +250,7 @@ class VersionService
     public function getVersionComparison(): array
     {
         $comparison = [];
-        
+
         foreach ($this->versions as $key => $version) {
             $comparison[$key] = [
                 'name' => $version['name'],
@@ -259,7 +259,7 @@ class VersionService
                 'features' => $version['features']
             ];
         }
-        
+
         return $comparison;
     }
 }

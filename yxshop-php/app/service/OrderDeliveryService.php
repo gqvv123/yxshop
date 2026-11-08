@@ -3,9 +3,12 @@
 namespace app\service;
 
 use app\repository\OrderDeliveryRepository;
-use app\model\OrderDelivery;
-use Exception;
 
+/**
+ * 业务服务：Order Delivery Service。
+ *
+ * @package app\service
+ */
 class OrderDeliveryService extends BaseService
 {
     public function __construct(?OrderDeliveryRepository $repository = null)

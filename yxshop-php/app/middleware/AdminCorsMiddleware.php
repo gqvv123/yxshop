@@ -6,6 +6,11 @@ use Webman\MiddlewareInterface;
 use Webman\Http\Request;
 use Webman\Http\Response;
 
+/**
+ * 中间件：Admin Cors Middleware。
+ *
+ * @package app\middleware
+ */
 class AdminCorsMiddleware implements MiddlewareInterface
 {
     private array $allowedOrigins;

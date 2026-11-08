@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\AppRepository;
-use app\model\App;
 use app\exception\BusinessException;
 use app\validate\AppValidate;
 use Exception;
@@ -15,7 +14,7 @@ use Exception;
  */
 class AppService extends BaseService
 {
-    public function __construct(AppRepository $repository = null)
+    public function __construct(?AppRepository $repository = null)
     {
         $repository = $repository ?? new AppRepository();
         parent::__construct($repository);
@@ -111,7 +110,7 @@ class AppService extends BaseService
     /**
      * 删除应用
      */
-    public function deleteApp($id)
+    public function deleteApp($id): bool
     {
         try {
             $this->logInfo('删除应用开始', ['id' => $id]);

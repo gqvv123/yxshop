@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\PaymentLog;
 
+/**
+ * 数据仓储：Payment Log Repository。
+ *
+ * @package app\repository
+ */
 class PaymentLogRepository extends BaseRepository
 {
     protected $model = PaymentLog::class;

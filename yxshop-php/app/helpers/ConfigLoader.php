@@ -14,7 +14,7 @@ class ConfigLoader implements Bootstrap
     /**
      * Bootstrap 启动方法
      */
-    public static function start(?Worker $worker)
+    public static function start(?Worker $worker): void
     {
         // 预加载配置
         self::load();
@@ -28,18 +28,18 @@ class ConfigLoader implements Bootstrap
         if ($configFile === null) {
             $configFile = base_path() . '/app.yaml';
         }
-        
+
         if (self::$config === null || self::$configFile !== $configFile) {
             self::$configFile = $configFile;
-            
+
             if (!file_exists($configFile)) {
                 throw new \Exception("配置文件不存在: {$configFile}");
             }
-            
+
             $yamlContent = file_get_contents($configFile);
             self::$config = Yaml::parse($yamlContent);
         }
-        
+
         return self::$config;
     }
 
@@ -49,11 +49,11 @@ class ConfigLoader implements Bootstrap
     public static function get($key, $default = null)
     {
         $config = self::load();
-        
+
         // 支持点号分隔的嵌套键
         $keys = explode('.', $key);
         $value = $config;
-        
+
         foreach ($keys as $k) {
             if (isset($value[$k])) {
                 $value = $value[$k];
@@ -61,7 +61,7 @@ class ConfigLoader implements Bootstrap
                 return $default;
             }
         }
-        
+
         return $value;
     }
 
@@ -89,4 +89,4 @@ class ConfigLoader implements Bootstrap
         self::$config = null;
         return self::load();
     }
-} 
+}

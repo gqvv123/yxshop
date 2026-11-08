@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Money Log。
+ *
+ * @package app\model
+ */
 class UserMoneyLog extends BaseModel
 {
     protected $table = 'yxshop_user_money_logs';

@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\MiniThemeService;
 
+/**
+ * 管理端控制器：Mini Theme Controller。
+ *
+ * @package app\admin\controller
+ */
 class MiniThemeController extends BaseController
 {
     protected $themeService;

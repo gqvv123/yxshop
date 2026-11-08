@@ -4,6 +4,11 @@ namespace app\model;
 
 use app\model\BaseModel;
 
+/**
+ * 数据模型：Mini Tab Bar。
+ *
+ * @package app\model
+ */
 class MiniTabBar extends BaseModel
 {
     protected $table = 'yxshop_mini_tab_bars';

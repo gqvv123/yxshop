@@ -8,8 +8,6 @@ Route::group('/admin/api', function () {
     Route::get('/captcha', [app\admin\controller\LoginController::class, 'captcha']);
     Route::get('/captcha/puzzle', [app\admin\controller\LoginController::class, 'puzzleCaptcha']);
     // 微信扫码登录已移除（开源版不需要）
-    // Route::post('/wechat/qrcode', [app\admin\controller\WechatAuthController::class, 'qrcode']);
-    // Route::get('/wechat/scan-status', [app\admin\controller\WechatAuthController::class, 'scanStatus']);
 
     Route::group('', function () {
 
@@ -19,15 +17,11 @@ Route::group('/admin/api', function () {
         Route::post('/user/change-password', [app\admin\controller\LoginController::class, 'changePassword']);
         Route::post('/user/force-change-password', [app\admin\controller\LoginController::class, 'forceChangePassword']);
         // 2FA 双因素认证已移除（开源版不需要，属于商业版等保功能）
-        // Route::get('/user/2fa/status', [app\admin\controller\LoginController::class, 'twoFactorStatus']);
-        // Route::post('/user/2fa/setup', [app\admin\controller\LoginController::class, 'twoFactorSetup']);
-        // Route::post('/user/2fa/enable', [app\admin\controller\LoginController::class, 'twoFactorEnable']);
-        // Route::post('/user/2fa/disable', [app\admin\controller\LoginController::class, 'twoFactorDisable']);
+        Route::get('/user/2fa/status', [app\admin\controller\LoginController::class, 'twoFactorStatus']);
+        Route::post('/user/2fa/setup', [app\admin\controller\LoginController::class, 'twoFactorSetup']);
+        Route::post('/user/2fa/enable', [app\admin\controller\LoginController::class, 'twoFactorEnable']);
+        Route::post('/user/2fa/disable', [app\admin\controller\LoginController::class, 'twoFactorDisable']);
         // 微信扫码绑定/解绑已移除（开源版不需要）
-        // Route::get('/wechat/bind-status', [app\admin\controller\WechatAuthController::class, 'bindStatus']);
-        // Route::post('/wechat/bind-qrcode', [app\admin\controller\WechatAuthController::class, 'bindQrcode']);
-        // Route::get('/wechat/bind-status/poll', [app\admin\controller\WechatAuthController::class, 'bindStatusPoll']);
-        // Route::post('/wechat/unbind', [app\admin\controller\WechatAuthController::class, 'unbind']);
 
         // 公共接口
         Route::get('/common/dict/all', [app\admin\controller\CommonController::class, 'dictAll']);
@@ -66,6 +60,7 @@ Route::group('/admin/api', function () {
         Route::get('/orders/tracking', [app\admin\controller\OrderController::class, 'tracking']);
         Route::get('/orders/{id}/customer-profile', [app\admin\controller\OrderController::class, 'customerProfile']);
         Route::get('/orders/{id}/tracking', [app\admin\controller\OrderController::class, 'showTracking']);
+        Route::get('/orders/export', [app\admin\controller\OrderController::class, 'export']);
         Route::get('/orders/{id}', [app\admin\controller\OrderController::class, 'show']);
         Route::post('/orders/{id}/status', [app\admin\controller\OrderController::class, 'updateStatus']);
         Route::post('/orders/{id}/change-price', [app\admin\controller\OrderController::class, 'changePrice']);
@@ -78,6 +73,7 @@ Route::group('/admin/api', function () {
 
         // 用户管理（静态路由在前）
         Route::get('/users', [app\admin\controller\UserController::class, 'index']);
+        Route::get('/users/dashboard/export', [app\admin\controller\UserController::class, 'exportDashboard']);
         Route::get('/users/dashboard', [app\admin\controller\UserController::class, 'dashboard']);
         Route::get('/users/{id}/addresses', [app\admin\controller\UserController::class, 'addresses']);
         Route::get('/users/{id}', [app\admin\controller\UserController::class, 'show']);
@@ -255,20 +251,8 @@ Route::group('/admin/api', function () {
         Route::get('/app-pages/{id}/preview', [app\admin\controller\AppPageController::class, 'preview']);
 
         // 内容页面管理
-        Route::get('/content-pages', [app\admin\controller\ContentPageController::class, 'index']);
-        Route::post('/content-pages', [app\admin\controller\ContentPageController::class, 'store']);
-        Route::get('/content-pages/{id}', [app\admin\controller\ContentPageController::class, 'show']);
-        Route::put('/content-pages/{id}', [app\admin\controller\ContentPageController::class, 'update']);
-        Route::delete('/content-pages/{id}', [app\admin\controller\ContentPageController::class, 'destroy']);
 
         // 配送规则（静态路由在前）
-        Route::get('/delivery-rules', [app\admin\controller\DeliveryRuleController::class, 'index']);
-        Route::post('/delivery-rules', [app\admin\controller\DeliveryRuleController::class, 'store']);
-        Route::get('/delivery-rules/stats', [app\admin\controller\DeliveryRuleController::class, 'stats']);
-        Route::get('/delivery-rules/{id}', [app\admin\controller\DeliveryRuleController::class, 'show']);
-        Route::put('/delivery-rules/{id}', [app\admin\controller\DeliveryRuleController::class, 'update']);
-        Route::delete('/delivery-rules/{id}', [app\admin\controller\DeliveryRuleController::class, 'destroy']);
-        Route::post('/delivery-rules/{id}/status', [app\admin\controller\DeliveryRuleController::class, 'updateStatus']);
 
         // 评价管理（静态路由在前）
         Route::get('/comments', [app\admin\controller\CommentController::class, 'index']);
@@ -298,8 +282,8 @@ Route::group('/admin/api', function () {
         Route::post('/settings/team/{id:\d+}/status', [app\admin\controller\SettingController::class, 'teamUpdateStatus']);
         Route::delete('/settings/team/{id:\d+}', [app\admin\controller\SettingController::class, 'teamDestroy']);
         // API 密钥管理已移除（开源版不需要）
-        // Route::get('/settings/api-keys', [app\admin\controller\SettingController::class, 'apiKeysIndex']);
-        // Route::post('/settings/api-keys', [app\admin\controller\SettingController::class, 'apiKeysStore']);
+        Route::get('/settings/api-keys', [app\admin\controller\SettingController::class, 'apiKeysIndex']);
+        Route::post('/settings/api-keys', [app\admin\controller\SettingController::class, 'apiKeysStore']);
         Route::get('/settings/regional', [app\admin\controller\SettingController::class, 'regionalShow']);
         Route::put('/settings/regional', [app\admin\controller\SettingController::class, 'regionalUpdate']);
         // 登录设置（会话超时、验证码类型）
@@ -397,6 +381,7 @@ Route::group('/admin/api', function () {
         Route::get('/prom-items/{id}', [app\admin\controller\PromItemController::class, 'show']);
         Route::put('/prom-items/{id}', [app\admin\controller\PromItemController::class, 'update']);
         Route::delete('/prom-items/{id}', [app\admin\controller\PromItemController::class, 'destroy']);
+        Route::post('/prom-items/batch-delete', [app\admin\controller\PromItemController::class, 'batchDelete']);
 
         // 订单促销
         Route::get('/prom-orders', [app\admin\controller\PromOrderController::class, 'index']);
@@ -539,6 +524,7 @@ Route::group('/admin/api', function () {
         // 友情链接
         Route::get('/friendly-links', [app\admin\controller\FriendlyLinkController::class, 'index']);
         Route::post('/friendly-links', [app\admin\controller\FriendlyLinkController::class, 'store']);
+    Route::post('/friendly-links/batch-delete', [app\admin\controller\FriendlyLinkController::class, 'batchDelete']);
         Route::get('/friendly-links/{id}', [app\admin\controller\FriendlyLinkController::class, 'show']);
         Route::put('/friendly-links/{id}', [app\admin\controller\FriendlyLinkController::class, 'update']);
         Route::delete('/friendly-links/{id}', [app\admin\controller\FriendlyLinkController::class, 'destroy']);
@@ -548,6 +534,7 @@ Route::group('/admin/api', function () {
         // 充值套餐
         Route::get('/recharge-packages', [app\admin\controller\RechargePackageController::class, 'index']);
         Route::post('/recharge-packages', [app\admin\controller\RechargePackageController::class, 'store']);
+    Route::post('/recharge-packages/batch-delete', [app\admin\controller\RechargePackageController::class, 'batchDelete']);
         Route::get('/recharge-packages/{id}', [app\admin\controller\RechargePackageController::class, 'show']);
         Route::put('/recharge-packages/{id}', [app\admin\controller\RechargePackageController::class, 'update']);
         Route::delete('/recharge-packages/{id}', [app\admin\controller\RechargePackageController::class, 'destroy']);
@@ -557,6 +544,7 @@ Route::group('/admin/api', function () {
         // 页面SEO
         Route::get('/page-seos', [app\admin\controller\PageSeoController::class, 'index']);
         Route::post('/page-seos', [app\admin\controller\PageSeoController::class, 'store']);
+    Route::post('/page-seos/batch-delete', [app\admin\controller\PageSeoController::class, 'batchDelete']);
         Route::get('/page-seos/{id}', [app\admin\controller\PageSeoController::class, 'show']);
         Route::put('/page-seos/{id}', [app\admin\controller\PageSeoController::class, 'update']);
         Route::delete('/page-seos/{id}', [app\admin\controller\PageSeoController::class, 'destroy']);
@@ -594,6 +582,11 @@ Route::group('/admin/api', function () {
         // AI 数据分析报表
         Route::post('/ai/analytics', [app\admin\controller\AiController::class, 'analytics']);
 
+        // ===== 开源版兼容层：发票模块基础接口 =====
+        // 原商业版路由已迁移到 commercial_admin.php（开源版不含该文件）；
+        // 数据库表与后台页面均在，此处补上基础 CRUD，使页面不再返回 code=404。
+        require __DIR__ . '/invoice_compat_routes.php';
+
     })->middleware([
         app\middleware\LicenseMiddleware::class,
         app\middleware\AdminAuthMiddleware::class,
@@ -601,36 +594,40 @@ Route::group('/admin/api', function () {
         app\middleware\OperationLogMiddleware::class,
     ]);
 
-    // 小程序装修
-    Route::get('/mini-page/pages', [app\admin\controller\MiniPageController::class, 'index']);
-    Route::post('/mini-page/pages', [app\admin\controller\MiniPageController::class, 'store']);
-    Route::get('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'show']);
-    Route::post('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'update']);
-    Route::delete('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'destroy']);
-    Route::post('/mini-page/pages/{id}/publish', [app\admin\controller\MiniPageController::class, 'publish']);
-    Route::post('/mini-page/pages/{id}/unpublish', [app\admin\controller\MiniPageController::class, 'unpublish']);
-    Route::get('/mini-page/component-schemas', [app\admin\controller\MiniPageController::class, 'componentSchemas']);
-    Route::get('/mini-page/themes', [app\admin\controller\MiniThemeController::class, 'index']);
-    Route::post('/mini-page/themes', [app\admin\controller\MiniThemeController::class, 'store']);
-    Route::post('/mini-page/themes/{id}', [app\admin\controller\MiniThemeController::class, 'update']);
-    Route::delete('/mini-page/themes/{id}', [app\admin\controller\MiniThemeController::class, 'destroy']);
-    Route::post('/mini-page/themes/{id}/apply', [app\admin\controller\MiniThemeController::class, 'apply']);
-    Route::get('/mini-page/tabbar', [app\admin\controller\MiniTabBarController::class, 'show']);
-    Route::post('/mini-page/tabbar', [app\admin\controller\MiniTabBarController::class, 'update']);
-    Route::get('/mini-page/pages/{id}/versions', [app\admin\controller\MiniPageVersionController::class, 'index']);
-    Route::get('/mini-page/pages/{id}/versions/{versionId}', [app\admin\controller\MiniPageVersionController::class, 'show']);
-    Route::post('/mini-page/pages/{id}/versions/{versionId}/rollback', [app\admin\controller\MiniPageVersionController::class, 'rollback']);
-    Route::get('/mini-page/templates', [app\admin\controller\MiniPageTemplateController::class, 'index']);
-    Route::post('/mini-page/templates', [app\admin\controller\MiniPageTemplateController::class, 'store']);
-    Route::post('/mini-page/templates/{id}/create-page', [app\admin\controller\MiniPageTemplateController::class, 'createPage']);
-    Route::delete('/mini-page/templates/{id}', [app\admin\controller\MiniPageTemplateController::class, 'destroy']);
-    Route::get('/mini-page/builtin-templates', [app\admin\controller\MiniPageTemplateController::class, 'builtinTemplates']);
-    Route::get('/mini-page/builtin-templates/{templateId}', [app\admin\controller\MiniPageTemplateController::class, 'builtinTemplateDetail']);
-    Route::post('/mini-page/builtin-templates/{templateId}/import', [app\admin\controller\MiniPageTemplateController::class, 'importBuiltinTemplate']);
-    Route::post('/mini-page/builtin-templates/{templateId}/create-page', [app\admin\controller\MiniPageTemplateController::class, 'createPageFromBuiltin']);
-
-    // 社区养老模块路由已迁移到 commercial_admin.php
-
+    // 小程序装修（需管理员鉴权：原先这些路由落在外层 group 内、绕过了 AdminAuthMiddleware）
+    Route::group('', function () {
+        Route::get('/mini-page/pages', [app\admin\controller\MiniPageController::class, 'index']);
+        Route::post('/mini-page/pages', [app\admin\controller\MiniPageController::class, 'store']);
+        Route::get('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'show']);
+        Route::post('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'update']);
+        Route::delete('/mini-page/pages/{id}', [app\admin\controller\MiniPageController::class, 'destroy']);
+        Route::post('/mini-page/pages/{id}/publish', [app\admin\controller\MiniPageController::class, 'publish']);
+        Route::post('/mini-page/pages/{id}/unpublish', [app\admin\controller\MiniPageController::class, 'unpublish']);
+        Route::get('/mini-page/component-schemas', [app\admin\controller\MiniPageController::class, 'componentSchemas']);
+        Route::get('/mini-page/themes', [app\admin\controller\MiniThemeController::class, 'index']);
+        Route::post('/mini-page/themes', [app\admin\controller\MiniThemeController::class, 'store']);
+        Route::post('/mini-page/themes/{id}', [app\admin\controller\MiniThemeController::class, 'update']);
+        Route::delete('/mini-page/themes/{id}', [app\admin\controller\MiniThemeController::class, 'destroy']);
+        Route::post('/mini-page/themes/{id}/apply', [app\admin\controller\MiniThemeController::class, 'apply']);
+        Route::get('/mini-page/tabbar', [app\admin\controller\MiniTabBarController::class, 'show']);
+        Route::post('/mini-page/tabbar', [app\admin\controller\MiniTabBarController::class, 'update']);
+        Route::get('/mini-page/pages/{id}/versions', [app\admin\controller\MiniPageVersionController::class, 'index']);
+        Route::get('/mini-page/pages/{id}/versions/{versionId}', [app\admin\controller\MiniPageVersionController::class, 'show']);
+        Route::post('/mini-page/pages/{id}/versions/{versionId}/rollback', [app\admin\controller\MiniPageVersionController::class, 'rollback']);
+        Route::get('/mini-page/templates', [app\admin\controller\MiniPageTemplateController::class, 'index']);
+        Route::post('/mini-page/templates', [app\admin\controller\MiniPageTemplateController::class, 'store']);
+        Route::post('/mini-page/templates/{id}/create-page', [app\admin\controller\MiniPageTemplateController::class, 'createPage']);
+        Route::delete('/mini-page/templates/{id}', [app\admin\controller\MiniPageTemplateController::class, 'destroy']);
+        Route::get('/mini-page/builtin-templates', [app\admin\controller\MiniPageTemplateController::class, 'builtinTemplates']);
+        Route::get('/mini-page/builtin-templates/{templateId}', [app\admin\controller\MiniPageTemplateController::class, 'builtinTemplateDetail']);
+        Route::post('/mini-page/builtin-templates/{templateId}/import', [app\admin\controller\MiniPageTemplateController::class, 'importBuiltinTemplate']);
+        Route::post('/mini-page/builtin-templates/{templateId}/create-page', [app\admin\controller\MiniPageTemplateController::class, 'createPageFromBuiltin']);
+    })->middleware([
+        app\middleware\LicenseMiddleware::class,
+        app\middleware\AdminAuthMiddleware::class,
+        app\middleware\ApiAccessLogMiddleware::class,
+        app\middleware\OperationLogMiddleware::class,
+    ]);
 })->middleware([
     app\middleware\LicenseMiddleware::class,
     app\middleware\AdminCorsMiddleware::class,

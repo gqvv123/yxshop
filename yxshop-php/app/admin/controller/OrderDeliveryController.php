@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\OrderDeliveryService;
 
+/**
+ * 管理端控制器：Order Delivery Controller。
+ *
+ * @package app\admin\controller
+ */
 class OrderDeliveryController extends BaseController
 {
     protected $orderDeliveryService;

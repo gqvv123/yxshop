@@ -3,11 +3,13 @@
 namespace app\admin\controller;
 
 use support\Request;
-use app\service\AuthService;
 use app\service\RoleService;
-use app\service\AdminService;
-use app\service\AdminMenuService;
 
+/**
+ * 管理端控制器：Auth Controller。
+ *
+ * @package app\admin\controller
+ */
 class AuthController extends BaseController
 {
     protected $roleService;

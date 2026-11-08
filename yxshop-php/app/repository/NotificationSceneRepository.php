@@ -61,7 +61,7 @@ class NotificationSceneRepository extends BaseRepository
     /**
      * 获取场景统计（修复累加 where bug，使用 clone）
      */
-    public function getSceneStats($appId = 0)
+    public function getSceneStats($appId = 0): array
     {
         $base = $this->query();
 

@@ -3,11 +3,15 @@
 namespace app\admin\controller;
 
 use support\Request;
-use app\service\AdminService;
 use app\service\RoleService;
 use app\validate\AdminValidate;
 use app\exception\ValidationException;
 
+/**
+ * 管理端控制器：Admin Controller。
+ *
+ * @package app\admin\controller
+ */
 class AdminController extends BaseController
 {
     protected $roleService;

@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\AfterSalesService;
 use app\service\UserService;
-use app\service\OrderService;
 
 /**
  * 售后控制器（兼容旧路由 /admin/api/services）
@@ -62,8 +61,8 @@ class ServiceController extends BaseController
     {
         $data = $request->post();
         $action = $data['action'] ?? '';
-        $operatorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
 
         try {
             switch ($action) {
@@ -135,8 +134,8 @@ class ServiceController extends BaseController
     {
         $status = (int) $request->post('status');
         $remark = $request->post('remark', '');
-        $operatorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
 
         try {
             $result = $this->afterSalesService->process($id, $status, $operatorId, $actorName, $remark);
@@ -156,8 +155,8 @@ class ServiceController extends BaseController
             return $this->error('缺少ids');
         }
 
-        $operatorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
         $remark = $request->post('remark', '');
 
         $success = 0;

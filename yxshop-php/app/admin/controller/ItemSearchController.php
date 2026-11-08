@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\ItemSearchService;
 
+/**
+ * 管理端控制器：Item Search Controller。
+ *
+ * @package app\admin\controller
+ */
 class ItemSearchController extends BaseController
 {
     protected $itemSearchService;

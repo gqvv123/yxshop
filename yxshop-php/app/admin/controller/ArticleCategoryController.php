@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\ArticleCategoryService;
 
+/**
+ * 管理端控制器：Article Category Controller。
+ *
+ * @package app\admin\controller
+ */
 class ArticleCategoryController extends BaseController
 {
     protected $categoryService;

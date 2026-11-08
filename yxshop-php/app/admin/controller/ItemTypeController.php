@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\ItemTypeService;
 
+/**
+ * 管理端控制器：Item Type Controller。
+ *
+ * @package app\admin\controller
+ */
 class ItemTypeController extends BaseController
 {
     protected $itemTypeService;

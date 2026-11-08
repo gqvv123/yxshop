@@ -67,6 +67,15 @@ class ArticleService extends BaseService
         try {
             $this->logInfo('创建文章开始', ['data' => $data]);
 
+            $title = trim((string) ($data['title'] ?? ''));
+            if ($title === '') {
+                throw new BusinessException('请填写文章标题');
+            }
+            $data['title'] = $title;
+            $data['content'] = (string) ($data['content'] ?? '');
+            // 编辑页未选择分类时会传空串，数字列收到 '' 在严格模式下会直接 500，这里归一为 0（未分类）
+            $data['category_id'] = (int) ($data['category_id'] ?? 0);
+
             $article = Db::transaction(function () use ($data) {
                 $article = $this->repository->createArticle($data);
 
@@ -100,6 +109,11 @@ class ArticleService extends BaseService
     {
         try {
             $this->logInfo('更新文章开始', ['id' => $id, 'data' => $data]);
+
+            // 分类 id 归一（前端未选分类时传空串）
+            if (array_key_exists('category_id', $data)) {
+                $data['category_id'] = (int) ($data['category_id'] ?? 0);
+            }
 
             $article = Db::transaction(function () use ($id, $data) {
                 $article = $this->repository->findOrFail($id);

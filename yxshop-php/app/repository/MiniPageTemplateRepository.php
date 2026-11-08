@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\MiniPageTemplate;
 
+/**
+ * 数据仓储：Mini Page Template Repository。
+ *
+ * @package app\repository
+ */
 class MiniPageTemplateRepository extends BaseRepository
 {
     public function __construct()

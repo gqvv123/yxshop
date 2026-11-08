@@ -53,10 +53,6 @@ return [
             'name' => '直播带货',
             'min_edition' => 'commercial',
         ],
-        'community_care' => [
-            'name' => '社区养老',
-            'min_edition' => 'commercial',
-        ],
         'gift_activity' => [
             'name' => '赠品活动',
             'min_edition' => 'commercial',
@@ -121,13 +117,11 @@ return [
         '/admin/api/group-buy-members' => 'group_buy',
         '/admin/api/gift-activities' => 'gift_activity',
         '/admin/api/gift-activity-items' => 'gift_activity',
-        '/admin/api/community' => 'community_care',
         '/admin/api/live-rooms' => 'live_stream',
 
         // ===== C端商业版路由前缀 =====
         '/api/v1/group-buy' => 'group_buy',
         '/api/v1/seckill' => 'seckill_pro',
-        '/api/v1/community' => 'community_care',
         '/api/v1/membership' => 'membership_card',
         '/api/v1/live' => 'live_stream',
 

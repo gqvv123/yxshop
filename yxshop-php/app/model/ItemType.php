@@ -33,7 +33,7 @@ class ItemType extends BaseModel
         'updated_at' => 'integer',
     ];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($model) {
             if (empty($model->created_at)) {
@@ -48,7 +48,7 @@ class ItemType extends BaseModel
     // 状态常量
     const STATUS_DISABLED = 0;  // 禁用
     const STATUS_ENABLED = 1;   // 启用
-    
+
     /**
      * 关联商品
      */
@@ -56,7 +56,7 @@ class ItemType extends BaseModel
     {
         return $this->hasMany(Item::class, 'type_id', 'id');
     }
-    
+
     /**
      * 关联应用
      */
@@ -64,7 +64,7 @@ class ItemType extends BaseModel
     {
         return $this->belongsTo(App::class, 'app_id', 'id');
     }
-    
+
     /**
      * 检查是否可用
      */
@@ -72,7 +72,7 @@ class ItemType extends BaseModel
     {
         return $this->status == self::STATUS_ENABLED;
     }
-    
+
     /**
      * 获取状态文本
      */

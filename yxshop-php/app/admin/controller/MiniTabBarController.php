@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\MiniTabBarService;
 
+/**
+ * 管理端控制器：Mini Tab Bar Controller。
+ *
+ * @package app\admin\controller
+ */
 class MiniTabBarController extends BaseController
 {
     protected $tabBarService;

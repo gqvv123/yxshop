@@ -95,7 +95,7 @@ class PromItemService extends BaseService
         }
     }
 
-    public function batchDelete(array $ids)
+    public function batchDelete(array $ids): bool
     {
         try {
             $this->logInfo('批量删除促销商品开始', ['ids' => $ids]);
@@ -108,7 +108,7 @@ class PromItemService extends BaseService
         }
     }
 
-    public function deletePromItem($id)
+    public function deletePromItem($id): bool
     {
         try {
             $this->logInfo('删除促销商品开始', ['id' => $id]);

@@ -13,22 +13,22 @@ class GenerateModelsCommand extends Command
     protected static $defaultName = 'generate:models';
     protected static $defaultDescription = '生成模型、仓储、服务文件';
 
-    public function handle()
+    public function handle(): void
     {
         $this->info('开始生成模型、仓储、服务文件...');
 
         // 获取所有表名
         $tables = $this->getTables();
-        
+
         foreach ($tables as $table) {
             $this->info("正在生成 {$table} 相关文件...");
-            
+
             // 生成模型
             $this->generateModel($table);
-            
+
             // 生成仓储
             $this->generateRepository($table);
-            
+
             // 生成服务
             $this->generateService($table);
         }
@@ -43,12 +43,12 @@ class GenerateModelsCommand extends Command
     {
         $tables = Db::select("SHOW TABLES LIKE 'yxshop_%'");
         $tableNames = [];
-        
+
         foreach ($tables as $table) {
             $tableName = array_values((array)$table)[0];
             $tableNames[] = $tableName;
         }
-        
+
         return $tableNames;
     }
 
@@ -59,7 +59,7 @@ class GenerateModelsCommand extends Command
     {
         $className = $this->getClassName($table);
         $modelPath = base_path("app/model/{$className}.php");
-        
+
         if (file_exists($modelPath)) {
             $this->warn("模型文件 {$className}.php 已存在，跳过生成");
             return;
@@ -67,10 +67,10 @@ class GenerateModelsCommand extends Command
 
         // 获取表结构
         $columns = $this->getTableColumns($table);
-        
+
         // 生成模型内容
         $content = $this->generateModelContent($className, $table, $columns);
-        
+
         // 写入文件
         file_put_contents($modelPath, $content);
         $this->info("生成模型文件: {$className}.php");
@@ -83,7 +83,7 @@ class GenerateModelsCommand extends Command
     {
         $className = $this->getClassName($table);
         $repositoryPath = base_path("app/repository/{$className}Repository.php");
-        
+
         if (file_exists($repositoryPath)) {
             $this->warn("仓储文件 {$className}Repository.php 已存在，跳过生成");
             return;
@@ -91,7 +91,7 @@ class GenerateModelsCommand extends Command
 
         // 生成仓储内容
         $content = $this->generateRepositoryContent($className, $table);
-        
+
         // 写入文件
         file_put_contents($repositoryPath, $content);
         $this->info("生成仓储文件: {$className}Repository.php");
@@ -104,7 +104,7 @@ class GenerateModelsCommand extends Command
     {
         $className = $this->getClassName($table);
         $servicePath = base_path("app/service/{$className}Service.php");
-        
+
         if (file_exists($servicePath)) {
             $this->warn("服务文件 {$className}Service.php 已存在，跳过生成");
             return;
@@ -112,7 +112,7 @@ class GenerateModelsCommand extends Command
 
         // 生成服务内容
         $content = $this->generateServiceContent($className, $table);
-        
+
         // 写入文件
         file_put_contents($servicePath, $content);
         $this->info("生成服务文件: {$className}Service.php");
@@ -125,12 +125,12 @@ class GenerateModelsCommand extends Command
     {
         // 移除前缀
         $name = str_replace('yxshop_', '', $table);
-        
+
         // 转换为驼峰命名
         $name = str_replace('_', ' ', $name);
         $name = ucwords($name);
         $name = str_replace(' ', '', $name);
-        
+
         return $name;
     }
 
@@ -141,7 +141,7 @@ class GenerateModelsCommand extends Command
     {
         $columns = Db::select("DESCRIBE `{$table}`");
         $result = [];
-        
+
         foreach ($columns as $column) {
             $result[] = [
                 'name' => $column->Field,
@@ -152,7 +152,7 @@ class GenerateModelsCommand extends Command
                 'extra' => $column->Extra,
             ];
         }
-        
+
         return $result;
     }
 
@@ -164,10 +164,10 @@ class GenerateModelsCommand extends Command
         $fillable = [];
         $casts = [];
         $hidden = [];
-        
+
         foreach ($columns as $column) {
             $fillable[] = "'{$column['name']}'";
-            
+
             // 生成类型转换
             if (strpos($column['type'], 'int') !== false) {
                 $casts[] = "'{$column['name']}' => 'integer'";
@@ -178,17 +178,17 @@ class GenerateModelsCommand extends Command
             } elseif (strpos($column['type'], 'text') !== false) {
                 $casts[] = "'{$column['name']}' => 'string'";
             }
-            
+
             // 隐藏敏感字段
             if (in_array($column['name'], ['password', 'open_id', 'app_secret'])) {
                 $hidden[] = "'{$column['name']}'";
             }
         }
-        
+
         $fillableStr = implode(', ', $fillable);
         $castsStr = implode(', ', $casts);
         $hiddenStr = implode(', ', $hidden);
-        
+
         $content = "<?php
 
 namespace app\model;
@@ -249,7 +249,7 @@ class {$className}Repository extends BaseRepository
     public function findByCondition(array \$conditions)
     {
         \$query = \$this->query();
-        
+
         foreach (\$conditions as \$field => \$value) {
             if (is_array(\$value)) {
                 \$query->whereIn(\$field, \$value);
@@ -257,7 +257,7 @@ class {$className}Repository extends BaseRepository
                 \$query->where(\$field, \$value);
             }
         }
-        
+
         return \$query->first();
     }
 
@@ -267,7 +267,7 @@ class {$className}Repository extends BaseRepository
     public function findAllByCondition(array \$conditions)
     {
         \$query = \$this->query();
-        
+
         foreach (\$conditions as \$field => \$value) {
             if (is_array(\$value)) {
                 \$query->whereIn(\$field, \$value);
@@ -275,7 +275,7 @@ class {$className}Repository extends BaseRepository
                 \$query->where(\$field, \$value);
             }
         }
-        
+
         return \$query->get();
     }
 
@@ -285,7 +285,7 @@ class {$className}Repository extends BaseRepository
     public function getStats(array \$conditions = [])
     {
         \$query = \$this->query();
-        
+
         foreach (\$conditions as \$field => \$value) {
             if (is_array(\$value)) {
                 \$query->whereIn(\$field, \$value);
@@ -293,7 +293,7 @@ class {$className}Repository extends BaseRepository
                 \$query->where(\$field, \$value);
             }
         }
-        
+
         return [
             'total' => \$query->count(),
             'active' => \$query->where('deleted_at', 0)->count(),

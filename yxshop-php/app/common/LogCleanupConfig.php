@@ -55,4 +55,4 @@ class LogCleanupConfig
     {
         return self::LEVEL_RETENTION[$level] ?? 30;
     }
-} 
+}

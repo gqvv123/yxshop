@@ -51,7 +51,7 @@ class AddressController extends BaseController
         $data['user_id'] = $userId;
         if (empty($data['app_id'])) {
             $user = $request->user ?? null;
-            $data['app_id'] = $user->app_id ?? 1;
+            $data['app_id'] = (int) ($user->app_id ?? 0);
         }
 
         // 小程序 picker 返回的是地区文本名称，需解析为 region_id

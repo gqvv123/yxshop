@@ -16,7 +16,7 @@ class AdminAuthValidate extends Validate
     protected $rule = [
         'admin_id' => 'require|number|min:1',
         'auth_id' => 'require|number|min:1',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
     ];
 
     /**
@@ -30,9 +30,8 @@ class AdminAuthValidate extends Validate
         'auth_id.require' => '权限ID不能为空',
         'auth_id.number' => '权限ID必须是数字',
         'auth_id.min' => '权限ID不能小于1',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
     ];
 
     /**

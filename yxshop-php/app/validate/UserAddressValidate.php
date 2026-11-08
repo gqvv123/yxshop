@@ -24,7 +24,7 @@ class UserAddressValidate extends Validate
         'is_default' => 'in:0,1',
         'label' => 'max:20',
         'user_id' => 'require|number|min:1',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
     ];
 
     /**
@@ -54,9 +54,8 @@ class UserAddressValidate extends Validate
         'user_id.require' => '用户ID不能为空',
         'user_id.number' => '用户ID必须是数字',
         'user_id.min' => '用户ID不能小于1',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
     ];
 
     /**

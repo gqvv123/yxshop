@@ -54,7 +54,7 @@ class PaymentRepository extends BaseRepository
     /**
      * 获取支付统计
      */
-    public function getPaymentStats($startTime = null, $endTime = null, $appId = 0)
+    public function getPaymentStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 

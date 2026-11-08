@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\EmailLogService;
 
+/**
+ * 管理端控制器：Email Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class EmailLogController extends BaseController
 {
     protected $emailLogService;

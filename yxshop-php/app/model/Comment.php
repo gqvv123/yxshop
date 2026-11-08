@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Comment。
+ *
+ * @package app\model
+ */
 class Comment extends BaseModel
 {
     protected $table = 'yxshop_comments';
@@ -73,13 +78,13 @@ class Comment extends BaseModel
         return $this->status == self::STATUS_APPROVED;
     }
 
-    public function approve()
+    public function approve(): void
     {
         $this->status = self::STATUS_APPROVED;
         $this->save();
     }
 
-    public function reject($reason = '')
+    public function reject($reason = ''): void
     {
         $this->status = self::STATUS_REJECTED;
         $this->reply_content = $reason;

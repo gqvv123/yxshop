@@ -4,6 +4,11 @@ namespace app\model;
 
 use app\model\BaseModel;
 
+/**
+ * 数据模型：Mini Page Template。
+ *
+ * @package app\model
+ */
 class MiniPageTemplate extends BaseModel
 {
     protected $table = 'yxshop_mini_page_templates';

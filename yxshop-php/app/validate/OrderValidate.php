@@ -23,9 +23,10 @@ class OrderValidate extends Validate
         'delivery_status' => 'in:10,20',
         'receipt_status' => 'in:10,20',
         'status' => 'in:10,20,30',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
         'address_id' => 'require|number|min:1',
         'items' => 'require|array',
+        'delivery_id' => 'number|min:0',
 
     ];
 
@@ -51,14 +52,15 @@ class OrderValidate extends Validate
         'delivery_status.in' => '发货状态值必须是10或20',
         'receipt_status.in' => '收货状态值必须是10或20',
         'status.in' => '订单状态值必须是10、20或30',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
         'address_id.require' => '收货地址不能为空',
         'address_id.number' => '收货地址ID必须是数字',
         'address_id.min' => '收货地址ID不能小于1',
         'items.require' => '订单商品不能为空',
         'items.array' => '订单商品格式错误',
+        'delivery_id.number' => '配送方式ID必须是数字',
+        'delivery_id.min' => '配送方式ID不能小于0',
 
     ];
 
@@ -68,7 +70,7 @@ class OrderValidate extends Validate
      */
     protected $scene = [
         'create' => ['order_no', 'user_id', 'total_price', 'pay_price', 'express_price', 'app_id'],
-        'api_create' => ['address_id', 'items', 'app_id'],
+        'api_create' => ['address_id', 'items', 'app_id', 'delivery_id'],
         'update' => ['pay_status', 'delivery_status', 'receipt_status', 'status'],
         'pay' => ['pay_status', 'pay_price'],
         'deliver' => ['delivery_status'],

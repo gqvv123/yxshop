@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Sms Log。
+ *
+ * @package app\model
+ */
 class SmsLog extends BaseModel
 {
     protected $table = 'yxshop_sms_logs';

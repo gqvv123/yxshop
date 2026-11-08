@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationSceneService;
 
+/**
+ * 管理端控制器：Notification Scene Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationSceneController extends BaseController
 {
     protected $notificationSceneService;
@@ -28,7 +33,7 @@ class NotificationSceneController extends BaseController
     {
         $data = $request->post();
         $data['app_id'] = $this->getAppId($request);
-        $result = $this->notificationSceneService->create($data);
+        $result = $this->notificationSceneService->createScene($data);
         return $this->success($result, '创建成功');
     }
 
@@ -44,7 +49,7 @@ class NotificationSceneController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->post();
-        $result = $this->notificationSceneService->update($id, $data);
+        $result = $this->notificationSceneService->updateScene($id, $data);
         return $this->success(null, '更新成功');
     }
 

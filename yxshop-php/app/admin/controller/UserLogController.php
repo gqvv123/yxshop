@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UserLogService;
 
+/**
+ * 管理端控制器：User Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class UserLogController extends BaseController
 {
     protected $userLogService;

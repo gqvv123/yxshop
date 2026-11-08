@@ -26,10 +26,16 @@ class Logger
      * @param array $context 上下文信息
      * @param string $type 日志类型
      * @param int $errorCode 错误码
+     * @param bool $central 是否投递到集中式日志队列（消费失败重入场景必须传 false）
      */
-    public static function error(string $message, array $context = [], string $type = self::TYPE_SYSTEM, int $errorCode = 0)
-    {
-        self::log(self::LEVEL_ERROR, $message, $context, $type, $errorCode);
+    public static function error(
+        string $message,
+        array $context = [],
+        string $type = self::TYPE_SYSTEM,
+        int $errorCode = 0,
+        bool $central = true
+    ): void {
+        self::log(self::LEVEL_ERROR, $message, $context, $type, $errorCode, $central);
     }
 
     /**
@@ -38,7 +44,7 @@ class Logger
      * @param array $context 上下文信息
      * @param string $type 日志类型
      */
-    public static function warning(string $message, array $context = [], string $type = self::TYPE_SYSTEM)
+    public static function warning(string $message, array $context = [], string $type = self::TYPE_SYSTEM): void
     {
         self::log(self::LEVEL_WARNING, $message, $context, $type);
     }
@@ -49,7 +55,7 @@ class Logger
      * @param array $context 上下文信息
      * @param string $type 日志类型
      */
-    public static function info(string $message, array $context = [], string $type = self::TYPE_SYSTEM)
+    public static function info(string $message, array $context = [], string $type = self::TYPE_SYSTEM): void
     {
         self::log(self::LEVEL_INFO, $message, $context, $type);
     }
@@ -60,7 +66,7 @@ class Logger
      * @param array $context 上下文信息
      * @param string $type 日志类型
      */
-    public static function debug(string $message, array $context = [], string $type = self::TYPE_SYSTEM)
+    public static function debug(string $message, array $context = [], string $type = self::TYPE_SYSTEM): void
     {
         self::log(self::LEVEL_DEBUG, $message, $context, $type);
     }
@@ -72,9 +78,16 @@ class Logger
      * @param array $context 上下文信息
      * @param string $type 日志类型
      * @param int $errorCode 错误码
+     * @param bool $central 是否投递到集中式日志队列
      */
-    private static function log(string $level, string $message, array $context = [], string $type = self::TYPE_SYSTEM, int $errorCode = 0)
-    {
+    private static function log(
+        string $level,
+        string $message,
+        array $context = [],
+        string $type = self::TYPE_SYSTEM,
+        int $errorCode = 0,
+        bool $central = true
+    ): void {
         // 构建日志数据
         $logData = [
             'timestamp' => date('Y-m-d H:i:s'),
@@ -95,7 +108,9 @@ class Logger
         Log::{$level}($message, $logData);
 
         // 如果是错误日志，发送到集中式日志系统
-        if ($level === self::LEVEL_ERROR) {
+        // 注意：CentralLog 消费失败时必须以 $central=false 调用本方法，否则
+        // "消费失败 -> 再入队 -> 再失败" 会形成自激循环（历史上把日志撑到 300MB+）
+        if ($level === self::LEVEL_ERROR && $central) {
             self::sendToCentralLog($logData);
         }
     }
@@ -104,7 +119,7 @@ class Logger
      * 发送日志到集中式日志系统
      * @param array $logData 日志数据
      */
-    private static function sendToCentralLog(array $logData)
+    private static function sendToCentralLog(array $logData): void
     {
         try {
             // 发送到 Redis 队列
@@ -114,4 +129,4 @@ class Logger
             Log::error('Failed to send log to central system: ' . $e->getMessage());
         }
     }
-} 
+}

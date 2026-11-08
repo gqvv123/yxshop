@@ -69,4 +69,27 @@ class PageSeoController extends BaseController
         $result = $this->service->upsert($pageKey, $langCode, $data, $appId);
         return $this->success($result, '保存成功');
     }
+
+    /**
+     * 批量删除（后台列表勾选后调用，前端传 { ids: [] }）
+     */
+    public function batchDelete(Request $request)
+    {
+        $ids = $request->post('ids', []);
+        if (!is_array($ids) || !$ids) {
+            return $this->error('请选择要删除的记录');
+        }
+
+        $deleted = 0;
+        foreach ($ids as $id) {
+            try {
+                $this->service->delete($id);
+                $deleted++;
+            } catch (\Throwable $e) {
+            // 单条失败不影响其余记录
+        }
+        }
+
+        return $this->success(['deleted' => $deleted], '删除成功');
+    }
 }

@@ -38,7 +38,7 @@ class LoginLogRepository extends BaseRepository
     /**
      * 获取登录统计
      */
-    public function getLoginStats($startTime = null, $endTime = null, $appId = 0)
+    public function getLoginStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 
@@ -94,7 +94,7 @@ class LoginLogRepository extends BaseRepository
     public function cleanExpiredLogs($days = 90)
     {
         $expiredTime = time() - ($days * 24 * 3600);
-        
+
         return $this->query()
             ->where('created_at', '<', $expiredTime)
             ->delete();

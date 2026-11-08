@@ -62,12 +62,12 @@ class CategoryRepository extends BaseRepository
     {
         $parentIds = [];
         $category = $this->find($categoryId);
-        
+
         while ($category && $category->parent_id > 0) {
             $parentIds[] = $category->parent_id;
             $category = $this->find($category->parent_id);
         }
-        
+
         return array_reverse($parentIds);
     }
 
@@ -95,12 +95,12 @@ class CategoryRepository extends BaseRepository
     {
         $path = [];
         $category = $this->find($categoryId);
-        
+
         while ($category) {
             array_unshift($path, $category);
             $category = $category->parent_id > 0 ? $this->find($category->parent_id) : null;
         }
-        
+
         return $path;
     }
 
@@ -167,10 +167,10 @@ class CategoryRepository extends BaseRepository
     /**
      * 获取分类统计
      */
-    public function getCategoryStats($appId = 0)
+    public function getCategoryStats($appId = 0): array
     {
         $query = $this->query();
-        
+
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }

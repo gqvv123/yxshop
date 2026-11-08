@@ -3,10 +3,10 @@
 namespace app\queue\redis;
 
 use Webman\RedisQueue\Consumer;
-use support\Db;
 use support\Log;
 use Webman\RedisQueue\Client;
 use app\common\Logger;
+use app\model\SystemLog;
 
 class CentralLog implements Consumer
 {
@@ -22,60 +22,96 @@ class CentralLog implements Consumer
 
     /**
      * 处理日志消息
+     *
+     * 重要：catch 里必须用 $central=false 记录错误。
+     * 否则 "消费失败 -> Logger::error -> 再入队 -> 再消费失败" 会形成自激循环，
+     * 每轮还嵌套上一轮的完整消息体，历史上曾把 webman 日志撑到 300MB+。
+     *
      * @param array $data
      */
-    public function consume($data)
+    public function consume($data): void
     {
         try {
             // 记录到数据库
             $this->saveToDatabase($data);
-            
+
             // 发送告警通知
             $this->sendAlert($data);
-            
+
             // 记录到本地日志
             Log::info('Central log processed', $data);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // Throwable 而非 Exception：SQL/类型错误在 PHP8 里可能是 Error
             Logger::error('Failed to process central log: ' . $e->getMessage(), [
+                // 只保留关键字段，避免把整条（可能已嵌套的）消息再复制一遍
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'log_data' => $data
-            ],Logger::TYPE_SYSTEM);
+                'trace' => substr($e->getTraceAsString(), 0, 4000),
+                'origin_level' => $data['level'] ?? '',
+                'origin_type' => $data['type'] ?? '',
+                'origin_message' => mb_substr((string) ($data['message'] ?? ''), 0, 500),
+            ], Logger::TYPE_SYSTEM, 0, false);
         }
     }
 
     /**
      * 保存日志到数据库
+     *
+     * 统一走 SystemLog::record()：表 yxshop_system_logs 的真实列是
+     * log_level(数字) / log_type / module / action / message / context / trace / created_at(int)，
+     * 而不是 level/type/error_code/server_host 那一套。此前手写 insert 的字段全不存在，
+     * 必然抛 "Unknown column" 并触发消费失败。
+     *
      * @param array $data
      */
-    private function saveToDatabase($data)
+    private function saveToDatabase($data): void
     {
-        Db::table('yxshop_system_log')
-            ->insert([
-                'level' => $data['level'],
-                'type' => $data['type'],
-                'message' => $data['message'],
-                'error_code' => $data['error_code'],
-                'context' => json_encode($data['context']),
-                'server_host' => $data['server']['host'],
-                'server_ip' => $data['server']['ip'],
-                'server_env' => $data['server']['env'],
-                'trace' => json_encode($data['trace']),
-                'created_at' => $data['timestamp']
-            ]);
+        $levelMap = [
+            'debug'    => SystemLog::LEVEL_DEBUG,
+            'info'     => SystemLog::LEVEL_INFO,
+            'warning'  => SystemLog::LEVEL_WARNING,
+            'error'    => SystemLog::LEVEL_ERROR,
+            'critical' => SystemLog::LEVEL_CRITICAL,
+        ];
+        $level = $levelMap[$data['level'] ?? 'error'] ?? SystemLog::LEVEL_ERROR;
+
+        // context/trace 可能很大（历史上有嵌套膨胀问题），入库前截断，避免撑爆 mediumtext
+        $context = [
+            'error_code' => $data['error_code'] ?? 0,
+            'server'     => $data['server'] ?? [],
+            'payload'    => $data['context'] ?? [],
+        ];
+        $contextJson = mb_substr(json_encode($context, JSON_UNESCAPED_UNICODE), 0, 60000);
+        $traceJson = mb_substr(
+            is_array($data['trace'] ?? null)
+                ? json_encode($data['trace'], JSON_UNESCAPED_UNICODE)
+                : (string) ($data['trace'] ?? ''),
+            0,
+            60000
+        );
+
+        SystemLog::record(
+            $level,
+            mb_substr((string) ($data['message'] ?? ''), 0, 2000),
+            $contextJson,
+            '',
+            0,
+            $traceJson,
+            (string) ($data['type'] ?? 'system'),
+            'central_log'
+        );
     }
 
     /**
      * 发送告警通知
      * @param array $data
      */
-    private function sendAlert($data)
+    private function sendAlert($data): void
     {
         // 如果是错误日志，发送告警
         if ($data['level'] === 'error') {
             // 根据错误类型和级别决定是否发送告警
             $shouldAlert = $this->shouldSendAlert($data);
-            
+
             if ($shouldAlert) {
                 // 发送到告警队列
                 Client::send('Alert-Notification', [
@@ -91,18 +127,18 @@ class CentralLog implements Consumer
      * @param array $data
      * @return bool
      */
-    private function shouldSendAlert($data)
+    private function shouldSendAlert($data): bool
     {
         // 获取告警规则
         $rules = $this->getAlertRules();
-        
+
         // 检查是否匹配任何规则
         foreach ($rules as $rule) {
             if ($this->matchRule($data, $rule)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -110,7 +146,7 @@ class CentralLog implements Consumer
      * 获取告警规则
      * @return array
      */
-    private function getAlertRules()
+    private function getAlertRules(): array
     {
         // 从数据库或配置文件获取告警规则
         return [
@@ -156,17 +192,18 @@ class CentralLog implements Consumer
 
     /**
      * 获取指定时间窗口内的错误次数
+     *
+     * created_at 是 int 时间戳，必须用时间戳比较；
+     * 用 date('Y-m-d H:i:s') 字符串会因隐式转数字导致条件恒不成立。
+     *
      * @param int $errorCode
      * @param int $timeWindow
      * @return int
      */
     private function getErrorCount($errorCode, $timeWindow)
     {
-        $startTime = date('Y-m-d H:i:s', time() - $timeWindow);
-        
-        return Db::table('yxshop_system_log')
-            ->where('error_code', $errorCode)
-            ->where('created_at', '>=', $startTime)
+        return SystemLog::where('log_level', SystemLog::LEVEL_ERROR)
+            ->where('created_at', '>=', time() - (int) $timeWindow)
             ->count();
     }
-} 
+}

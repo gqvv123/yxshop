@@ -2,10 +2,16 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Payment Log。
+ *
+ * @package app\model
+ */
 class PaymentLog extends BaseModel
 {
     protected $table = 'yxshop_payment_logs';
 
+    protected $primaryKey = 'log_id';
     protected $softDeleteEnabled = false;
     public $timestamps = false;
 

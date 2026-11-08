@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UserLevelService;
 
+/**
+ * 管理端控制器：User Level Controller。
+ *
+ * @package app\admin\controller
+ */
 class UserLevelController extends BaseController
 {
     protected $userLevelService;
@@ -28,7 +33,7 @@ class UserLevelController extends BaseController
     {
         $data = $request->post();
         $data['app_id'] = $this->getAppId($request);
-        $result = $this->userLevelService->create($data);
+        $result = $this->userLevelService->createLevel($data);
         return $this->success($result, '创建成功');
     }
 
@@ -44,13 +49,13 @@ class UserLevelController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->post();
-        $result = $this->userLevelService->update($id, $data);
+        $result = $this->userLevelService->updateLevel($id, $data);
         return $this->success(null, '更新成功');
     }
 
     public function destroy(Request $request, $id)
     {
-        $this->userLevelService->delete($id);
+        $this->userLevelService->deleteLevel($id);
         return $this->success(null, '删除成功');
     }
 

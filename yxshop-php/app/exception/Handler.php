@@ -98,6 +98,35 @@ class Handler extends ExceptionHandler
             ], JSON_UNESCAPED_UNICODE));
         }
 
+        if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+            // 后台详情接口用 findOrFail，记录不存在应返回 404 而不是 500
+            return new Response(404, ['Content-Type' => 'application/json'], json_encode([
+                'code' => 404,
+                'message' => '记录不存在',
+                'data' => null,
+            ], JSON_UNESCAPED_UNICODE));
+        }
+
+        if ($exception instanceof \Illuminate\Database\QueryException) {
+            // 唯一索引冲突 / 非空约束等由数据完整性引起的错误，属于「参数问题」而非服务故障，
+            // 统一转成 422 业务提示，避免前端弹「页面加载异常」。
+            $sqlState = (string) ($exception->errorInfo[0] ?? '');
+            $driverCode = (int) ($exception->errorInfo[1] ?? 0);
+            if (str_starts_with($sqlState, '23')) {
+                $message = match ($driverCode) {
+                    1062 => '数据已存在，请勿重复提交',
+                    1048, 1364 => '必填项未填写完整，请检查后重试',
+                    1451, 1452 => '该数据被其它记录引用，无法操作',
+                    default => '数据校验未通过，请检查填写内容',
+                };
+                return new Response(422, ['Content-Type' => 'application/json'], json_encode([
+                    'code' => 422,
+                    'message' => $message,
+                    'data' => null,
+                ], JSON_UNESCAPED_UNICODE));
+            }
+        }
+
         if ($request->expectsJson() || $request->header('accept') === 'application/json' || str_starts_with($request->path(), 'api/')) {
             $code = $this->isDebug() ? $exception->getCode() : 500;
             $message = $this->isDebug() ? $exception->getMessage() : '服务器内部错误';

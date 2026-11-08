@@ -20,7 +20,7 @@ class Order extends BaseModel
         'give_integral', 'express_no', 'discount_id', 'discount_price',
         'receiver_name', 'receiver_phone', 'seller_note', 'delivery_time', 'is_integral',
         'receipt_time', 'brand_id',
-        'source', 'auto_confirm_time', 'deleted_at'
+        'source', 'auto_confirm_time', 'deleted_at', 'delivery_id'
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class Order extends BaseModel
         'pay_price' => 'decimal:2',
         'update_price' => 'decimal:2',
         'express_price' => 'decimal:2',
+        'delivery_id' => 'integer',
         'discount_price' => 'decimal:2',
         'give_integral' => 'decimal:2',
         'rebate' => 'decimal:2',
@@ -234,7 +235,7 @@ class Order extends BaseModel
      */
     public function canPay()
     {
-        return $this->status == self::ORDER_STATUS_PENDING && 
+        return $this->status == self::ORDER_STATUS_PENDING &&
                $this->pay_status == self::PAY_STATUS_UNPAID;
     }
 
@@ -243,8 +244,8 @@ class Order extends BaseModel
      */
     public function canShip()
     {
-        return $this->status == self::ORDER_STATUS_PENDING && 
-               $this->pay_status == self::PAY_STATUS_PAID && 
+        return $this->status == self::ORDER_STATUS_PENDING &&
+               $this->pay_status == self::PAY_STATUS_PAID &&
                $this->delivery_status == self::DELIVERY_STATUS_UNSHIPPED;
     }
 
@@ -253,8 +254,8 @@ class Order extends BaseModel
      */
     public function canReceive()
     {
-        return $this->status == self::ORDER_STATUS_PENDING && 
-               $this->delivery_status == self::DELIVERY_STATUS_SHIPPED && 
+        return $this->status == self::ORDER_STATUS_PENDING &&
+               $this->delivery_status == self::DELIVERY_STATUS_SHIPPED &&
                $this->receipt_status == self::RECEIPT_STATUS_UNRECEIVED;
     }
 
@@ -263,7 +264,7 @@ class Order extends BaseModel
      */
     public function canCancel()
     {
-        return $this->status == self::ORDER_STATUS_PENDING && 
+        return $this->status == self::ORDER_STATUS_PENDING &&
                $this->pay_status == self::PAY_STATUS_UNPAID;
     }
 
@@ -272,7 +273,7 @@ class Order extends BaseModel
      */
     public function canApplyService()
     {
-        return $this->status == self::ORDER_STATUS_COMPLETE && 
+        return $this->status == self::ORDER_STATUS_COMPLETE &&
                $this->pay_status == self::PAY_STATUS_PAID;
     }
 
@@ -281,8 +282,8 @@ class Order extends BaseModel
      */
     public function canComment()
     {
-        return $this->status == self::ORDER_STATUS_COMPLETE && 
-               $this->pay_status == self::PAY_STATUS_PAID && 
+        return $this->status == self::ORDER_STATUS_COMPLETE &&
+               $this->pay_status == self::PAY_STATUS_PAID &&
                $this->is_comment == 0;
     }
 
@@ -322,7 +323,7 @@ class Order extends BaseModel
     /**
      * 记录订单变化日志
      */
-    public function logChange($changeType, $changeField, $oldValue, $newValue, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = '')
+    public function logChange($changeType, $changeField, $oldValue, $newValue, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = ''): void
     {
         OrderLog::create([
             'order_id' => $this->id,
@@ -343,7 +344,7 @@ class Order extends BaseModel
     /**
      * 更新订单状态
      */
-    public function updateStatus($status, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = '')
+    public function updateStatus($status, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = ''): void
     {
         $oldStatus = $this->status;
         $this->status = $status;
@@ -355,7 +356,7 @@ class Order extends BaseModel
     /**
      * 更新支付状态
      */
-    public function updatePayStatus($status, $transactionId = '', $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = '')
+    public function updatePayStatus($status, $transactionId = '', $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = ''): void
     {
         $oldStatus = $this->pay_status;
         $this->pay_status = $status;
@@ -371,7 +372,7 @@ class Order extends BaseModel
     /**
      * 更新发货状态
      */
-    public function updateDeliveryStatus($status, $expressNo = '', $expressId = 0, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = '')
+    public function updateDeliveryStatus($status, $expressNo = '', $expressId = 0, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = ''): void
     {
         $oldStatus = $this->delivery_status;
         $this->delivery_status = $status;
@@ -387,7 +388,7 @@ class Order extends BaseModel
     /**
      * 更新收货状态
      */
-    public function updateReceiptStatus($status, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = '')
+    public function updateReceiptStatus($status, $reason = '', $operatorType = 20, $operatorId = 0, $operatorName = ''): void
     {
         $oldStatus = $this->receipt_status;
         $this->receipt_status = $status;
@@ -404,7 +405,7 @@ class Order extends BaseModel
      * 获取配送状态选项
      * @return array
      */
-    public static function delevaryStatus()
+    public static function delevaryStatus(): array
     {
         return [
             'pending' => self::ORDER_STATUS_PENDING,

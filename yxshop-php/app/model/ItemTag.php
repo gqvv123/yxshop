@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Item Tag。
+ *
+ * @package app\model
+ */
 class ItemTag extends BaseModel
 {
     protected $table = 'yxshop_item_tags';

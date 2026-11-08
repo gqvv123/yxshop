@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Admin Role。
+ *
+ * @package app\model
+ */
 class AdminRole extends BaseModel
 {
     protected $table = 'yxshop_admin_roles';
@@ -37,7 +42,7 @@ class AdminRole extends BaseModel
         )->withTimestamps();
     }
 
-    public function assignAuths(array $authIds)
+    public function assignAuths(array $authIds): void
     {
         $this->auths()->sync($authIds);
     }

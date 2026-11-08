@@ -139,7 +139,7 @@ class UserCouponRepository extends BaseRepository
     /**
      * 用户优惠券状态计数（每项 clone 防 where 累加 bug）
      */
-    public function getUserCouponStats($userId, $appId = 0)
+    public function getUserCouponStats($userId, $appId = 0): array
     {
         $base = $this->query()->where('user_id', $userId);
         if ($appId > 0) {

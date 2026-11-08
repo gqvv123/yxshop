@@ -2,6 +2,11 @@
 
 namespace app\uuid;
 
+/**
+ * 组件：Snowflake。
+ *
+ * @package app\uuid
+ */
 class Snowflake
 {
     private const EPOCH = 1704067200000;

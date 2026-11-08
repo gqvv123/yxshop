@@ -2,10 +2,16 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Log。
+ *
+ * @package app\model
+ */
 class UserLog extends BaseModel
 {
     protected $table = 'yxshop_user_logs';
 
+    protected $primaryKey = 'log_id';
     protected $softDeleteEnabled = false;
     public $timestamps = false;
 

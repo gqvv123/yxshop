@@ -12,6 +12,14 @@ class NotificationTemplateRepository extends BaseRepository
     protected $model = NotificationTemplate::class;
 
     /**
+     * 按 template_code 查找模板
+     */
+    public function findByCode(string $templateCode)
+    {
+        return $this->query()->where('template_code', $templateCode)->first();
+    }
+
+    /**
      * 获取模板列表
      */
     public function getTemplates($templateType = null, $appId = 0)
@@ -66,7 +74,7 @@ class NotificationTemplateRepository extends BaseRepository
     /**
      * 获取模板统计
      */
-    public function getTemplateStats($appId = 0)
+    public function getTemplateStats($appId = 0): array
     {
         $query = $this->query();
 

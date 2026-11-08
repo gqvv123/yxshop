@@ -72,8 +72,8 @@ class ScheduledTaskController extends BaseController
                 $this->service->delete($id);
                 $count++;
             } catch (\Throwable $e) {
-                // 跳过不存在的记录
-            }
+            // 跳过不存在的记录
+        }
         }
         return $this->success(['count' => $count], "成功删除{$count}条记录");
     }

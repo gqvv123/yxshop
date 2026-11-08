@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UserAddressService;
 
+/**
+ * 管理端控制器：User Address Controller。
+ *
+ * @package app\admin\controller
+ */
 class UserAddressController extends BaseController
 {
     protected $userAddressService;

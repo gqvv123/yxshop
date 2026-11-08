@@ -7,6 +7,11 @@ use app\service\MiniPageService;
 use app\service\MiniPageVersionService;
 use app\service\ComponentSchemaService;
 
+/**
+ * 管理端控制器：Mini Page Controller。
+ *
+ * @package app\admin\controller
+ */
 class MiniPageController extends BaseController
 {
     protected $pageService;

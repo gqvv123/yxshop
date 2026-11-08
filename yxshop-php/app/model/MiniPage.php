@@ -4,6 +4,11 @@ namespace app\model;
 
 use app\model\BaseModel;
 
+/**
+ * 数据模型：Mini Page。
+ *
+ * @package app\model
+ */
 class MiniPage extends BaseModel
 {
     protected $table = 'yxshop_mini_pages';
@@ -67,7 +72,7 @@ class MiniPage extends BaseModel
         return array_search((int) $value, self::TYPE_MAP, true) ?: (int) $value;
     }
 
-    public function setPageTypeAttribute($value)
+    public function setPageTypeAttribute($value): void
     {
         $this->attributes['page_type'] = self::normalizeType($value) ?? self::TYPE_CUSTOM;
     }
@@ -77,7 +82,7 @@ class MiniPage extends BaseModel
         return array_search((int) $value, self::STATUS_MAP, true) ?: (int) $value;
     }
 
-    public function setStatusAttribute($value)
+    public function setStatusAttribute($value): void
     {
         $this->attributes['status'] = self::normalizeStatus($value) ?? self::STATUS_DRAFT;
     }

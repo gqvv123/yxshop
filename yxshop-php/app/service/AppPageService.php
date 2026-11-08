@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\AppPageRepository;
-use app\model\AppPage;
 use app\validate\AppPageValidate;
 use Exception;
 
@@ -112,7 +111,7 @@ class AppPageService extends BaseService
     /**
      * 删除页面
      */
-    public function deletePage($id)
+    public function deletePage($id): bool
     {
         try {
             $this->logInfo('删除页面开始', ['id' => $id]);

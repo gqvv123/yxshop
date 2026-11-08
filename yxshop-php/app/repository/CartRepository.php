@@ -53,7 +53,7 @@ class CartRepository extends BaseRepository
     /**
      * 获取购物车统计
      */
-    public function getCartStats($userId, $appId = 0)
+    public function getCartStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
 
@@ -98,7 +98,7 @@ class CartRepository extends BaseRepository
     public function deleteExpiredItems($days = 30)
     {
         $expiredTime = time() - ($days * 24 * 3600);
-        
+
         return $this->query()
             ->where('created_at', '<', $expiredTime)
             ->delete();

@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\MiniTheme;
 
+/**
+ * 数据仓储：Mini Theme Repository。
+ *
+ * @package app\repository
+ */
 class MiniThemeRepository extends BaseRepository
 {
     public function __construct()

@@ -7,6 +7,11 @@ use app\service\ExpressService;
 use app\validate\ExpressValidate;
 use app\exception\ValidationException;
 
+/**
+ * 管理端控制器：Express Controller。
+ *
+ * @package app\admin\controller
+ */
 class ExpressController extends BaseController
 {
     protected $expressService;

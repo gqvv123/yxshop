@@ -19,7 +19,7 @@ class AdminValidate extends Validate
         'nickname' => 'max:200',
         'phone' => 'max:11|regex:/^1[3-9]\d{9}$/',
         'email' => 'max:255|email',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
         'is_super_admin' => 'in:0,1',
     ];
 
@@ -38,9 +38,8 @@ class AdminValidate extends Validate
         'phone.regex' => '手机号格式不正确',
         'email.max' => '邮箱最多不能超过255个字符',
         'email.email' => '邮箱格式不正确',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
         'is_super_admin.in' => '超级管理员值必须是0或1',
     ];
 

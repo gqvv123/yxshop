@@ -6,6 +6,11 @@ use support\Request;
 use support\Response;
 use app\service\PayService;
 
+/**
+ * 组件：Pay Notify Controller。
+ *
+ * @package app\controller
+ */
 class PayNotifyController extends BaseController
 {
     protected $payService;

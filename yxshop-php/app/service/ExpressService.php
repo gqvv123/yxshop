@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\ExpressRepository;
-use app\model\Express;
 use app\exception\BusinessException;
 use app\validate\ExpressValidate;
 use Exception;
@@ -110,7 +109,7 @@ class ExpressService extends BaseService
     /**
      * 删除快递公司
      */
-    public function deleteExpress($id)
+    public function deleteExpress($id): bool
     {
         try {
             $this->logInfo('删除快递公司开始', ['id' => $id]);

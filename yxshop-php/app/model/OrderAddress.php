@@ -3,7 +3,10 @@
 namespace app\model;
 
 /**
- * 订单地址模型（字段对齐 yxshop_order_addresses 表，B 方案：region_id 关联 yxshop_regions）
+ * 订单地址模型（字段对齐 yxshop_order_addresses 表）
+ *
+ * 下单时会把用户地址快照到本表：优先保存省市县名称（region 基础数据可能缺失，
+ * 名称随快照一起存才不会出现「地址只剩门牌号」），名称缺失时再回落到 yxshop_regions。
  */
 class OrderAddress extends BaseModel
 {
@@ -12,10 +15,11 @@ class OrderAddress extends BaseModel
     protected $fillable = [
         'order_id', 'user_id', 'name', 'phone',
         'province_id', 'city_id', 'region_id',
+        'province', 'city', 'district',
         'detail', 'postal_code', 'is_default', 'app_id',
     ];
 
-    protected $appends = ['province_name', 'city_name', 'district_name'];
+    protected $appends = ['province_name', 'city_name', 'district_name', 'full_address'];
 
     protected $casts = [
         'order_id' => 'integer',
@@ -34,53 +38,57 @@ class OrderAddress extends BaseModel
         return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
-    public function province()
+    public function provinceRegion()
     {
         return $this->belongsTo(Region::class, 'province_id', 'id');
     }
 
-    public function city()
+    public function cityRegion()
     {
         return $this->belongsTo(Region::class, 'city_id', 'id');
     }
 
-    public function district()
+    public function districtRegion()
     {
         return $this->belongsTo(Region::class, 'region_id', 'id');
     }
 
     /**
-     * 省名称
+     * 名称优先取快照，其次回落地区表
      */
+    public function resolveRegionName(string $field): string
+    {
+        $name = (string) ($this->getAttribute($field) ?? '');
+        if ($name !== '') {
+            return $name;
+        }
+        $relation = $field . 'Region';
+        return (string) ($this->{$relation}->name ?? '');
+    }
+
     public function getProvinceNameAttribute()
     {
-        return $this->province->name ?? '';
+        return $this->resolveRegionName('province');
     }
 
-    /**
-     * 市名称
-     */
     public function getCityNameAttribute()
     {
-        return $this->city->name ?? '';
+        return $this->resolveRegionName('city');
     }
 
-    /**
-     * 区名称
-     */
     public function getDistrictNameAttribute()
     {
-        return $this->district->name ?? '';
+        return $this->resolveRegionName('district');
     }
 
     /**
-     * 完整地址字符串（按需 with(['province','city','district']) 预加载）
+     * 完整地址字符串
      */
     public function getFullAddressAttribute()
     {
-        $province = $this->province->name ?? '';
-        $city = $this->city->name ?? '';
-        $district = $this->district->name ?? '';
-        return $province . $city . $district . $this->detail;
+        return $this->getProvinceNameAttribute()
+            . $this->getCityNameAttribute()
+            . $this->getDistrictNameAttribute()
+            . $this->detail;
     }
 }

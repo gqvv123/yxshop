@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Friendly Link。
+ *
+ * @package app\model
+ */
 class FriendlyLink extends BaseModel
 {
     protected $table = 'yxshop_friendly_links';

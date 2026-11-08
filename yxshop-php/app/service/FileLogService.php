@@ -4,6 +4,11 @@ namespace app\service;
 
 use app\repository\FileLogRepository;
 
+/**
+ * 业务服务：File Log Service。
+ *
+ * @package app\service
+ */
 class FileLogService extends BaseService
 {
     public function __construct(?FileLogRepository $repository = null)

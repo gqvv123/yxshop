@@ -17,7 +17,7 @@ class ExpressValidate extends Validate
         'express_name' => 'require|max:255',
         'express_code' => 'require|max:30',
         'sort' => 'number|min:0',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
     ];
 
     /**

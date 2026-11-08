@@ -14,7 +14,7 @@ use Exception;
  */
 class BrandService extends BaseService
 {
-    public function __construct(BrandRepository $repository = null)
+    public function __construct(?BrandRepository $repository = null)
     {
         $repository = $repository ?? new BrandRepository();
         parent::__construct($repository);
@@ -114,7 +114,7 @@ class BrandService extends BaseService
     /**
      * 删除品牌
      */
-    public function deleteBrand($id)
+    public function deleteBrand($id): bool
     {
         try {
             $this->logInfo('删除品牌开始', ['id' => $id]);

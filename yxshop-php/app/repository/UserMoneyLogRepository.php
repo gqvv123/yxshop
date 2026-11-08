@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\UserMoneyLog;
 
+/**
+ * 数据仓储：User Money Log Repository。
+ *
+ * @package app\repository
+ */
 class UserMoneyLogRepository extends BaseRepository
 {
     protected $model = UserMoneyLog::class;

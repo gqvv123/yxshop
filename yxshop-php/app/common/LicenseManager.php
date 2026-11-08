@@ -208,8 +208,11 @@ class LicenseManager
     {
         $trialStart = Redis::get(self::CACHE_PREFIX . 'trial_start');
         if (!$trialStart) {
-            // 试用未启动
-            return true;
+            // 试用标记写在 .env、起始时间写在 Redis，两边不同步时（Redis 被清空、
+            // 换库、未持久化）会被判定为「已过期」，导致所有后台接口 403 被锁死。
+            // 这里按当前时间补记一次，让试用从此刻开始，而不是直接锁死系统。
+            $this->startTrial();
+            return false;
         }
 
         $trialDays = (int) config('license.trial.days', 14);

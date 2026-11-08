@@ -2,8 +2,6 @@
 
 namespace app\model;
 
-use app\exception\BusinessException;
-
 /**
  * 用户优惠券模型
  */
@@ -61,7 +59,7 @@ class UserCoupon extends BaseModel
      */
     public function canUse()
     {
-        return $this->status == self::STATUS_UNUSED && 
+        return $this->status == self::STATUS_UNUSED &&
                $this->coupon->canUse();
     }
 

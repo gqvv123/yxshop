@@ -10,26 +10,26 @@ class UserController extends BaseController
 {
     protected $userService;
     protected $itemService;
-    
+
     public function __construct()
     {
         $this->userService = new UserService();
         $this->itemService = new ItemService();
     }
-    
+
     /**
      * 获取用户信息
      */
     public function getInfo(Request $request)
     {
         $userId = $this->getCurrentUserId($request);
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         $result = $this->userService->getUserInfo($userId);
-        
+
         if ($result['success']) {
             return $this->success($result['data']);
         } else {
@@ -57,7 +57,7 @@ class UserController extends BaseController
             return $this->error($e->getMessage());
         }
     }
-    
+
     /**
      * 更新用户信息
      */
@@ -65,20 +65,20 @@ class UserController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $data = $request->post();
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         $result = $this->userService->updateUserInfo($userId, $data);
-        
+
         if ($result['success']) {
             return $this->success(null, $result['message']);
         } else {
             return $this->error($result['message']);
         }
     }
-    
+
     /**
      * 更新用户头像
      */
@@ -86,24 +86,24 @@ class UserController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $avatar = $request->file('avatar');
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         if (!$avatar) {
             return $this->error('请选择头像文件');
         }
-        
+
         $result = $this->userService->updateUserAvatar($userId, $avatar);
-        
+
         if ($result['success']) {
             return $this->success($result['data'], $result['message']);
         } else {
             return $this->error($result['message']);
         }
     }
-    
+
     /**
      * 修改密码
      */
@@ -111,28 +111,28 @@ class UserController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $data = $request->post();
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         if (empty($data['old_password'])) {
             return $this->error('原密码不能为空');
         }
-        
+
         if (empty($data['new_password'])) {
             return $this->error('新密码不能为空');
         }
-        
+
         $result = $this->userService->changePassword($userId, $data['old_password'], $data['new_password']);
-        
+
         if ($result['success']) {
             return $this->success(null, $result['message']);
         } else {
             return $this->error($result['message']);
         }
     }
-    
+
     /**
      * 获取用户订单
      */
@@ -141,20 +141,20 @@ class UserController extends BaseController
         $userId = $this->getCurrentUserId($request);
         $page = $request->get('page', 1);
         $pageSize = $request->get('page_size', 20);
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         $result = $this->userService->getUserOrders($userId, $page, $pageSize);
-        
+
         if ($result['success']) {
             return $this->success($result['data']);
         } else {
             return $this->error($result['message']);
         }
     }
-    
+
     /**
      * 获取用户收藏
      */
@@ -163,13 +163,13 @@ class UserController extends BaseController
         $userId = $this->getCurrentUserId($request);
         $page = $request->get('page', 1);
         $pageSize = $request->get('page_size', 20);
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         $result = $this->userService->getUserFavorites($userId, $page, $pageSize);
-        
+
         if ($result['success']) {
             return $this->success($result['data']);
         } else {

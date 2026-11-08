@@ -6,7 +6,6 @@ use app\repository\DeliveryRepository;
 use app\repository\DeliveryRuleRepository;
 use app\repository\ItemRepository;
 use app\exception\BusinessException;
-use support\Db;
 
 /**
  * 配送模板服务
@@ -30,6 +29,18 @@ class DeliveryService extends BaseService
     public function getList($appId = 0, $pageSize = 20, $keyword = '')
     {
         return $this->repository->paginateForList((int) $appId, (int) $pageSize, (string) $keyword);
+    }
+
+    /**
+     * C 端可用配送方式（仅启用 + 有名称）
+     *
+     * @param int $appId
+     * @param int $limit
+     * @return array
+     */
+    public function getActiveList(int $appId = 0, int $limit = 50): array
+    {
+        return $this->repository->getActiveForClient($appId, $limit);
     }
 
     public function getDetail($id)
@@ -98,7 +109,7 @@ class DeliveryService extends BaseService
         });
     }
 
-    public function delete($id)
+    public function delete($id): bool
     {
         $delivery = $this->repository->findOrFail($id);
 

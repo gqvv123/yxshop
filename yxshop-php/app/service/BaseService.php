@@ -62,7 +62,7 @@ abstract class BaseService
     /**
      * 记录日志
      */
-    protected function log($level, $message, $context = [])
+    protected function log($level, $message, $context = []): void
     {
         $msg = is_string($message) ? $message : json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $level = strtolower((string)$level);
@@ -87,7 +87,7 @@ abstract class BaseService
     /**
      * 记录信息日志
      */
-    protected function logInfo($message, $context = [])
+    protected function logInfo($message, $context = []): void
     {
         $this->log('info', $message, $context);
     }
@@ -95,7 +95,7 @@ abstract class BaseService
     /**
      * 记录错误日志
      */
-    protected function logError($message, $context = [])
+    protected function logError($message, $context = []): void
     {
         $this->log('error', $message, $context);
     }
@@ -103,7 +103,7 @@ abstract class BaseService
     /**
      * 记录警告日志
      */
-    protected function logWarning($message, $context = [])
+    protected function logWarning($message, $context = []): void
     {
         $this->log('warning', $message, $context);
     }
@@ -111,7 +111,7 @@ abstract class BaseService
     /**
      * 记录调试日志
      */
-    protected function logDebug($message, $context = [])
+    protected function logDebug($message, $context = []): void
     {
         $this->log('debug', $message, $context);
     }
@@ -119,7 +119,7 @@ abstract class BaseService
     /**
      * 抛出业务异常
      */
-    protected function throwBusinessException($message, $code = 400, $data = [])
+    protected function throwBusinessException($message, $code = 400, $data = []): void
     {
         throw new \app\exception\BusinessException($message, $code, $data);
     }
@@ -127,14 +127,14 @@ abstract class BaseService
     /**
      * 验证数据
      */
-    protected function validate($data, $rules)
+    protected function validate($data, $rules): bool
     {
         // 创建验证器实例
         $validator = new \think\Validate();
-        
+
         // 设置验证规则
         $validator->rule($rules);
-        
+
         // 执行验证
         if (!$validator->check($data)) {
             $this->throwBusinessException($validator->getError());
@@ -142,7 +142,7 @@ abstract class BaseService
         return true;
     }
 
-    protected function validateWith($validateClass, $scene, $data)
+    protected function validateWith($validateClass, $scene, $data): bool
     {
         $validate = new $validateClass();
         $validate->failException(false);
@@ -199,6 +199,17 @@ abstract class BaseService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * 详情（记录不存在返回 null，由控制器决定如何提示）
+     *
+     * 后台列表控制器统一调用 getDetail()，此前仅部分服务实现，
+     * 其余服务会抛 "Call to undefined method"，这里统一兜底。
+     */
+    public function getDetail($id)
+    {
+        return $this->repository->find($id);
     }
 
     /**
@@ -471,7 +482,7 @@ abstract class BaseService
      * 注意：BaseModel 全局 not_deleted scope 已自动过滤已删记录，
      * 故 active = total；inactive 需要 withTrashed 旁路才能查到。
      */
-    public function getStats(array $conditions = [])
+    public function getStats(array $conditions = []): array
     {
         try {
             $base = $this->repository->query();
@@ -512,7 +523,7 @@ abstract class BaseService
             ]);
 
             $query = $this->repository->query();
-            
+
             foreach ($conditions as $field => $value) {
                 if (is_array($value)) {
                     $query->whereIn($field, $value);
@@ -522,7 +533,7 @@ abstract class BaseService
             }
 
             $data = $query->get();
-            
+
             if (empty($fields)) {
                 $fields = array_keys($data->first()->toArray());
             }

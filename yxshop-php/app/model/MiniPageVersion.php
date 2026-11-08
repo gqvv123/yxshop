@@ -4,6 +4,11 @@ namespace app\model;
 
 use app\model\BaseModel;
 
+/**
+ * 数据模型：Mini Page Version。
+ *
+ * @package app\model
+ */
 class MiniPageVersion extends BaseModel
 {
     protected $table = 'yxshop_mini_page_versions';

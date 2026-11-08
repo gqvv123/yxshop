@@ -56,7 +56,7 @@ class ItemTagRepository extends BaseRepository
         return $query->get();
     }
 
-    public function getTagStats($appId = 0)
+    public function getTagStats($appId = 0): array
     {
         $query = $this->query();
 

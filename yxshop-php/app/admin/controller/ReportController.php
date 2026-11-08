@@ -7,6 +7,11 @@ use app\service\UserService;
 use app\service\OrderService;
 use app\service\ItemService;
 
+/**
+ * 管理端控制器：Report Controller。
+ *
+ * @package app\admin\controller
+ */
 class ReportController extends BaseController
 {
     protected $userService;

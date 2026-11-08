@@ -6,6 +6,11 @@ use app\repository\NotificationSceneRepository;
 use app\exception\BusinessException;
 use Exception;
 
+/**
+ * 业务服务：Notification Scene Service。
+ *
+ * @package app\service
+ */
 class NotificationSceneService extends BaseService
 {
     public function __construct(?NotificationSceneRepository $repository = null)
@@ -56,7 +61,19 @@ class NotificationSceneService extends BaseService
         try {
             $this->logInfo('创建通知场景开始', ['data' => $data]);
 
-            $existing = $this->repository->findByCodeAndApp($data['scene_code'], $data['app_id']);
+            $code = trim((string) ($data['scene_code'] ?? ''));
+            $name = trim((string) ($data['scene_name'] ?? ''));
+            if ($code === '') {
+                throw new BusinessException('请填写场景编码');
+            }
+            if ($name === '') {
+                throw new BusinessException('请填写场景名称');
+            }
+            $data['scene_code'] = $code;
+            $data['scene_name'] = $name;
+            $data['app_id'] = (int) ($data['app_id'] ?? 0);
+
+            $existing = $this->repository->findByCodeAndApp($code, $data['app_id']);
 
             if ($existing) {
                 throw new BusinessException('场景编码已存在');
@@ -106,7 +123,7 @@ class NotificationSceneService extends BaseService
         }
     }
 
-    public function deleteScene($id)
+    public function deleteScene($id): bool
     {
         try {
             $this->logInfo('删除通知场景开始', ['id' => $id]);

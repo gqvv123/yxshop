@@ -42,15 +42,15 @@ class ApiRateLimitMiddleware implements MiddlewareInterface
     {
         // 根据路由设置不同的限流
         $route = $request->path();
-        
+
         if (strpos($route, '/api/v1/auth/') === 0) {
             return 5; // 认证接口限制更严格
         }
-        
+
         if (strpos($route, '/api/v1/upload/') === 0) {
             return 10; // 上传接口限制
         }
-        
+
         return 100; // 默认限制
     }
 

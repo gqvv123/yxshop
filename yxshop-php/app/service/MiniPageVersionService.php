@@ -7,6 +7,11 @@ use app\model\MiniPage;
 use app\exception\BusinessException;
 use support\Db;
 
+/**
+ * 业务服务：Mini Page Version Service。
+ *
+ * @package app\service
+ */
 class MiniPageVersionService extends BaseService
 {
     public function __construct(?MiniPageVersionRepository $repository = null)

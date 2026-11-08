@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\MiniPageVersionService;
 
+/**
+ * 管理端控制器：Mini Page Version Controller。
+ *
+ * @package app\admin\controller
+ */
 class MiniPageVersionController extends BaseController
 {
     protected $versionService;

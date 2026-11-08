@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：File Download Log。
+ *
+ * @package app\model
+ */
 class FileDownloadLog extends BaseModel
 {
     protected $table = 'yxshop_file_download_logs';

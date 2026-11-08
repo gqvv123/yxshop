@@ -3,9 +3,12 @@
 namespace app\service;
 
 use app\repository\RoleRepository;
-use app\model\AdminRole;
-use app\validate\AdminRoleValidate;
 
+/**
+ * 业务服务：Role Service。
+ *
+ * @package app\service
+ */
 class RoleService extends BaseService
 {
     public function __construct()

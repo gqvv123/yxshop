@@ -9,7 +9,7 @@ class LogCleanupMonitor implements Consumer
     public $queue = 'Log-Cleanup-Monitor';
     public $connection = 'default';
 
-    public function consume($data)
+    public function consume($data): void
     {
         // 处理监控数据
         Log::info('Log cleanup monitor data: ' . $data);

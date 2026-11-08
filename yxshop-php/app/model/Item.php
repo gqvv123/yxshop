@@ -319,17 +319,28 @@ class Item extends BaseModel
     public function getMinPrice()
     {
         $minPrice = $this->specs()->min('price');
-        return $minPrice ?: 0;
+        if ($minPrice !== null && (float) $minPrice > 0) {
+            return $minPrice;
+        }
+        // 单规格商品没有 SKU 价格记录，直接回落到商品自身的价格，
+        // 否则购物车/下单金额会被算成 0。
+        return (float) ($this->getAttribute('price') ?? 0);
     }
 
     public function getMaxPrice()
     {
         $maxPrice = $this->specs()->max('price');
-        return $maxPrice ?: 0;
+        if ($maxPrice !== null && (float) $maxPrice > 0) {
+            return $maxPrice;
+        }
+        return (float) ($this->getAttribute('price') ?? 0);
     }
 
     public function getSpecStock($specId)
     {
+        if ((int) $specId <= 0) {
+            return (int) $this->getAttribute('stock');
+        }
         $spec = $this->specs()->where('id', $specId)->first();
         return $spec ? $spec->stock : 0;
     }

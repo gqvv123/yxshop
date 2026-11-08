@@ -70,7 +70,7 @@ class UserLevelRepository extends BaseRepository
     /**
      * 获取等级统计
      */
-    public function getLevelStats($appId = 0)
+    public function getLevelStats($appId = 0): array
     {
         $base = $this->model->newQuery();
 

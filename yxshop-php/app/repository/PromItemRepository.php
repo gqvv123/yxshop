@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\PromItem;
 
+/**
+ * 数据仓储：Prom Item Repository。
+ *
+ * @package app\repository
+ */
 class PromItemRepository extends BaseRepository
 {
     protected $model = PromItem::class;
@@ -44,7 +49,7 @@ class PromItemRepository extends BaseRepository
         return $query->get();
     }
 
-    public function getPromItemStats($promId = null, $appId = 0)
+    public function getPromItemStats($promId = null, $appId = 0): array
     {
         $query = $this->query();
 

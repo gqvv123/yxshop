@@ -7,6 +7,11 @@ use Webman\Http\Response;
 use app\model\SystemLog;
 use Webman\MiddlewareInterface;
 
+/**
+ * 中间件：Api Access Log Middleware。
+ *
+ * @package app\middleware
+ */
 class ApiAccessLogMiddleware implements MiddlewareInterface
 {
     protected array $excludePaths = [

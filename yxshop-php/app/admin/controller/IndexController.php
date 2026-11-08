@@ -10,6 +10,11 @@ use app\service\ItemService;
 use app\service\CategoryService;
 use app\service\DashboardService;
 
+/**
+ * 管理端控制器：Index Controller。
+ *
+ * @package app\admin\controller
+ */
 class IndexController extends BaseController
 {
     protected $orderService;

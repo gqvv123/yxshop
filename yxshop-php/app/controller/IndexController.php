@@ -3,11 +3,15 @@
 namespace app\controller;
 
 use support\Request;
-use support\Response;
 use app\service\CurrencyService;
 use app\service\LanguageService;
 use app\exception\NotFoundException;
 
+/**
+ * 组件：Index Controller。
+ *
+ * @package app\controller
+ */
 class IndexController extends BaseController
 {
     protected $currencyService;
@@ -19,7 +23,7 @@ class IndexController extends BaseController
         $this->languageService = new LanguageService();
     }
 
-    public function index(Request $request)
+    public function index(Request $request): string
     {
         return 'Hello World';
     }

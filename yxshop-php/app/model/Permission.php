@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Permission。
+ *
+ * @package app\model
+ */
 class Permission extends BaseModel
 {
     protected $table = 'yxshop_permissions';

@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Item Attr。
+ *
+ * @package app\model
+ */
 class ItemAttr extends BaseModel
 {
     protected $table = 'yxshop_item_attrs';

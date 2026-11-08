@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\ItemSearchRepository;
-use Exception;
 
 class ItemSearchService extends BaseService
 {

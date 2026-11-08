@@ -48,6 +48,14 @@ class UserLevelService extends BaseService
         try {
             $this->logInfo('创建等级开始', ['data' => $data]);
 
+            // 必填项兜底，避免空提交时出现 Undefined array key 的 500
+            $data['level'] = max(1, (int) ($data['level'] ?? 1));
+            $data['app_id'] = (int) ($data['app_id'] ?? 0);
+            $name = trim((string) ($data['name'] ?? ''));
+            $data['name'] = $name !== '' ? $name : ('V' . $data['level']);
+
+            $data = $this->normalizeLevelData($data);
+
 
             // 检查等级是否重复
             $existing = $this->repository->getByLevel($data['level'], $data['app_id']);
@@ -82,6 +90,7 @@ class UserLevelService extends BaseService
         try {
             $this->logInfo('更新等级开始', ['id' => $id, 'data' => $data]);
 
+            $data  = $this->normalizeLevelData($data);
             $level = $this->repository->findOrFail($id);
 
             // 检查等级是否重复
@@ -113,9 +122,49 @@ class UserLevelService extends BaseService
     }
 
     /**
+     * 统一等级入参：
+     * - 兼容旧字段（desc / agio / integral）
+     * - discount（10=不打折）与 agio 双写，保证订单折扣与前端展示一致
+     * - 缺失字段给默认值，避免 NOT NULL 报错
+     */
+    private function normalizeLevelData(array $data): array
+    {
+        if (isset($data['desc']) && !isset($data['description'])) {
+            $data['description'] = (string) $data['desc'];
+        }
+        unset($data['desc'], $data['sort'], $data['integral'], $data['values'], $data['key'], $data['shop_money']);
+
+        if (isset($data['discount'])) {
+            $data['discount'] = round((float) $data['discount'], 2);
+            $data['agio'] = $data['discount'];
+        } elseif (isset($data['agio'])) {
+            $data['agio'] = round((float) $data['agio'], 2);
+            $data['discount'] = $data['agio'];
+        }
+
+        if (isset($data['level'])) {
+            $data['level'] = max(1, (int) $data['level']);
+        }
+        if (isset($data['experience'])) {
+            $data['experience'] = max(0, (int) $data['experience']);
+        }
+        if (isset($data['status'])) {
+            $data['status'] = (int) $data['status'] === 0 ? 0 : 1;
+        }
+        if (array_key_exists('is_default', $data)) {
+            $data['is_default'] = !empty($data['is_default']) ? 1 : 0;
+        }
+        if (isset($data['app_id'])) {
+            $data['app_id'] = (int) $data['app_id'];
+        }
+
+        return $data;
+    }
+
+    /**
      * 删除等级
      */
-    public function deleteLevel($id)
+    public function deleteLevel($id): bool
     {
         try {
             $this->logInfo('删除等级开始', ['id' => $id]);

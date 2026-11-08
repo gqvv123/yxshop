@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\PromotionRepository;
-use app\model\Promotion;
 use app\model\NotificationSend;
 use Exception;
 

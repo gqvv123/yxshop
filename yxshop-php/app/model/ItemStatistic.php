@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Item Statistic。
+ *
+ * @package app\model
+ */
 class ItemStatistic extends BaseModel
 {
     protected $table = 'yxshop_item_statistics';

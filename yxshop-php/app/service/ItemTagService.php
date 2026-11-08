@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\ItemTagRepository;
-use app\model\ItemTag;
 use app\exception\BusinessException;
 use Exception;
 
@@ -49,9 +48,15 @@ class ItemTagService extends BaseService
         try {
             $this->logInfo('创建标签开始', ['data' => $data]);
 
+            $tagName = trim((string) ($data['tag_name'] ?? ''));
+            if ($tagName === '') {
+                throw new BusinessException('请填写标签名称');
+            }
+            $data['tag_name'] = $tagName;
+            $data['app_id'] = (int) ($data['app_id'] ?? 0);
 
             // 检查标签名称是否重复
-            $existing = $this->repository->findByNameAndApp($data['tag_name'], $data['app_id']);
+            $existing = $this->repository->findByNameAndApp($tagName, $data['app_id']);
 
             if ($existing) {
                 throw new BusinessException('标签名称已存在');
@@ -78,7 +83,6 @@ class ItemTagService extends BaseService
     {
         try {
             $this->logInfo('更新标签开始', ['id' => $id, 'data' => $data]);
-
 
             $tag = $this->repository->findOrFail($id);
 
@@ -109,7 +113,7 @@ class ItemTagService extends BaseService
     /**
      * 删除标签
      */
-    public function deleteTag($id)
+    public function deleteTag($id): bool
     {
         try {
             $this->logInfo('删除标签开始', ['id' => $id]);

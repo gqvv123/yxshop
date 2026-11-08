@@ -7,6 +7,11 @@ use support\Request;
 use support\Response;
 use app\exception\BusinessException;
 
+/**
+ * 组件：Version Controller。
+ *
+ * @package app\controller
+ */
 class VersionController extends BaseController
 {
     private $versionService;

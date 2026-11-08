@@ -86,7 +86,7 @@ class CouponRepository extends BaseRepository
     /**
      * 获取优惠券统计
      */
-    public function getCouponStats($appId = 0)
+    public function getCouponStats($appId = 0): array
     {
         $base = $this->query();
 

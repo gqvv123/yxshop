@@ -4,6 +4,11 @@ namespace app\exception;
 
 use RuntimeException;
 
+/**
+ * 组件：Validation Exception。
+ *
+ * @package app\exception
+ */
 class ValidationException extends RuntimeException
 {
     protected $errors;

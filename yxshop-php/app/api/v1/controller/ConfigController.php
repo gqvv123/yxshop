@@ -22,6 +22,20 @@ class ConfigController extends BaseController
     }
 
     /**
+     * 基础配置（站点名称 / 标题 / 关键词 / 描述 / LOGO / 客服电话邮箱 / 版权）
+     *
+     * 注意：这些键在 yxshop_settings 里的 group 是 `basic`，不是 `system`。
+     * 此前只有 getSystemConfig（查 group=system）时返回一直是空数组，
+     * 前端因此拿不到站点名，只能硬编码。
+     */
+    public function getBasicConfig(Request $request)
+    {
+        $appId = (int) $request->get('app_id', 0);
+        $data = $this->settingService->getGroupSettings('basic', $appId);
+        return $this->success($data);
+    }
+
+    /**
      * 系统配置
      */
     public function getSystemConfig(Request $request)

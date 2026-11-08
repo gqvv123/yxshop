@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Recharge Order。
+ *
+ * @package app\model
+ */
 class RechargeOrder extends BaseModel
 {
     protected $table = 'yxshop_recharge_orders';

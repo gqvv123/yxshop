@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\OrderItem;
 
+/**
+ * 数据仓储：Order Item Repository。
+ *
+ * @package app\repository
+ */
 class OrderItemRepository extends BaseRepository
 {
     protected $model = OrderItem::class;

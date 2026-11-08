@@ -4,6 +4,11 @@ namespace app\exception;
 
 use RuntimeException;
 
+/**
+ * 组件：Business Exception。
+ *
+ * @package app\exception
+ */
 class BusinessException extends RuntimeException
 {
     protected $data;

@@ -3,12 +3,11 @@
 namespace app\admin\controller;
 
 use support\Request;
-use app\service\OrderService;
-use app\validate\OrderValidate;
-use app\exception\ValidationException;
+use app\traits\XlsxExportTrait;
 
 class OrderController extends BaseController
 {
+    use XlsxExportTrait;
 
     public function index(Request $request)
     {
@@ -244,5 +243,45 @@ class OrderController extends BaseController
             $admin['username'] ?? ''
         );
         return $this->success($order, '备注成功');
+    }
+
+    /**
+     * 导出订单（CSV/XLSX，前端按 blob 下载）
+     */
+    public function export(Request $request)
+    {
+        $appId = $this->getAppId($request);
+        $params = [
+            'search'          => $request->input('search'),
+            'date'            => $request->input('date'),
+            'status'          => $request->input('status'),
+            'pay_status'      => $request->input('pay_status'),
+            'delivery_status' => $request->input('delivery_status'),
+            'start_date'      => $request->input('start_date'),
+            'end_date'        => $request->input('end_date'),
+        ];
+
+        $orders = $this->orderService->getAdminOrderList($appId, $params, 1000);
+        $list = method_exists($orders, 'items') ? $orders->items() : $orders;
+
+        $payText = [10 => '未付款', 20 => '已付款'];
+        $statusText = [10 => '进行中', 20 => '已取消', 30 => '已完成'];
+
+        $rows = [];
+        foreach ($list as $order) {
+            $rows[] = [
+                $order->order_no ?? '',
+                $order->user_id ?? '',
+                (float) ($order->total_price ?? 0),
+                (float) ($order->pay_price ?? 0),
+                $payText[(int) ($order->pay_status ?? 0)] ?? '未知',
+                $statusText[(int) ($order->status ?? 0)] ?? '未知',
+                $order->created_at ? date('Y-m-d H:i:s', (int) $order->created_at) : '',
+            ];
+        }
+
+        $headers = ['订单号', '用户ID', '订单金额', '实付金额', '支付状态', '订单状态', '下单时间'];
+
+        return $this->xlsxDownload($headers, $rows, 'orders.xlsx');
     }
 }

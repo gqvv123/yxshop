@@ -124,7 +124,7 @@ class AfterSales extends BaseModel
             ->orderBy('created_at', 'asc');
     }
 
-    public function getTypeTextAttribute()
+    public function getTypeTextAttribute(): array
     {
         return [
             self::TYPE_REFUND => '退款',
@@ -134,7 +134,7 @@ class AfterSales extends BaseModel
         ][$this->sub_type] ?? '未知';
     }
 
-    public function getStatusTextAttribute()
+    public function getStatusTextAttribute(): array
     {
         return [
             self::STATUS_PENDING => '待处理',

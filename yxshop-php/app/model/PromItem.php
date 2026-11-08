@@ -2,24 +2,36 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Prom Item。
+ *
+ * @package app\model
+ */
 class PromItem extends BaseModel
 {
     protected $table = 'yxshop_prom_items';
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'prom_id', 'item_id', 'prom_price', 'prom_stock', 'prom_sales', 'prom_status', 'sort',
         'name', 'type', 'expression', 'description',
         'start_time', 'end_time', 'is_close', 'group',
-        'prom_img', 'app_id', 'item_id',
+        'prom_img', 'app_id',
     ];
 
     protected $casts = [
+        'prom_id' => 'integer',
+        'item_id' => 'integer',
+        'prom_price' => 'decimal:2',
+        'prom_stock' => 'integer',
+        'prom_sales' => 'integer',
+        'prom_status' => 'integer',
+        'sort' => 'integer',
         'type' => 'integer',
         'start_time' => 'integer',
         'end_time' => 'integer',
         'is_close' => 'integer',
         'app_id' => 'integer',
-        'item_id' => 'integer',
         'created_at' => 'integer',
         'updated_at' => 'integer',
     ];

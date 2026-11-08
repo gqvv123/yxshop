@@ -3,16 +3,22 @@
 namespace app\admin\controller;
 
 use support\Request;
+use support\Response;
 use app\service\SettingService;
-use app\service\LanguageService;
 use app\service\SettingEncryptService;
 use app\service\WechatPayConfigProvider;
 use app\service\WechatPayService;
-use app\service\AdminService;
 use app\service\AdminApiTokenService;
 
+/**
+ * 管理端控制器：Setting Controller。
+ *
+ * @package app\admin\controller
+ */
 class SettingController extends BaseController
 {
+    use SettingGroupTrait;
+
     protected $settingService;
 
     public function __construct()
@@ -142,10 +148,10 @@ class SettingController extends BaseController
             $oldCertPath = $this->settingService->getRawSetting('wxpay_cert_path', $appId, '');
             $oldKeyPath = $this->settingService->getRawSetting('wxpay_key_path', $appId, '');
             if (!empty($oldCertPath) && file_exists($oldCertPath) && str_starts_with(realpath($oldCertPath), realpath($certBaseDir))) {
-                @unlink($oldCertPath);
+                \app\common\SafeHelper::unlink($oldCertPath);
             }
             if (!empty($oldKeyPath) && file_exists($oldKeyPath) && str_starts_with(realpath($oldKeyPath), realpath($certBaseDir))) {
-                @unlink($oldKeyPath);
+                \app\common\SafeHelper::unlink($oldKeyPath);
             }
 
             $certSavePath = $certDir . DIRECTORY_SEPARATOR . 'apiclient_cert_' . $random . '.pem';
@@ -176,7 +182,7 @@ class SettingController extends BaseController
             }
             $oldPlatformPath = $this->settingService->getRawSetting('wxpay_platform_cert_path', $appId, '');
             if (!empty($oldPlatformPath) && file_exists($oldPlatformPath) && str_starts_with(realpath($oldPlatformPath), realpath($certBaseDir))) {
-                @unlink($oldPlatformPath);
+                \app\common\SafeHelper::unlink($oldPlatformPath);
             }
             $platformSavePath = $certDir . DIRECTORY_SEPARATOR . 'platform_cert_' . $random . '.pem';
             file_put_contents($platformSavePath, $platformContent);
@@ -209,7 +215,7 @@ class SettingController extends BaseController
         return $this->error($result['message']);
     }
 
-    private function saveBasicSettings($data, $appId)
+    private function saveBasicSettings($data, $appId): void
     {
         $fields = ['site_name', 'site_title', 'site_keywords', 'site_description', 'service_phone', 'service_email', 'site_logo', 'site_favicon', 'copyright'];
         foreach ($fields as $field) {
@@ -227,7 +233,7 @@ class SettingController extends BaseController
         return $settings;
     }
 
-    private function savePaymentSettings($d, $appId)
+    private function savePaymentSettings($d, $appId): void
     {
         if (!empty($d['wxpay_enable']) && empty($d['wxpay_key'])) {
             $existingKey = $this->settingService->getRawSetting('wxpay_key', $appId, '');
@@ -307,7 +313,7 @@ class SettingController extends BaseController
         return $settings;
     }
 
-    private function saveShippingSettings($d, $appId)
+    private function saveShippingSettings($d, $appId): void
     {
         $this->settingService->setSetting('shipping_template_default', $d['shipping_template_default'] ?? 'flat', 'string', 'shipping', '默认运费模板', $appId);
         $this->settingService->setSetting('shipping_flat_fee', $d['shipping_flat_fee'] ?? '0.00', 'string', 'shipping', '统一运费', $appId);
@@ -326,7 +332,7 @@ class SettingController extends BaseController
         return $settings;
     }
 
-    private function saveNotificationSettings($d, $appId)
+    private function saveNotificationSettings($d, $appId): void
     {
         $this->settingService->setSetting('notify_inbox_enable', (int)($d['notify_inbox_enable'] ?? 1), 'int', 'notification', '开启站内消息', $appId);
         $this->settingService->setSetting('notify_email_enable', (int)($d['notify_email_enable'] ?? 0), 'int', 'notification', '开启邮件', $appId);
@@ -357,7 +363,7 @@ class SettingController extends BaseController
         return $settings;
     }
 
-    private function saveTradeSettings($d, $appId)
+    private function saveTradeSettings($d, $appId): void
     {
         $this->settingService->setSetting('order_auto_cancel_minutes', (int)($d['order_auto_cancel_minutes'] ?? 30), 'int', 'trade', '订单自动取消时间(分钟)', $appId);
         $this->settingService->setSetting('auto_confirm_days', (int)($d['auto_confirm_days'] ?? 7), 'int', 'trade', '自动确认收货天数', $appId);
@@ -375,178 +381,6 @@ class SettingController extends BaseController
             $settings[$field] = $this->settingService->getSetting($field, $appId, '');
         }
         return $settings;
-    }
-
-    public function languages(Request $request)
-    {
-        $languages = $this->languageService->getActive();
-        return $this->success($languages);
-    }
-
-    public function languageStore(Request $request)
-    {
-        $data = $request->post();
-
-        if (empty($data['name']) || empty($data['code'])) {
-            return $this->error('语言名称和编码不能为空');
-        }
-
-        $result = $this->languageService->create($data);
-        if (!$result) {
-            return $this->error('添加失败');
-        }
-        return $this->success($result, '添加成功');
-    }
-
-    public function languageUpdate(Request $request, $id)
-    {
-        if (empty($id) || !is_numeric($id)) {
-            return $this->error('无效的语言ID');
-        }
-
-        $data = $request->post();
-        $result = $this->languageService->update($id, $data);
-        if (!$result) {
-            return $this->error('更新失败');
-        }
-        return $this->success($result, '更新成功');
-    }
-
-    public function languageDestroy(Request $request, $id)
-    {
-        if (empty($id) || !is_numeric($id)) {
-            return $this->error('无效的语言ID');
-        }
-
-        $result = $this->languageService->delete($id);
-        if (!$result) {
-            return $this->error('删除失败');
-        }
-        return $this->success(null, '删除成功');
-    }
-
-    public function languageUpdateStatus(Request $request, $id)
-    {
-        if (empty($id) || !is_numeric($id)) {
-            return $this->error('无效的语言ID');
-        }
-
-        $data = $request->post();
-        if (!isset($data['status'])) {
-            return $this->error('状态值不能为空');
-        }
-
-        $result = $this->languageService->update($id, ['status' => (int) $data['status']]);
-        if (!$result) {
-            return $this->error('操作失败');
-        }
-        return $this->success(null, '操作成功');
-    }
-
-    public function teamIndex(Request $request)
-    {
-        $appId = $this->getAppId($request);
-        $list = $this->adminService->getTeamList($appId);
-        return $this->success($list);
-    }
-
-    public function teamUpdateRole(Request $request, int $id)
-    {
-        $currentAdmin = $request->admin;
-        if (empty($currentAdmin['is_super_admin'])) {
-            return $this->error('无权操作', 403);
-        }
-
-        $roleId = $request->input('role_id');
-        if (empty($roleId)) {
-            return $this->error('角色不能为空');
-        }
-
-        try {
-            $this->adminService->updateTeamRole($id, $roleId);
-            return $this->success(null, '角色更新成功');
-        } catch (\app\exception\BusinessException $e) {
-            return $this->error($e->getMessage(), 404);
-        }
-    }
-
-    public function teamInvite(Request $request)
-    {
-        $email = $request->input('email');
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return $this->error('邮箱格式不正确');
-        }
-
-        $appId = $this->getAppId($request);
-        $roleId = $request->input('role_id', 0);
-
-        try {
-            $admin = $this->adminService->inviteTeamMember($email, $appId, $roleId);
-            return $this->success([
-                'id' => $admin->id,
-                'email' => $admin->email,
-                'name' => $admin->username,
-            ], '邀请成功');
-        } catch (\app\exception\BusinessException $e) {
-            return $this->error($e->getMessage(), 409);
-        }
-    }
-
-    public function teamUpdateStatus(Request $request, int $id)
-    {
-        $currentAdmin = $request->admin;
-        if (empty($currentAdmin['is_super_admin'])) {
-            return $this->error('无权操作', 403);
-        }
-
-        if ($currentAdmin['id'] == $id) {
-            return $this->error('不能操作自己的状态', 422);
-        }
-
-        $status = $request->input('status', '');
-        if (!in_array($status, ['active', 'disabled', 'pending'], true)) {
-            return $this->error('状态值不合法', 422);
-        }
-
-        try {
-            $admin = $this->adminService->find($id);
-            if (!$admin) {
-                return $this->error('用户不存在', 404);
-            }
-            if ($admin->is_super_admin) {
-                return $this->error('不能操作超级管理员', 422);
-            }
-            $this->adminService->updateTeamStatus($id, $status);
-            return $this->success(null, '状态更新成功');
-        } catch (\app\exception\BusinessException $e) {
-            return $this->error($e->getMessage(), 404);
-        }
-    }
-
-    public function teamDestroy(Request $request, int $id)
-    {
-        $currentAdmin = $request->admin;
-        if (empty($currentAdmin['is_super_admin'])) {
-            return $this->error('无权操作', 403);
-        }
-
-        if ($currentAdmin['id'] == $id) {
-            return $this->error('不能移除自己', 422);
-        }
-
-        try {
-            $admin = $this->adminService->find($id);
-            if (!$admin) {
-                return $this->error('用户不存在', 404);
-            }
-            if ($admin->is_super_admin) {
-                return $this->error('不能移除超级管理员', 422);
-            }
-            $this->adminService->deleteTeamMember($id);
-            return $this->success(null, '成员已移除');
-        } catch (\app\exception\BusinessException $e) {
-            return $this->error($e->getMessage(), 404);
-        }
     }
 
     public function apiKeysIndex(Request $request)

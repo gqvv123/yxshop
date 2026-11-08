@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Page Seo。
+ *
+ * @package app\model
+ */
 class PageSeo extends BaseModel
 {
     protected $table = 'yxshop_page_seos';

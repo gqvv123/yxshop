@@ -71,7 +71,7 @@ class ApplyRepository extends BaseRepository
     /**
      * 获取申请统计
      */
-    public function getApplyStats($startTime = null, $endTime = null, $appId = 0)
+    public function getApplyStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 
@@ -101,7 +101,7 @@ class ApplyRepository extends BaseRepository
     /**
      * 获取用户申请统计
      */
-    public function getUserApplyStats($userId, $appId = 0)
+    public function getUserApplyStats($userId, $appId = 0): array
     {
         $base = $this->query()->where('user_id', $userId);
 

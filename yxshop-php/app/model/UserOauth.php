@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Oauth。
+ *
+ * @package app\model
+ */
 class UserOauth extends BaseModel
 {
     protected $table = 'yxshop_user_oauths';

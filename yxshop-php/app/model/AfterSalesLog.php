@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：After Sales Log。
+ *
+ * @package app\model
+ */
 class AfterSalesLog extends BaseModel
 {
     protected $table = 'yxshop_after_sales_logs';

@@ -44,7 +44,14 @@ class UserLevelController extends BaseController
         $appId = (int) ($user->app_id ?? 0);
 
         // 当前等级
-        $currentLevel = $this->levelService->getByLevel($user->level ?? 1, $appId);
+        //
+        // users.level_id 存的是等级序号（1/2/3…），不是 user_levels 主键，
+        // 所以先按 level 查；再退回按主键查，兼容历史数据。
+        $currentLevel = null;
+        if ($user->level_id) {
+            $currentLevel = $this->levelService->getByLevel((int) $user->level_id, $appId)
+                ?: $this->levelService->getDetail((int) $user->level_id);
+        }
 
         if (!$currentLevel) {
             $currentLevel = $this->levelService->getDefaultLevel($appId);
@@ -135,13 +142,9 @@ class UserLevelController extends BaseController
             ];
         }
 
-        if ($level->agio > 0) {
-            $benefits[] = [
-                'icon'  => 'points',
-                'title' => '积分加速',
-                'desc'  => '购物积分 x' . $level->agio . ' 倍',
-            ];
-        }
+        // 注意：等级表的 agio 与 discount 都是「折」的含义（10 = 原价），
+        // 不是积分倍率。此前按 `agio > 0 就显示 积分 x agio 倍` 会输出
+        // 「购物积分 ×10.00 倍」这种错误文案，已移除；积分倍率需独立字段支持后再加。
 
         $benefits[] = [
             'icon'  => 'service',

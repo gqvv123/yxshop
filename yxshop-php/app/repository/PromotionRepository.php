@@ -18,7 +18,8 @@ class PromotionRepository extends BaseRepository
             $query->where('app_id', $appId);
         }
         if ($keyword) {
-            $query->where('name', 'like', '%' . $keyword . '%');
+            // yxshop_promotions 的标题列是 title，不是 name（用 name 会直接 SQL 报错）
+            $query->where('title', 'like', '%' . $keyword . '%');
         }
         return $query->paginate($pageSize);
     }
@@ -62,7 +63,7 @@ class PromotionRepository extends BaseRepository
     /**
      * 获取促销订单统计
      */
-    public function getPromOrderStats($startTime = null, $endTime = null, $appId = 0)
+    public function getPromOrderStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 
@@ -93,7 +94,7 @@ class PromotionRepository extends BaseRepository
     /**
      * 获取用户促销订单统计
      */
-    public function getUserPromOrderStats($userId, $appId = 0)
+    public function getUserPromOrderStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
 

@@ -49,7 +49,7 @@ class Payment extends BaseModel
         return $this->getAttribute('payment_amount');
     }
 
-    public function setAmountAttribute($value)
+    public function setAmountAttribute($value): void
     {
         $this->attributes['payment_amount'] = $value;
     }
@@ -60,7 +60,7 @@ class Payment extends BaseModel
         return $this->getAttribute('payment_status');
     }
 
-    public function setStatusAttribute($value)
+    public function setStatusAttribute($value): void
     {
         $this->attributes['payment_status'] = $value;
     }

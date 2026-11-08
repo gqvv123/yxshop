@@ -20,7 +20,7 @@ class MenuValidate extends Validate
         'sort' => 'number|min:0',
         'model' => 'max:255',
         'icon' => 'max:255',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
         'is_show' => 'in:0,1',
         'deleted_at' => 'in:0,1',
     ];

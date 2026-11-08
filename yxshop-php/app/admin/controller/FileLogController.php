@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\FileLogService;
 
+/**
+ * 管理端控制器：File Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class FileLogController extends BaseController
 {
     protected $fileLogService;

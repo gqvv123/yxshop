@@ -2,6 +2,11 @@
 
 namespace app\observer;
 
+/**
+ * 组件：Sensitive Fields。
+ *
+ * @package app\observer
+ */
 class SensitiveFields
 {
     public static function getMaskedFields(string $tableName): array

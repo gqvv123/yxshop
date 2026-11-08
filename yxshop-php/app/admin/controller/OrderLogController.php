@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\OrderLogService;
 
+/**
+ * 管理端控制器：Order Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class OrderLogController extends BaseController
 {
     protected $orderLogService;

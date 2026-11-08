@@ -32,7 +32,7 @@ class MiniTabBarService extends BaseService
         return $this->create($data);
     }
 
-    protected function validateTabBarData(array $data)
+    protected function validateTabBarData(array $data): void
     {
         $items = $data['items'] ?? [];
 

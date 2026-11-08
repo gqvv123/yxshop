@@ -12,7 +12,7 @@ class NotificationSendService extends BaseService
 {
     protected $templateRepository;
 
-    public function __construct(NotificationSendRepository $repository = null)
+    public function __construct(?NotificationSendRepository $repository = null)
     {
         $repository = $repository ?? new NotificationSendRepository();
         parent::__construct($repository);
@@ -118,7 +118,7 @@ class NotificationSendService extends BaseService
     /**
      * 发送短信
      */
-    private function sendSms($sendRecord)
+    private function sendSms($sendRecord): array
     {
         // 这里集成具体的短信服务商
         return [
@@ -130,7 +130,7 @@ class NotificationSendService extends BaseService
     /**
      * 发送邮件
      */
-    private function sendEmail($sendRecord)
+    private function sendEmail($sendRecord): array
     {
         // 这里集成具体的邮件服务
         return [
@@ -142,7 +142,7 @@ class NotificationSendService extends BaseService
     /**
      * 发送微信
      */
-    private function sendWechat($sendRecord)
+    private function sendWechat($sendRecord): array
     {
         // 这里集成微信发送
         return [
@@ -154,7 +154,7 @@ class NotificationSendService extends BaseService
     /**
      * 发送推送
      */
-    private function sendPush($sendRecord)
+    private function sendPush($sendRecord): array
     {
         // 这里集成推送服务
         return [
@@ -166,7 +166,7 @@ class NotificationSendService extends BaseService
     /**
      * 发送系统通知
      */
-    private function sendSystem($sendRecord)
+    private function sendSystem($sendRecord): array
     {
         // 系统通知直接成功
         return [

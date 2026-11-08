@@ -3,8 +3,12 @@
 namespace app\service;
 
 use app\repository\UploadGroupRepository;
-use app\model\UploadGroup;
 
+/**
+ * 业务服务：Upload Group Service。
+ *
+ * @package app\service
+ */
 class UploadGroupService extends BaseService
 {
     public function __construct()

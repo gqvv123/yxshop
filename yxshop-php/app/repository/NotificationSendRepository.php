@@ -54,7 +54,7 @@ class NotificationSendRepository extends BaseRepository
     /**
      * 获取发送统计
      */
-    public function getSendStats($startTime = null, $endTime = null, $appId = 0)
+    public function getSendStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 

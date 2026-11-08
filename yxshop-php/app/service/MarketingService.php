@@ -7,13 +7,15 @@ use app\repository\CouponRepository;
 use app\repository\UserCouponRepository;
 use app\repository\OrderRepository;
 use app\repository\PromOrderRepository;
-use app\model\Promotion;
 use app\model\Coupon;
 use app\model\UserCoupon;
-use app\model\Order;
-use app\model\PromOrder;
 use Exception;
 
+/**
+ * 业务服务：Marketing Service。
+ *
+ * @package app\service
+ */
 class MarketingService
 {
     protected PromotionRepository $promotionRepo;
@@ -131,10 +133,14 @@ class MarketingService
                 ->limit($pageSize)
                 ->get();
 
+            // 批量统计各活动订单数，避免逐条查询（N+1）
+            $orderCountMap = $this->promOrderRepo->countByPromIds(
+                array_map(fn($p) => (int) $p->id, $list->all())
+            );
+
             $items = [];
             foreach ($list as $item) {
-                $orderCount = $this->promOrderRepo->query()
-                    ->where('prom_id', $item->id)->count();
+                $orderCount = $orderCountMap[(string) $item->id] ?? 0;
                 $items[] = [
                     'id' => $item->id,
                     'name' => $item->title,
@@ -334,9 +340,13 @@ class MarketingService
 
             fputcsv($fp, ['=== 促销活动 ===']);
             fputcsv($fp, ['ID', '名称', '类型', '状态', '开始时间', '结束时间', '浏览量', '订单数']);
+            // 批量统计各活动订单数，避免逐条查询（N+1）
+            $orderCountMap = $this->promOrderRepo->countByPromIds(
+                array_map(fn($p) => (int) $p->id, $campaigns->all())
+            );
+
             foreach ($campaigns as $item) {
-                $orderCount = $this->promOrderRepo->query()
-                    ->where('prom_id', $item->id)->count();
+                $orderCount = $orderCountMap[(string) $item->id] ?? 0;
                 fputcsv($fp, [
                     $item->id,
                     $item->title,

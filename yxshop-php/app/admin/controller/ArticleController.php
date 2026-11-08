@@ -56,8 +56,8 @@ class ArticleController extends BaseController
     {
         $data = $request->post();
         $data['app_id'] = $this->getAppId($request);
-        $data['modifier_id'] = $this->admin['id'] ?? 0;
-        $data['modifier_name'] = $this->admin['name'] ?? null;
+        $data['modifier_id'] = $this->getAdminId($request);
+        $data['modifier_name'] = $this->getAdminName($request);
 
         // 定时发布
         if (!empty($data['scheduled_at'])) {
@@ -79,8 +79,8 @@ class ArticleController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->post();
-        $data['modifier_id'] = $this->admin['id'] ?? 0;
-        $data['modifier_name'] = $this->admin['name'] ?? null;
+        $data['modifier_id'] = $this->getAdminId($request);
+        $data['modifier_name'] = $this->getAdminName($request);
 
         // 定时发布
         if (array_key_exists('scheduled_at', $data) && !empty($data['scheduled_at'])) {
@@ -110,8 +110,8 @@ class ArticleController extends BaseController
      */
     public function publish(Request $request, $id)
     {
-        $actorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $actorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
         try {
             $result = $this->articleService->publish((int) $id, $actorId, $actorName);
             return $this->success($result, '发布成功');
@@ -125,8 +125,8 @@ class ArticleController extends BaseController
      */
     public function unpublish(Request $request, $id)
     {
-        $actorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $actorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
         try {
             $result = $this->articleService->unpublish((int) $id, $actorId, $actorName);
             return $this->success($result, '下架成功');
@@ -168,8 +168,8 @@ class ArticleController extends BaseController
     public function restoreVersion(Request $request, $id)
     {
         $version = (int) $request->post('version', 1);
-        $actorId = $this->admin['id'] ?? 0;
-        $actorName = $this->admin['name'] ?? null;
+        $actorId = $this->getAdminId($request);
+        $actorName = $this->getAdminName($request);
         try {
             $result = $this->articleService->restoreVersion((int) $id, $version, $actorId, $actorName);
             return $this->success($result, '恢复成功');

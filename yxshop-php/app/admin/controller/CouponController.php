@@ -42,7 +42,7 @@ class CouponController extends BaseController
             throw new ValidationException($validate->getError());
         }
 
-        $result = $this->couponService->create($data);
+        $result = $this->couponService->createCoupon($data);
         return $this->success($result, '优惠券创建成功');
     }
 
@@ -59,7 +59,7 @@ class CouponController extends BaseController
             throw new ValidationException($validate->getError());
         }
 
-        $result = $this->couponService->update($id, $data);
+        $result = $this->couponService->updateCoupon($id, $data);
         return $this->success($result, '优惠券更新成功');
     }
 

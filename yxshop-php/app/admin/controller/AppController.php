@@ -7,6 +7,11 @@ use app\service\AppService;
 use app\validate\AppValidate;
 use app\exception\ValidationException;
 
+/**
+ * 管理端控制器：App Controller。
+ *
+ * @package app\admin\controller
+ */
 class AppController extends BaseController
 {
     protected $appService;

@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\SmsLog;
 
+/**
+ * 数据仓储：Sms Log Repository。
+ *
+ * @package app\repository
+ */
 class SmsLogRepository extends BaseRepository
 {
     protected $model = SmsLog::class;

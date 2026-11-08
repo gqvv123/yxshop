@@ -50,10 +50,25 @@ class AdvertisementService extends BaseService
         try {
             $this->logInfo('创建广告开始', ['data' => $data]);
 
+            // 广告内容历史上存在 count 列（mediumtext），前端可能传 content，这里做兼容映射
+            if (!isset($data['count']) || $data['count'] === '') {
+                $data['count'] = (string) ($data['content'] ?? '');
+            }
+            if (!isset($data['content'])) {
+                $data['content'] = (string) $data['count'];
+            }
+
             $this->validateWith(AdValidate::class, 'create', $data);
 
-            // 验证时间
-            if ($data['start_time'] >= $data['end_time']) {
+            $data['title'] = trim((string) ($data['title'] ?? ''));
+            if ($data['title'] === '') {
+                throw new BusinessException('请填写广告标题');
+            }
+            $data['start_time'] = (int) ($data['start_time'] ?? 0);
+            $data['end_time'] = (int) ($data['end_time'] ?? 0);
+
+            // 验证时间（未填时间视为长期有效，不参与比较）
+            if ($data['start_time'] > 0 && $data['end_time'] > 0 && $data['start_time'] >= $data['end_time']) {
                 throw new BusinessException('开始时间不能大于等于结束时间');
             }
 
@@ -79,15 +94,22 @@ class AdvertisementService extends BaseService
         try {
             $this->logInfo('更新广告开始', ['id' => $id, 'data' => $data]);
 
-            $this->validateWith(AdValidate::class, 'update', $data);
-
             $ad = $this->repository->findOrFail($id);
 
+            // 局部更新时用已有内容补齐，避免校验器把「未传」当成「为空」
+            if (!isset($data['count']) || $data['count'] === '') {
+                $data['count'] = $ad->count ?: (string) ($data['content'] ?? '');
+            }
+            if (!isset($data['content']) || $data['content'] === '') {
+                $data['content'] = (string) $data['count'];
+            }
+
+            $this->validateWith(AdValidate::class, 'update', $data);
+
             // 验证时间
-            if (isset($data['start_time']) && isset($data['end_time'])) {
-                if ($data['start_time'] >= $data['end_time']) {
-                    throw new BusinessException('开始时间不能大于等于结束时间');
-                }
+            if (!empty($data['start_time']) && !empty($data['end_time'])
+                && (int) $data['start_time'] >= (int) $data['end_time']) {
+                throw new BusinessException('开始时间不能大于等于结束时间');
             }
 
             $ad = $this->repository->update($id, $data);
@@ -108,7 +130,7 @@ class AdvertisementService extends BaseService
     /**
      * 删除广告
      */
-    public function deleteAd($id)
+    public function deleteAd($id): bool
     {
         try {
             $this->logInfo('删除广告开始', ['id' => $id]);

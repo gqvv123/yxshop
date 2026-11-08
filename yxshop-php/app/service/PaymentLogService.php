@@ -3,8 +3,12 @@
 namespace app\service;
 
 use app\repository\PaymentLogRepository;
-use Exception;
 
+/**
+ * 业务服务：Payment Log Service。
+ *
+ * @package app\service
+ */
 class PaymentLogService extends BaseService
 {
     public function __construct(?PaymentLogRepository $repository = null)

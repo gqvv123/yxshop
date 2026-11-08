@@ -2,7 +2,6 @@
 
 namespace app\service;
 
-use app\model\Language;
 use app\repository\LanguageRepository;
 use app\service\cache\TieredCache;
 
@@ -16,7 +15,7 @@ class LanguageService extends BaseService
     /**
      * 构造函数
      */
-    public function __construct(LanguageRepository $repository = null)
+    public function __construct(?LanguageRepository $repository = null)
     {
         $repository = $repository ?? new LanguageRepository();
         parent::__construct($repository);
@@ -89,14 +88,13 @@ class LanguageService extends BaseService
         try {
             $this->logInfo('创建语言开始', ['data' => $data]);
 
-
             // 检查代码是否已存在
             if ($this->repository->codeExists($data['code'])) {
                 throw new \Exception('语言代码已存在');
             }
 
             $language = $this->repository->create($data);
-            
+
             // 清除缓存
             $this->clearCache();
 
@@ -116,7 +114,6 @@ class LanguageService extends BaseService
     {
         try {
             $this->logInfo('更新语言开始', ['id' => $id, 'data' => $data]);
-
 
             if (isset($data['code']) && $this->repository->codeExists($data['code'], $id)) {
                 throw new \Exception('语言代码已存在');
@@ -151,11 +148,11 @@ class LanguageService extends BaseService
             $language = $this->repository->find($id);
 
             if (!$language) {
-                throw new \Exception('语言不存在');
+                throw new \app\exception\BusinessException('语言不存在', 404);
             }
 
             if ($language->is_default) {
-                throw new \Exception('不能删除默认语言');
+                throw new \app\exception\BusinessException('不能删除默认语言');
             }
 
             $result = $this->repository->delete($id);
@@ -183,7 +180,7 @@ class LanguageService extends BaseService
             $this->logInfo('设置默认语言开始', ['id' => $id]);
 
             $result = $this->repository->setDefault($id);
-            
+
             if (!$result) {
                 throw new \Exception('设置默认语言失败');
             }
@@ -210,14 +207,14 @@ class LanguageService extends BaseService
     {
         try {
             $language = $this->getByCode($code);
-            
+
             if (!$language) {
                 throw new \Exception('语言不存在');
             }
 
             // 设置到 session
             session()->put('locale', $code);
-            
+
             $this->logInfo('切换语言成功', ['code' => $code]);
             return true;
 
@@ -237,14 +234,14 @@ class LanguageService extends BaseService
     {
         try {
             $code = session()->get('locale');
-            
+
             if ($code) {
                 $language = $this->getByCode($code);
                 if ($language) {
                     return $language;
                 }
             }
-            
+
             return $this->getDefault();
 
         } catch (\Exception $e) {
@@ -256,11 +253,11 @@ class LanguageService extends BaseService
     /**
      * 清除缓存
      */
-    protected function clearCache()
+    protected function clearCache(): void
     {
         TieredCache::delete('language_default');
         TieredCache::delete('languages_active');
-        
+
         // 清除所有语言代码缓存
         $languages = $this->repository->getActive();
         foreach ($languages as $language) {
@@ -268,4 +265,3 @@ class LanguageService extends BaseService
         }
     }
 }
-

@@ -15,7 +15,7 @@ class AdminMenuRepository extends BaseRepository
      * 获取菜单树
      */
     public function getMenuTree($parentId = 0, $appId = 0)
-    {        
+    {
         $query = $this->query()
             ->where('parent_id', $parentId)
             ->where('is_show', 1)
@@ -34,7 +34,7 @@ class AdminMenuRepository extends BaseRepository
         return $menus;
     }
 
-    public function getAdminMenuTree(array $menuIds = [], bool $isSuperAdmin = false, int $appId = 10001): array
+    public function getAdminMenuTree(array $menuIds = [], bool $isSuperAdmin = false, int $appId = 0): array
     {
         $query = $this->query()
             ->where('is_show', 1)
@@ -110,7 +110,7 @@ class AdminMenuRepository extends BaseRepository
     /**
      * 获取菜单统计
      */
-    public function getMenuStats($appId = 0)
+    public function getMenuStats($appId = 0): array
     {
         $base = $this->query();
 

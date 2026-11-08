@@ -82,7 +82,7 @@ class CouponService extends BaseService
     /**
      * 删除优惠券（已被领取过的不可删除）
      */
-    public function deleteCoupon($id)
+    public function deleteCoupon($id): bool
     {
         try {
             $coupon = $this->repository->findOrFail($id);

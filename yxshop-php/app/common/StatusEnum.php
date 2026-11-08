@@ -2,6 +2,12 @@
 
 namespace app\common;
 
+/**
+ * 公共组件：通用状态枚举。
+ *
+ * @package app\common
+ */
+
 enum StatusEnum: int
 {
     case true = 1;

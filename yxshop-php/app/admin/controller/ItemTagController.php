@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\ItemTagService;
 
+/**
+ * 管理端控制器：Item Tag Controller。
+ *
+ * @package app\admin\controller
+ */
 class ItemTagController extends BaseController
 {
     protected $itemTagService;
@@ -28,7 +33,7 @@ class ItemTagController extends BaseController
     {
         $data = $request->post();
         $data['app_id'] = $this->getAppId($request);
-        $result = $this->itemTagService->create($data);
+        $result = $this->itemTagService->createTag($data);
         return $this->success($result, '创建成功');
     }
 
@@ -44,7 +49,7 @@ class ItemTagController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->post();
-        $result = $this->itemTagService->update($id, $data);
+        $result = $this->itemTagService->updateTag($id, $data);
         return $this->success(null, '更新成功');
     }
 

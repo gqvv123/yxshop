@@ -23,6 +23,17 @@ class UserRepository extends BaseRepository
     }
 
     /**
+     * 根据登录账号查找用户
+     */
+    public function findByUsername(string $username, int $appId = 0)
+    {
+        return $this->query()
+            ->where('username', $username)
+            ->where('app_id', $appId)
+            ->first();
+    }
+
+    /**
      * 根据OpenID查找用户
      */
     public function findByOpenId($openId, $appId = 0)
@@ -102,7 +113,7 @@ class UserRepository extends BaseRepository
     /**
      * 获取用户统计信息
      */
-    public function getUserStats($appId = 0)
+    public function getUserStats($appId = 0): array
     {
         $base = $this->query()
             ->where('app_id', $appId ?? 0);
@@ -243,7 +254,7 @@ class UserRepository extends BaseRepository
             $date = date('Y-m-d', strtotime("-{$i} days"));
             $startTime = strtotime($date . ' 00:00:00');
             $endTime = strtotime($date . ' 23:59:59');
-            
+
             $count = $query->whereBetween('created_at', [$startTime, $endTime])->count();
             $data[] = [
                 'date' => $date,

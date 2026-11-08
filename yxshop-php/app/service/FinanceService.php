@@ -7,9 +7,6 @@ use app\repository\AccountStatementItemRepository;
 use app\repository\SupplierStatementRepository;
 use app\repository\OrderRepository;
 use app\repository\PurchaseOrderRepository;
-use app\model\AccountStatement;
-use app\model\AccountStatementItem;
-use app\model\SupplierStatement;
 use Exception;
 
 /**
@@ -43,7 +40,7 @@ class FinanceService extends BaseService
     /**
      * 平台对账单列表
      */
-    public function statementIndex(int $appId, int $page = 1, int $limit = 20, string $status = '')
+    public function statementIndex(int $appId, int $page = 1, int $limit = 20, string $status = ''): array
     {
         $paginator = $this->statementRepository->getPaginatedList($appId, $limit, $status);
         return [
@@ -81,7 +78,7 @@ class FinanceService extends BaseService
             $orderStats = $this->orderRepository->query()
                 ->where('app_id', $appId)
                 ->whereBetween('created_at', [$startTs, $endTs])
-                ->selectRaw('COUNT(*) as total_orders, SUM(total_price) as total_amount, SUM(refund_amount ?? 0) as total_refund')
+                ->selectRaw('COUNT(*) as total_orders, SUM(total_price) as total_amount, SUM(COALESCE(refund_amount, 0)) as total_refund')
                 ->first();
 
             $totalOrders = $orderStats->total_orders ?? 0;
@@ -170,7 +167,7 @@ class FinanceService extends BaseService
     /**
      * 供应商对账单列表
      */
-    public function supplierStatementIndex(int $appId, int $page = 1, int $limit = 20, int $supplierId = 0)
+    public function supplierStatementIndex(int $appId, int $page = 1, int $limit = 20, int $supplierId = 0): array
     {
         $paginator = $this->supplierStatementRepository->getPaginatedList($appId, $limit, $supplierId);
         return [

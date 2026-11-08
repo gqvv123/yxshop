@@ -85,11 +85,11 @@ class NotificationTemplate extends BaseModel
     public function renderContent($variables = [])
     {
         $content = $this->template_content;
-        
+
         foreach ($variables as $key => $value) {
             $content = str_replace('{{' . $key . '}}', $value, $content);
         }
-        
+
         return $content;
     }
 
@@ -99,11 +99,11 @@ class NotificationTemplate extends BaseModel
     public function renderTitle($variables = [])
     {
         $title = $this->template_title;
-        
+
         foreach ($variables as $key => $value) {
             $title = str_replace('{{' . $key . '}}', $value, $title);
         }
-        
+
         return $title;
     }
 }

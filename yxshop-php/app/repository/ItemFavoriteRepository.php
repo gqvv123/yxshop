@@ -11,7 +11,7 @@ class ItemFavoriteRepository extends BaseRepository
 {
     protected $model = ItemFavorite::class;
 
-    public function getList($appId = 0, $pageSize = 20, $keyword = '')
+    public function getList($appId = 0, $pageSize = 20, $keyword = ''): array
     {
         $query = $this->query()->with(['item'])->orderBy('created_at', 'desc');
 
@@ -141,7 +141,7 @@ class ItemFavoriteRepository extends BaseRepository
     /**
      * 收藏统计（每项 clone 防累加 bug）
      */
-    public function getFavoriteStats($userId, $appId = 0)
+    public function getFavoriteStats($userId, $appId = 0): array
     {
         $base = $this->query()->where('user_id', $userId);
         if ($appId > 0) {

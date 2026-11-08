@@ -152,7 +152,7 @@ class FileController extends BaseController
     {
         $auditStatus = (int) $request->post('audit_status');
         $remark = $request->post('remark', '');
-        $auditorId = $this->admin['id'] ?? 0;
+        $auditorId = $this->getAdminId($request);
 
         if (!in_array($auditStatus, [UploadFileService::AUDIT_PASSED, UploadFileService::AUDIT_REJECTED], true)) {
             return $this->error('审核状态值非法');
@@ -174,7 +174,7 @@ class FileController extends BaseController
         $ids = (array) $request->post('ids', []);
         $auditStatus = (int) $request->post('audit_status');
         $remark = $request->post('remark', '');
-        $auditorId = $this->admin['id'] ?? 0;
+        $auditorId = $this->getAdminId($request);
 
         if (empty($ids)) {
             return $this->error('缺少ids');
@@ -210,8 +210,8 @@ class FileController extends BaseController
         if ($quotaBytes <= 0) {
             return $this->error('配额值非法');
         }
-        $operatorId = $this->admin['id'] ?? 0;
-        $operatorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $operatorName = $this->getAdminName($request);
         $result = $this->fileService->updateQuota($appId, $quotaBytes, $operatorId, $operatorName);
         return $this->success($result, '配额更新成功');
     }
@@ -229,8 +229,8 @@ class FileController extends BaseController
         // 记录下载日志
         $this->fileService->logDownload(
             (int) $id,
-            $this->admin['id'] ?? 0,
-            $this->admin['name'] ?? null,
+            $this->getAdminId($request),
+            $this->getAdminName($request),
             $request->getRealIp() ?? '',
             $request->header('user-agent', '')
         );

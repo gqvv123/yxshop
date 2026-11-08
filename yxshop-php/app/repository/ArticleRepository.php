@@ -3,9 +3,6 @@
 namespace app\repository;
 
 use app\model\Article;
-use app\model\ArticleVersion;
-use app\model\ArticleLog;
-use support\Db;
 
 /**
  * 文章 Repository
@@ -86,7 +83,7 @@ class ArticleRepository extends BaseRepository
     /**
      * 获取文章统计
      */
-    public function getArticleStats($appId = 0)
+    public function getArticleStats($appId = 0): array
     {
         $base = $this->query();
 

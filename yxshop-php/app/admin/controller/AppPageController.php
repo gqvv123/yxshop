@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\AppPageService;
 
+/**
+ * 管理端控制器：App Page Controller。
+ *
+ * @package app\admin\controller
+ */
 class AppPageController extends BaseController
 {
     protected $appPageService;

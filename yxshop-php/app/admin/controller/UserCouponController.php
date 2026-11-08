@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UserCouponService;
 
+/**
+ * 管理端控制器：User Coupon Controller。
+ *
+ * @package app\admin\controller
+ */
 class UserCouponController extends BaseController
 {
     protected $userCouponService;

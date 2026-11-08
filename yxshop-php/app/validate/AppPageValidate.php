@@ -17,7 +17,7 @@ class AppPageValidate extends Validate
         'type' => 'require|in:10,20',
         'name' => 'require|max:255',
         'data' => 'require',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
         'deleted_at' => 'in:0,1',
     ];
 

@@ -5,7 +5,6 @@ namespace app\service;
 use app\repository\AdminRepository;
 use app\repository\UserRepository;
 use app\repository\UserOauthRepository;
-use app\model\Admin;
 use app\model\User;
 use app\model\UserOauth;
 use app\model\LoginLog;
@@ -141,7 +140,9 @@ class WechatAuthService
         $sceneKey = null;
         try {
             $sceneKey = (string) \support\Redis::get("wechat_scan_state:{$state}");
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // 读取扫码状态失败按无状态处理
+        }
 
         if (!$sceneKey) {
             Log::warning('WechatAuthService callback: state not found', ['state' => $state]);

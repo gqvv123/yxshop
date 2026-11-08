@@ -25,30 +25,30 @@ return [
         'read_timeout' => env('redis.read_timeout', 0),
         'prefix' => env('redis.prefix', ''),
     ],
-    
+
     'file' => [
         'handler' => support\Cache::class,
         'path' => runtime_path() . '/cache',
     ],
-    
+
     'memory' => [
         'handler' => support\Cache::class,
     ],
-    
+
     // 查询缓存配置
     'query_cache' => [
         'enabled' => true,
         'ttl' => 300, // 5分钟
         'prefix' => 'query:',
     ],
-    
+
     // 统计缓存配置
     'stats_cache' => [
         'enabled' => true,
         'ttl' => 600, // 10分钟
         'prefix' => 'stats:',
     ],
-    
+
     // 菜单缓存配置
     'menu_cache' => [
         'enabled' => true,

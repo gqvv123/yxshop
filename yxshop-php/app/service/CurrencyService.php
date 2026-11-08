@@ -2,8 +2,8 @@
 
 namespace app\service;
 
-use app\model\Currency;
 use app\repository\CurrencyRepository;
+use app\exception\BusinessException;
 use app\service\cache\TieredCache;
 
 /**
@@ -16,7 +16,7 @@ class CurrencyService extends BaseService
     /**
      * 构造函数
      */
-    public function __construct(CurrencyRepository $repository = null)
+    public function __construct(?CurrencyRepository $repository = null)
     {
         $repository = $repository ?? new CurrencyRepository();
         parent::__construct($repository);
@@ -89,14 +89,32 @@ class CurrencyService extends BaseService
         try {
             $this->logInfo('创建货币开始', ['data' => $data]);
 
+            $code = strtoupper(trim((string) ($data['code'] ?? '')));
+            $name = trim((string) ($data['name'] ?? ''));
+            if ($code === '') {
+                throw new BusinessException('请填写货币代码');
+            }
+            if ($name === '') {
+                throw new BusinessException('请填写货币名称');
+            }
+            $data['code'] = $code;
+            $data['name'] = $name;
+            $data['symbol'] = trim((string) ($data['symbol'] ?? '')) ?: $code;
+            $data['exchange_rate'] = isset($data['exchange_rate']) ? (float) $data['exchange_rate'] : 1.0;
+            if ($data['exchange_rate'] <= 0) {
+                throw new BusinessException('汇率必须大于 0');
+            }
+            $data['status'] = isset($data['status']) ? (int) $data['status'] : 1;
+            $data['is_default'] = !empty($data['is_default']) ? 1 : 0;
+            $data['sort'] = (int) ($data['sort'] ?? 0);
 
             // 检查代码是否已存在
-            if ($this->repository->findByCode($data['code'])) {
-                throw new \Exception('货币代码已存在');
+            if ($this->repository->findByCode($code)) {
+                throw new BusinessException('货币代码已存在');
             }
 
             $currency = $this->repository->create($data);
-            
+
             // 清除缓存
             $this->clearCache();
 
@@ -115,76 +133,6 @@ class CurrencyService extends BaseService
     /**
      * 更新货币
      */
-    // public function update(int $id, array $data)
-    // {
-    //     try {
-    //         $this->logInfo('更新货币开始', ['id' => $id, 'data' => $data]);
-
-    //         // 验证数据
-    //         $this->validate($data, [
-    //             'name' => 'string|max:50',
-    //             'code' => 'string|max:10',
-    //             'symbol' => 'string|max:10',
-    //             'exchange_rate' => 'numeric|min:0',
-    //         ]);
-
-    //         $currency = $this->repository->update($id, $data);
-            
-    //         if (!$currency) {
-    //             throw new \Exception('货币不存在');
-    //         }
-
-    //         // 清除缓存
-    //         $this->clearCache();
-
-    //         $this->logInfo('更新货币成功', ['currency_id' => $id]);
-    //         return $currency;
-
-    //     } catch (\Exception $e) {
-    //         $this->logError('更新货币失败', [
-    //             'id' => $id,
-    //             'data' => $data,
-    //             'error' => $e->getMessage()
-    //         ]);
-    //         throw $e;
-    //     }
-    // }
-
-    // /**
-    //  * 删除货币
-    //  */
-    // public function delete(int $id): bool
-    // {
-    //     try {
-    //         $this->logInfo('删除货币开始', ['id' => $id]);
-
-    //         $currency = $this->repository->find($id);
-            
-    //         if (!$currency) {
-    //             throw new \Exception('货币不存在');
-    //         }
-
-    //         if ($currency->is_default) {
-    //             throw new \Exception('不能删除默认货币');
-    //         }
-
-    //         $result = $this->repository->delete($id);
-            
-    //         // 清除缓存
-    //         $this->clearCache();
-
-    //         $this->logInfo('删除货币成功', ['id' => $id]);
-    //         return $result;
-
-    //     } catch (\Exception $e) {
-    //         $this->logError('删除货币失败', [
-    //             'id' => $id,
-    //             'error' => $e->getMessage()
-    //         ]);
-    //         throw $e;
-    //     }
-    // }
-
     /**
      * 设置默认货币
      */
@@ -194,7 +142,7 @@ class CurrencyService extends BaseService
             $this->logInfo('设置默认货币开始', ['id' => $id]);
 
             $result = $this->repository->setDefault($id);
-            
+
             if (!$result) {
                 throw new \Exception('设置默认货币失败');
             }
@@ -249,11 +197,11 @@ class CurrencyService extends BaseService
     /**
      * 清除缓存
      */
-    protected function clearCache()
+    protected function clearCache(): void
     {
         TieredCache::delete('currency_default');
         TieredCache::delete('currencies_active');
-        
+
         // 清除所有货币代码缓存
         $currencies = $this->repository->getActive();
         foreach ($currencies as $currency) {
@@ -266,4 +214,3 @@ class CurrencyService extends BaseService
         return $this->repository->paginateAll((int) $pageSize);
     }
 }
-

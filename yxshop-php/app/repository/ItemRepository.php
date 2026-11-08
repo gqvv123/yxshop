@@ -13,6 +13,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
  */
 class ItemRepository extends BaseRepository
 {
+    use ItemStatisticRepositoryTrait;
+
     protected $model = Item::class;
 
     // ---------------- 单商品查询 ----------------
@@ -31,7 +33,7 @@ class ItemRepository extends BaseRepository
     public function findWithAllRelations($id)
     {
         return $this->query()
-            ->with(['category', 'brand', 'images', 'skus', 'tags'])
+            ->with(['category', 'brand', 'images', 'skus', 'tags', 'attrs.attribute'])
             ->find($id);
     }
 
@@ -73,6 +75,23 @@ class ItemRepository extends BaseRepository
         }
         if (!empty($params['brand_id'])) {
             $query->where('brand_id', $params['brand_id']);
+        }
+        // 标签筛选（对应管理端「商品标签」）：走关联表 yxshop_item_tag_relations
+        if (!empty($params['tag_id'])) {
+            $tagIds = is_array($params['tag_id'])
+                ? array_map('intval', $params['tag_id'])
+                : array_map('intval', array_filter(explode(',', (string) $params['tag_id'])));
+            $tagIds = array_values(array_filter($tagIds));
+            if ($tagIds) {
+                $query->whereIn('id', function ($sub) use ($tagIds, $params) {
+                    $sub->select('item_id')
+                        ->from('yxshop_item_tag_relations')
+                        ->whereIn('tag_id', $tagIds);
+                    if (!empty($params['app_id'])) {
+                        $sub->where('app_id', $params['app_id']);
+                    }
+                });
+            }
         }
         if (!empty($params['keyword'])) {
             $escapedKeyword = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], $params['keyword']);
@@ -201,140 +220,12 @@ class ItemRepository extends BaseRepository
             ->get();
     }
 
-    /**
-     * 热门商品
-     * 没有热销标记时，自动回退到按销量排序的全部商品
-     */
-    public function getHotItems($limit = 10, $appId = 0)
-    {
-        $query = $this->query()
-            ->where('is_on_sale', 1)
-            ->where('is_hot', 1)
-            ->with(['images'])
-            ->orderBy('total_sales', 'desc')
-            ->limit($limit);
 
-        if ($appId > 0) {
-            $query->where('app_id', $appId);
-        }
-        $result = $query->get();
 
-        // 没有热销商品时，回退到按销量排序的普通商品
-        if ($result->isEmpty()) {
-            $fallbackQuery = $this->query()
-                ->where('is_on_sale', 1)
-                ->with(['images'])
-                ->orderBy('total_sales', 'desc')
-                ->orderBy('sort', 'asc')
-                ->limit($limit);
-            if ($appId > 0) {
-                $fallbackQuery->where('app_id', $appId);
-            }
-            $result = $fallbackQuery->get();
-        }
-        return $result;
-    }
 
-    /**
-     * 推荐商品
-     * 没有推荐标记时，自动回退到按排序的全部商品
-     */
-    public function getRecommendedItems($limit = 10, $appId = 0)
-    {
-        $query = $this->query()
-            ->where('is_on_sale', 1)
-            ->where('is_recommended', 1)
-            ->with(['images'])
-            ->orderBy('sort', 'asc')
-            ->limit($limit);
-
-        if ($appId > 0) {
-            $query->where('app_id', $appId);
-        }
-        $result = $query->get();
-
-        // 没有推荐商品时，回退到普通商品
-        if ($result->isEmpty()) {
-            $fallbackQuery = $this->query()
-                ->where('is_on_sale', 1)
-                ->with(['images'])
-                ->orderBy('sort', 'asc')
-                ->orderBy('created_at', 'desc')
-                ->limit($limit);
-            if ($appId > 0) {
-                $fallbackQuery->where('app_id', $appId);
-            }
-            $result = $fallbackQuery->get();
-        }
-        return $result;
-    }
-
-    /**
-     * 新品
-     * 没有新品标记时，自动回退到按创建时间排序的全部商品
-     */
-    public function getNewItems($limit = 10, $appId = 0)
-    {
-        $query = $this->query()
-            ->where('is_on_sale', 1)
-            ->where('is_new', 1)
-            ->with(['images'])
-            ->orderBy('created_at', 'desc')
-            ->limit($limit);
-
-        if ($appId > 0) {
-            $query->where('app_id', $appId);
-        }
-        $result = $query->get();
-
-        // 没有新品标记时，回退到全部商品按创建时间排序
-        if ($result->isEmpty()) {
-            $fallbackQuery = $this->query()
-                ->where('is_on_sale', 1)
-                ->with(['images'])
-                ->orderBy('created_at', 'desc')
-                ->limit($limit);
-            if ($appId > 0) {
-                $fallbackQuery->where('app_id', $appId);
-            }
-            $result = $fallbackQuery->get();
-        }
-        return $result;
-    }
-
-    /**
-     * 售罄商品
-     */
-    public function getSoldOutItems(int $appId, int $limit = 20)
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('stock', 0)
-            ->with(['category'])
-            ->limit($limit)
-            ->get();
-    }
 
     // ---------------- 统计 / 报表 ----------------
 
-    /**
-     * 商品基础统计（每项 clone 防累加）
-     */
-    public function getItemStats($appId = 0): array
-    {
-        $base = $this->query();
-        if ($appId > 0) {
-            $base->where('app_id', $appId);
-        }
-
-        return [
-            'total'          => (clone $base)->count(),
-            'on_sale'        => (clone $base)->where('is_on_sale', 1)->count(),
-            'off_sale'       => (clone $base)->where('is_on_sale', 0)->count(),
-            'low_stock'      => (clone $base)->where('stock', '<=', 10)->count(),
-            'out_of_stock'   => (clone $base)->where('stock', '<=', 0)->count(),
-        ];
-    }
 
     /**
      * 商品总数
@@ -344,65 +235,9 @@ class ItemRepository extends BaseRepository
         return $this->query()->where('app_id', $appId)->count();
     }
 
-    /**
-     * 库存预警商品
-     */
-    public function getLowStockItems($threshold = 10, $appId = 0)
-    {
-        $query = $this->query()
-            ->where('stock', '<=', $threshold)
-            ->where('is_on_sale', 1)
-            ->with(['category', 'brand']);
 
-        if ($appId > 0) {
-            $query->where('app_id', $appId);
-        }
-        return $query->orderBy('stock', 'asc')->get();
-    }
 
-    /**
-     * 商品报表（低库存 + 总数）
-     */
-    public function getProductReport(int $appId): array
-    {
-        $base = $this->query()->where('app_id', $appId);
-        return [
-            'low_stock' => (clone $base)
-                ->where('stock', '>', 0)
-                ->where('stock', '<=', 10)
-                ->count(),
-            'total_product' => (clone $base)->count(),
-        ];
-    }
 
-    /**
-     * 按年统计商品创建数
-     */
-    public function getProductCountByYear(int $appId): array
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->selectRaw("YEAR(FROM_UNIXTIME(created_at)) as year, COUNT(*) as total")
-            ->groupBy('year')
-            ->orderBy('year')
-            ->get()
-            ->keyBy('year')
-            ->toArray();
-    }
-
-    /**
-     * 按月统计销量
-     */
-    public function getProductSellByMonth(int $appId): array
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->selectRaw("DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m') as month, SUM(total_sales) as total_sales")
-            ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total_sales', 'month')
-            ->toArray();
-    }
 
     // ---------------- 写操作 ----------------
 
@@ -415,29 +250,8 @@ class ItemRepository extends BaseRepository
         return $this->query()->where('id', $itemId)->update(['stock' => $stock, 'updated_at' => time()]);
     }
 
-    public function getOnSaleCount(int $appId): int
-    {
-        return $this->query()->where('app_id', $appId)->where('is_on_sale', 1)->count();
-    }
 
-    public function getTotalStockValue(int $appId): float
-    {
-        return (float) $this->query()
-            ->where('app_id', $appId)
-            ->where('is_on_sale', 1)
-            ->selectRaw('SUM(stock * sale_price) as total')
-            ->value('total') ?? 0;
-    }
 
-    public function getStockAlertCount(int $appId): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('is_on_sale', 1)
-            ->whereRaw('stock <= stock_warning')
-            ->where('stock_warning', '>', 0)
-            ->count();
-    }
 
 public function getOnSaleTrend(int $appId, string $period = 'month'): float
 {
@@ -516,74 +330,7 @@ $result[$dayIndex]++;
 return $result;
 }
 
-    public function getCategoryContrib(int $appId): array
-    {
-        $rows = $this->query()
-            ->where('app_id', $appId)
-            ->where('is_on_sale', 1)
-            ->selectRaw('category_id, SUM(total_sales) as total_sales')
-            ->groupBy('category_id')
-            ->orderByDesc('total_sales')
-            ->get();
 
-$totalSales = $rows->sum('total_sales');
-// 如果没有销售数据，改用库存价值作为贡献度
-if ($totalSales == 0) {
-$rows = $this->query()
-->where('app_id', $appId)
-->where('is_on_sale', 1)
-->where('stock', '>', 0)
-->selectRaw('category_id, SUM(stock * sale_price) as total_value')
-->groupBy('category_id')
-->orderByDesc('total_value')
-->get();
-$totalSales = $rows->sum('total_value');
-if ($totalSales == 0) return [];
-// 用 total_value 替代 total_sales
-foreach ($rows as $row) {
-$row->total_sales = $row->total_value;
-}
-}
-
-        // 批量查询分类名称，避免 N+1 问题
-        $categoryIds = $rows->pluck('category_id')->unique()->filter()->values()->all();
-        $categories = \app\model\Category::whereIn('id', $categoryIds)->pluck('name', 'id');
-
-        $colors = ['var(--color-primary-container)', 'var(--color-tertiary-fixed-dim)', 'var(--color-secondary)', 'var(--color-error)', 'var(--color-warning)'];
-        $result = [];
-        $otherSales = 0;
-
-        foreach ($rows as $i => $row) {
-            $name = $categories->get($row->category_id) ?? '未分类';
-            if ($i < 5) {
-                $result[] = ['name' => $name, 'percent' => round($row->total_sales / $totalSales * 100, 1), 'color' => $colors[$i] ?? $colors[4]];
-            } else {
-                $otherSales += $row->total_sales;
-            }
-        }
-
-        if ($otherSales > 0) {
-            $result[] = ['name' => '其他', 'percent' => round($otherSales / $totalSales * 100, 1), 'color' => $colors[4]];
-        }
-        return $result;
-    }
-
-    public function getTrendingItems(int $appId, int $limit = 5): array
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('is_on_sale', 1)
-            ->orderByDesc('total_sales')
-            ->limit($limit)
-            ->get()
-            ->map(fn($item) => [
-                'name' => $item->name,
-                'growth' => null,
-                'price' => (float) $item->sale_price,
-                'image' => $item->images && $item->images->count() > 0 ? $item->images->first()->url : '',
-            ])
-            ->toArray();
-    }
 
     public function getPriceHistoryByItem(int $itemId)
     {
@@ -710,4 +457,54 @@ $row->total_sales = $row->total_value;
     {
         return $this->query()->where('id', $itemId)->update(['stock' => $stock, 'updated_at' => time()]);
     }
+
+    /**
+     * 按商品 ID 聚合已支付订单的销量与销售额。
+     *
+     * 销售额必须来自已支付订单明细（yxshop_order_items）聚合，
+     * 商品表上的 total_sales 字段只是冗余统计，不能直接当作销售额使用。
+     *
+     * @param array<int, mixed> $itemIds
+     * @return \Illuminate\Support\Collection<string, object> 以 item_id 为键
+     */
+    public function aggregatePaidSales(array $itemIds)
+    {
+        if (!$itemIds) {
+            return collect();
+        }
+
+        return \support\Db::table('yxshop_order_items as oi')
+            ->join('yxshop_orders as o', 'oi.order_id', '=', 'o.id')
+            ->whereIn('oi.item_id', $itemIds)
+            ->where('o.pay_status', \app\model\Order::PAY_STATUS_PAID)
+            ->where('o.status', '<>', \app\model\Order::ORDER_STATUS_CANCEL)
+            ->where('o.deleted_at', 0)
+            ->groupBy('oi.item_id')
+            ->selectRaw('oi.item_id, SUM(oi.total_num) as sales_count, SUM(oi.total_pay_price) as sales_amount')
+            ->get()
+            ->keyBy('item_id');
+    }
+
+    /**
+     * 按 ID 集合批量取商品，返回以 id 为键的数组。
+     *
+     * 用于消除「循环里逐个 find」的 N+1 查询。
+     *
+     * @param array<int, mixed> $ids
+     * @return array<string, \App\Models\Item|\app\model\Item>
+     */
+    public function findByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (!$ids) {
+            return [];
+        }
+
+        $map = [];
+        foreach ($this->query()->whereIn('id', $ids)->get() as $item) {
+            $map[(string) $item->id] = $item;
+        }
+        return $map;
+    }
+
 }

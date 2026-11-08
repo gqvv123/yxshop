@@ -46,7 +46,7 @@ class Monitor
      * Pause monitor
      * @return void
      */
-    public static function pause()
+    public static function pause(): void
     {
         file_put_contents(static::lockFile(), time());
     }

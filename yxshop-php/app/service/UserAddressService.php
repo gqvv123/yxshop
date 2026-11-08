@@ -89,7 +89,7 @@ class UserAddressService extends BaseService
     /**
      * 删除用户地址（含归属校验）
      */
-    public function deleteUserAddress($id, $userId)
+    public function deleteUserAddress($id, $userId): bool
     {
         try {
             $address = $this->repository->findUserAddress((int) $id, (int) $userId);
@@ -126,6 +126,24 @@ class UserAddressService extends BaseService
                 compact('id', 'userId') + ['error' => $e->getMessage()]);
             throw $e;
         }
+    }
+
+    /**
+     * 后台：把指定地址设为该用户默认地址（不传 userId 时自动按地址归属用户）
+     *
+     * @param int|string $id
+     */
+    public function setDefault($id, ?int $userId = null)
+    {
+        $address = $this->repository->find((int) $id);
+        if (!$address) {
+            throw new BusinessException('地址不存在', 404);
+        }
+        $userId = $userId ?? (int) ($address->user_id ?? 0);
+        if ($userId <= 0) {
+            throw new BusinessException('该地址未关联用户，无法设为默认');
+        }
+        return $this->setDefaultAddress($id, $userId);
     }
 
     /**

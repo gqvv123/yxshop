@@ -61,7 +61,7 @@ class ExpressRepository extends BaseRepository
     /**
      * 获取快递公司统计
      */
-    public function getExpressStats($appId = 0)
+    public function getExpressStats($appId = 0): array
     {
         $query = $this->query();
 

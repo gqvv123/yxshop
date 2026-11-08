@@ -14,6 +14,8 @@ use app\model\Order;
  */
 class OrderRepository extends BaseRepository
 {
+    use OrderStatisticRepositoryTrait;
+
     protected $model = Order::class;
 
     // ---------------- 单订单查询 ----------------
@@ -58,7 +60,7 @@ class OrderRepository extends BaseRepository
     {
         $q = $this->query()
             ->where('id', $id)
-            ->with(['items.item.images', 'address.province', 'address.city', 'address.district', 'delivery', 'coupon']);
+            ->with(['items.item.images', 'address.provinceRegion', 'address.cityRegion', 'address.districtRegion', 'delivery', 'coupon']);
         if ($userId !== null) {
             $q->where('user_id', $userId);
         }
@@ -71,7 +73,7 @@ class OrderRepository extends BaseRepository
     public function findAdminOrderDetail($id)
     {
         return $this->query()
-            ->with(['items', 'user', 'address.province', 'address.city', 'address.district', 'delivery', 'logs' => function($q) { $q->orderBy('created_at', 'desc'); }])
+            ->with(['items', 'user', 'address.provinceRegion', 'address.cityRegion', 'address.districtRegion', 'delivery', 'logs' => function($q) { $q->orderBy('created_at', 'desc'); }])
             ->find($id);
     }
 
@@ -209,7 +211,7 @@ class OrderRepository extends BaseRepository
     /**
      * 用户订单状态统计
      */
-    public function getUserOrderStats($userId, $appId = 0)
+    public function getUserOrderStats($userId, $appId = 0): array
     {
         $base = $this->query()->where('user_id', $userId);
 
@@ -228,7 +230,7 @@ class OrderRepository extends BaseRepository
     /**
      * 销售统计（按时间窗口）
      */
-    public function getSalesStats($startTime = null, $endTime = null, $appId = 0)
+    public function getSalesStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query()
             ->where('status', Order::ORDER_STATUS_COMPLETE)
@@ -273,107 +275,15 @@ class OrderRepository extends BaseRepository
             ->get();
     }
 
-    /**
-     * 指定状态订单计数
-     */
-    public function getOrderCountByStatus(int $appId, $status): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('status', $status)
-            ->count();
-    }
 
-    /**
-     * 多状态计数（后台首页指标）
-     * @return array{pending,cancelled,completed,unpaid,paid,unshipped,shipped: int}
-     */
-    public function getStatusCounts(int $appId): array
-    {
-        $base = $this->query()->where('app_id', $appId);
-        return [
-            'pending'    => (clone $base)->where('status', 10)->count(),
-            'cancelled'  => (clone $base)->where('status', 20)->count(),
-            'completed'  => (clone $base)->where('status', 30)->count(),
-            'unpaid'     => (clone $base)->where('pay_status', 10)->count(),
-            'paid'       => (clone $base)->where('pay_status', 20)->count(),
-            'unshipped'  => (clone $base)->where('delivery_status', 10)->count(),
-            'shipped'    => (clone $base)->where('delivery_status', 20)->count(),
-        ];
-    }
 
-    /**
-     * 总订单数
-     */
-    public function countByApp(int $appId): int
-    {
-        return $this->query()->where('app_id', $appId)->count();
-    }
 
-    public function countYesterdayByApp(int $appId): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('created_at', '>=', strtotime('yesterday'))
-            ->where('created_at', '<', strtotime('today'))
-            ->count();
-    }
 
-    public function countPendingPayment(int $appId): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('status', Order::ORDER_STATUS_PENDING)
-            ->where('pay_status', Order::PAY_STATUS_UNPAID)
-            ->count();
-    }
 
-    public function countPendingShip(int $appId): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('status', Order::ORDER_STATUS_PENDING)
-            ->where('pay_status', Order::PAY_STATUS_PAID)
-            ->where('delivery_status', Order::DELIVERY_STATUS_UNSHIPPED)
-            ->count();
-    }
 
-    public function countOverdueUnshipped(int $appId, int $hours = 48): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('status', Order::ORDER_STATUS_PENDING)
-            ->where('pay_status', Order::PAY_STATUS_PAID)
-            ->where('delivery_status', Order::DELIVERY_STATUS_UNSHIPPED)
-            ->where('pay_time', '<', time() - $hours * 3600)
-            ->count();
-    }
 
-    public function getTodayRevenue(int $appId): float
-    {
-        return (float) $this->query()
-            ->where('app_id', $appId)
-            ->where('pay_status', Order::PAY_STATUS_PAID)
-            ->where('pay_time', '>=', strtotime('today'))
-            ->sum('pay_price');
-    }
 
-    public function getYesterdayRevenue(int $appId): float
-    {
-        return (float) $this->query()
-            ->where('app_id', $appId)
-            ->where('pay_status', Order::PAY_STATUS_PAID)
-            ->where('pay_time', '>=', strtotime('yesterday'))
-            ->where('pay_time', '<', strtotime('today'))
-            ->sum('pay_price');
-    }
 
-    public function countPendingRefund(int $appId): int
-    {
-        return \app\model\AfterSales::where('app_id', $appId)
-            ->where('status', 10)
-            ->count();
-    }
 
     public function getOrderDeliveries(int $orderId)
     {
@@ -392,110 +302,11 @@ class OrderRepository extends BaseRepository
         ];
     }
 
-    /**
-     * 今日订单数
-     */
-    public function countTodayByApp(int $appId): int
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('created_at', '>=', strtotime('today'))
-            ->count();
-    }
 
-    /**
-     * 月度日订单数（本月每天的下单量）
-     * @return array [{date, order_count}, ...]
-     */
-    public function getMonthlyDailyCounts(int $appId): array
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->where('created_at', '>=', strtotime('first day of this month'))
-            ->selectRaw("DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m-%d') as date, count(*) as order_count")
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->toArray();
-    }
 
-    /**
-     * 按年统计订单数
-     * @return array<int|string, array{year:int, total:int}>
-     */
-    public function getOrderCountByYear(int $appId): array
-    {
-        return $this->query()
-            ->where('app_id', $appId)
-            ->selectRaw("YEAR(FROM_UNIXTIME(created_at)) as year, COUNT(*) as total")
-            ->groupBy('year')
-            ->orderBy('year')
-            ->get()
-            ->keyBy('year')
-            ->toArray();
-    }
 
-    /**
-     * 日销售趋势（近 N 天）
-     * @return array<string, array{date,total,count}>
-     */
-    public function getDailySalesTrend(int $days, ?int $appId = null): array
-    {
-        $q = $this->query()
-            ->selectRaw("FROM_UNIXTIME(created_at, '%Y-%m-%d') as date, SUM(pay_price) as total, COUNT(*) as count")
-            ->where('created_at', '>=', time() - $days * 86400);
 
-        if ($appId !== null && $appId > 0) {
-            $q->where('app_id', $appId);
-        }
 
-        return $q->groupBy('date')->orderBy('date')->get()->keyBy('date')->toArray();
-    }
-
-    /**
-     * 客户洞察聚合（原始指标，衍生比率由 Service 计算）
-     * @return array{total_orders,total_revenue,repeat_customers,total_customers: int|float}
-     */
-    public function getCustomerInsightStats(int $appId): array
-    {
-        $base = $this->query()->where('app_id', $appId);
-
-        return [
-            'total_orders' => (clone $base)->count(),
-            'total_revenue' => (float) (clone $base)->sum('pay_price'),
-            'repeat_customers' => (clone $base)
-                ->selectRaw('user_id, COUNT(*) as order_count')
-                ->groupBy('user_id')
-                ->having('order_count', '>', 1)
-                ->get()
-                ->count(),
-            'total_customers' => (clone $base)->distinct('user_id')->count('user_id'),
-        ];
-    }
-
-    /**
-     * 已支付订单营收聚合（总/今日/月，月度分布）
-     * @return array{revenue_total,today_revenue,month_revenue: float, monthly: array}
-     */
-    public function getPaidRevenueStats(int $appId): array
-    {
-        $todayStart = strtotime('today');
-        $monthStart = strtotime('first day of this month');
-
-        $paidBase = $this->query()
-            ->where('app_id', $appId)
-            ->where('pay_status', Order::PAY_STATUS_PAID);
-
-        return [
-            'revenue_total' => (float) (clone $paidBase)->sum('pay_price'),
-            'today_revenue' => (float) (clone $paidBase)->where('created_at', '>=', $todayStart)->sum('pay_price'),
-            'month_revenue' => (float) (clone $paidBase)->where('created_at', '>=', $monthStart)->sum('pay_price'),
-            'monthly' => (clone $paidBase)
-                ->selectRaw("DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m') as month, SUM(pay_price) as total")
-                ->groupBy('month')->orderBy('month')
-                ->pluck('total', 'month')->toArray(),
-        ];
-    }
 
     /**
      * 积分兑换订单分页（用户端）
@@ -588,4 +399,41 @@ class OrderRepository extends BaseRepository
 
         return $query->get();
     }
+
+    /**
+     * 按用户 ID 批量统计订单数与已支付金额，返回以 user_id 为键的数组。
+     *
+     * 用于消除「循环里逐个 count/sum」的 N+1 查询。
+     *
+     * @param array<int, mixed> $userIds
+     * @param int $paidStatus 已支付状态值
+     * @return array<string, array{order_count: int, total_spent: float}>
+     */
+    public function aggregateByUserIds(array $userIds, int $paidStatus = 20): array
+    {
+        $userIds = array_values(array_unique(array_filter(array_map('intval', $userIds))));
+        if (!$userIds) {
+            return [];
+        }
+
+        $rows = $this->query()
+            ->whereIn('user_id', $userIds)
+            ->groupBy('user_id')
+            ->selectRaw(
+                'user_id, COUNT(*) as order_count, '
+                . 'SUM(CASE WHEN pay_status = ? THEN pay_price ELSE 0 END) as total_spent',
+                [$paidStatus]
+            )
+            ->get();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(string) $row->user_id] = [
+                'order_count' => (int) $row->order_count,
+                'total_spent' => (float) $row->total_spent,
+            ];
+        }
+        return $map;
+    }
+
 }

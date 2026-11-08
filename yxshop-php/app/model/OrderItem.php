@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Order Item。
+ *
+ * @package app\model
+ */
 class OrderItem extends BaseModel
 {
     protected $table = 'yxshop_order_items';

@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Admin Log。
+ *
+ * @package app\model
+ */
 class AdminLog extends BaseModel
 {
     protected $table = 'yxshop_admin_logs';

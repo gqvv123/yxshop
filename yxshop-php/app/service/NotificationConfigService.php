@@ -3,9 +3,12 @@
 namespace app\service;
 
 use app\repository\NotificationConfigRepository;
-use app\model\NotificationConfig;
-use Exception;
 
+/**
+ * 业务服务：Notification Config Service。
+ *
+ * @package app\service
+ */
 class NotificationConfigService extends BaseService
 {
     public function __construct(?NotificationConfigRepository $repository = null)

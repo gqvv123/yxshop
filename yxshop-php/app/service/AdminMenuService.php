@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\AdminMenuRepository;
-use app\model\AdminMenu;
 use app\exception\BusinessException;
 use app\validate\MenuValidate;
 use Exception;
@@ -143,7 +142,7 @@ class AdminMenuService extends BaseService
     /**
      * 删除菜单
      */
-    public function deleteMenu($id)
+    public function deleteMenu($id): bool
     {
         try {
             $this->logInfo('删除菜单开始', ['id' => $id]);

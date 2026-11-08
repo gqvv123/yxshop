@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\ItemConsultationRepository;
-use app\model\ItemConsultation;
 use Exception;
 
 /**
@@ -90,7 +89,7 @@ class ItemConsultationService extends BaseService
         }
     }
 
-    public function getStats(array $conditions = [])
+    public function getStats(array $conditions = []): array
     {
         try {
             return $this->repository->getStats($conditions);

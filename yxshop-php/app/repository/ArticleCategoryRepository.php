@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\ArticleCategory;
 
+/**
+ * 数据仓储：Article Category Repository。
+ *
+ * @package app\repository
+ */
 class ArticleCategoryRepository extends BaseRepository
 {
     protected $model = ArticleCategory::class;

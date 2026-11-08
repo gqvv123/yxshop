@@ -3,7 +3,6 @@
 namespace app\repository;
 
 use app\model\PointTask;
-use app\model\UserPointTask;
 
 /**
  * 积分任务仓储

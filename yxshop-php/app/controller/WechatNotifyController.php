@@ -8,6 +8,11 @@ use support\Request;
 use support\Response;
 use support\Log;
 
+/**
+ * 组件：Wechat Notify Controller。
+ *
+ * @package app\controller
+ */
 class WechatNotifyController extends BaseController
 {
     private $wechatPayService;

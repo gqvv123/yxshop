@@ -2,7 +2,6 @@
 
 namespace app\command;
 
-use support\Redis;
 use app\common\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +13,7 @@ class LogCleanupCommand extends Command
     protected static $defaultName = 'log:cleanup';
     protected static $defaultDescription = '手动触发日志清理任务';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('手动触发日志清理任务');
     }
@@ -45,4 +44,4 @@ class LogCleanupCommand extends Command
             return Command::FAILURE;
         }
     }
-} 
+}

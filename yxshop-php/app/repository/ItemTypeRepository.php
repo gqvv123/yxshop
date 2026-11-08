@@ -17,13 +17,14 @@ class ItemTypeRepository extends BaseRepository
     public function getTypes($appId = 0)
     {
         $query = $this->query();
-        
+
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }
-        
+
+        // yxshop_item_types 没有 type_id 列（原先按 type_id 排序会直接 500），改按主键排序
         return $query->orderBy('sort', 'asc')
-                    ->orderBy('type_id', 'asc')
+                    ->orderBy('id', 'asc')
                     ->get();
     }
 
@@ -33,11 +34,11 @@ class ItemTypeRepository extends BaseRepository
     public function getAvailableTypes($appId = 0)
     {
         $query = $this->query();
-        
+
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }
-        
+
         return $query->where('status', 1)
                     ->orderBy('sort', 'asc')
                     ->get();
@@ -46,7 +47,7 @@ class ItemTypeRepository extends BaseRepository
     /**
      * 获取类型统计
      */
-    public function getTypeStats($appId = 0)
+    public function getTypeStats($appId = 0): array
     {
         $base = $this->model->newQuery();
 

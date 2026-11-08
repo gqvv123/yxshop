@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * 管理端英文语言包：后台界面文案。
+ *
+ * @package app\admin\language\english
+ */
+
 
 $lang['language_id'] = "1";
 $lang['menu'] = "Menu";

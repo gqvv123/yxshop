@@ -14,7 +14,7 @@ use Exception;
  */
 class PromOrderService extends BaseService
 {
-    public function __construct(PromOrderRepository $repository = null)
+    public function __construct(?PromOrderRepository $repository = null)
     {
         $repository = $repository ?? new PromOrderRepository();
         parent::__construct($repository);
@@ -202,7 +202,7 @@ class PromOrderService extends BaseService
     /**
      * 处理折扣促销
      */
-    private function processDiscountProm($promOrder)
+    private function processDiscountProm($promOrder): void
     {
         // 折扣促销逻辑
         $this->logInfo('处理折扣促销', ['order_id' => $promOrder->order_id]);
@@ -211,7 +211,7 @@ class PromOrderService extends BaseService
     /**
      * 处理优惠券促销
      */
-    private function processCouponProm($promOrder)
+    private function processCouponProm($promOrder): void
     {
         // 优惠券促销逻辑
         $this->logInfo('处理优惠券促销', ['order_id' => $promOrder->order_id]);
@@ -220,7 +220,7 @@ class PromOrderService extends BaseService
     /**
      * 处理赠品促销
      */
-    private function processGiftProm($promOrder)
+    private function processGiftProm($promOrder): void
     {
         // 赠品促销逻辑
         $this->logInfo('处理赠品促销', ['order_id' => $promOrder->order_id]);
@@ -229,7 +229,7 @@ class PromOrderService extends BaseService
     /**
      * 处理积分促销
      */
-    private function processPointsProm($promOrder)
+    private function processPointsProm($promOrder): void
     {
         // 积分促销逻辑
         $this->logInfo('处理积分促销', ['order_id' => $promOrder->order_id]);

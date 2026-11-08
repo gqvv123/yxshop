@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\PaymentLogService;
 
+/**
+ * 管理端控制器：Payment Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class PaymentLogController extends BaseController
 {
     protected $paymentLogService;

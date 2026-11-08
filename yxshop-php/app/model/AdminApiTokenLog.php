@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Admin Api Token Log。
+ *
+ * @package app\model
+ */
 class AdminApiTokenLog extends BaseModel
 {
     protected $table = 'yxshop_admin_api_token_logs';

@@ -55,7 +55,7 @@ class NotificationVariableRepository extends BaseRepository
     /**
      * 获取变量统计（修复累加 where bug，使用 clone）
      */
-    public function getVariableStats($appId = 0)
+    public function getVariableStats($appId = 0): array
     {
         $base = $this->query();
 

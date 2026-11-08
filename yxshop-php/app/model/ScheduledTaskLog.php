@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Scheduled Task Log。
+ *
+ * @package app\model
+ */
 class ScheduledTaskLog extends BaseModel
 {
     protected $table = 'yxshop_scheduled_task_logs';

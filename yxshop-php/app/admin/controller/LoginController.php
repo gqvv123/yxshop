@@ -4,7 +4,6 @@ namespace app\admin\controller;
 
 use support\Request;
 use support\Response;
-use app\service\AdminService;
 use app\service\LoginLogService;
 use app\service\JwtService;
 use app\service\CaptchaService;
@@ -220,7 +219,8 @@ class LoginController extends BaseController
             'roles' => $roles,
             'codes' => $permissions,
             'routers' => $menus,
-        ]);
+        ])->header('Cache-Control', 'no-cache, max-age=0, must-revalidate')
+          ->header('Pragma', 'no-cache');
     }
 
     public function updateProfile(Request $request): Response

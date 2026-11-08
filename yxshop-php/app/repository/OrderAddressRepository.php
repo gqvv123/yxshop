@@ -22,10 +22,10 @@ class OrderAddressRepository extends BaseRepository
     /**
      * 获取用户订单统计
      */
-    public function getUserOrderStats($userId, $appId = 0)
+    public function getUserOrderStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
-        
+
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }
@@ -41,7 +41,7 @@ class OrderAddressRepository extends BaseRepository
     /**
      * 获取订单销售统计
      */
-    public function getSalesStats($startTime = null, $endTime = null, $appId = 0)
+    public function getSalesStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query()
             ->where('order_status', Order::ORDER_STATUS_COMPLETE)
@@ -88,7 +88,7 @@ class OrderAddressRepository extends BaseRepository
     public function getTimeoutOrders($timeout = 1800) // 30分钟
     {
         $timeoutTime = time() - $timeout;
-        
+
         return $this->query()
             ->where('order_status', Order::ORDER_STATUS_PENDING)
             ->where('pay_status', Order::PAY_STATUS_UNPAID)

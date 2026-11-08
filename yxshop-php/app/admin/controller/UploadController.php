@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UploadFileService;
 
+/**
+ * 管理端控制器：Upload Controller。
+ *
+ * @package app\admin\controller
+ */
 class UploadController extends BaseController
 {
     protected $uploadFileService;

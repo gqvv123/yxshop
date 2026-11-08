@@ -10,10 +10,10 @@ use app\model\BaseModel;
 class AdminMenu extends BaseModel
 {
     protected $table = 'yxshop_admin_menus';
-    
+
     protected $fillable = [
         'parent_id',
-        'name', 
+        'name',
         'model',
         'url',
         'icon',
@@ -23,9 +23,9 @@ class AdminMenu extends BaseModel
         'method',
         'app_id',
     ];
-    
+
     protected $casts = [];
-    
+
     /**
      * 获取子菜单
      */
@@ -35,7 +35,7 @@ class AdminMenu extends BaseModel
             ->where('is_show', 1)
             ->orderBy('sort', 'asc');
     }
-    
+
     /**
      * 获取父菜单
      */

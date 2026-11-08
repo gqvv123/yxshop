@@ -45,27 +45,6 @@ Route::group('/user/address', function () {
     Route::post('/default', [app\controller\UserAddressController::class, 'setDefault']);
 })->middleware([app\middleware\ApiAuthMiddleware::class]);
 
-// 主题路由(公开读取)
-Route::group('/theme', function () {
-    Route::get('/list', [app\controller\ThemeController::class, 'list']);
-    Route::get('/current', [app\controller\ThemeController::class, 'current']);
-});
-
-// 主题路由(需要认证-写操作)
-Route::group('/theme', function () {
-    Route::post('/apply', [app\controller\ThemeController::class, 'apply']);
-    Route::post('/custom', [app\controller\ThemeController::class, 'custom']);
-    Route::delete('/{id}', [app\controller\ThemeController::class, 'delete']);
-})->middleware([app\middleware\ApiAuthMiddleware::class]);
-
-// 推荐路由(公开读取)
-Route::group('/recommendation', function () {
-    Route::get('/sales-trend', [app\controller\RecommendationController::class, 'salesTrend']);
-    Route::get('/hot', [app\controller\RecommendationController::class, 'hotDishes']);
-    Route::get('/insights', [app\controller\RecommendationController::class, 'customerInsights']);
-    Route::get('/strategies', [app\controller\RecommendationController::class, 'strategies']);
-});
-
 // 推荐路由(需要认证-写操作)
 Route::group('/recommendation', function () {
     Route::post('/strategy/update', [app\controller\RecommendationController::class, 'updateStrategy']);

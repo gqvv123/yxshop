@@ -96,7 +96,7 @@ class SignRepository extends BaseRepository
     /**
      * 获取签到统计
      */
-    public function getSignStats($startDate = null, $endDate = null, $appId = 0)
+    public function getSignStats($startDate = null, $endDate = null, $appId = 0): array
     {
         $query = $this->query();
 
@@ -128,7 +128,7 @@ class SignRepository extends BaseRepository
     /**
      * 获取用户签到统计
      */
-    public function getUserSignStats($userId, $appId = 0)
+    public function getUserSignStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
 

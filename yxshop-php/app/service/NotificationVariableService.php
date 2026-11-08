@@ -2,9 +2,15 @@
 
 namespace app\service;
 
+use app\exception\BusinessException;
 use app\repository\NotificationVariableRepository;
 use Exception;
 
+/**
+ * 业务服务：Notification Variable Service。
+ *
+ * @package app\service
+ */
 class NotificationVariableService extends BaseService
 {
     public function __construct(?NotificationVariableRepository $repository = null)
@@ -35,6 +41,18 @@ class NotificationVariableService extends BaseService
     {
         try {
             $this->logInfo('创建通知变量开始', ['data' => $data]);
+
+            $code = trim((string) ($data['variable_code'] ?? ''));
+            $name = trim((string) ($data['variable_name'] ?? ''));
+            if ($code === '') {
+                throw new BusinessException('请填写变量代码');
+            }
+            if ($name === '') {
+                throw new BusinessException('请填写变量名称');
+            }
+            $data['variable_code'] = $code;
+            $data['variable_name'] = $name;
+            $data['app_id'] = (int) ($data['app_id'] ?? 0);
 
             if (!empty($data['variable_code'])) {
                 $exists = $this->repository->query()
@@ -93,7 +111,7 @@ class NotificationVariableService extends BaseService
         }
     }
 
-    public function deleteVariable($id)
+    public function deleteVariable($id): bool
     {
         try {
             $this->logInfo('删除通知变量开始', ['id' => $id]);

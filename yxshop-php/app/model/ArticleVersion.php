@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Article Version。
+ *
+ * @package app\model
+ */
 class ArticleVersion extends BaseModel
 {
     protected $table = 'yxshop_article_versions';

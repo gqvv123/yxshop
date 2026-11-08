@@ -6,6 +6,11 @@ use support\Request;
 use app\service\ApplyService;
 use app\service\UserService;
 
+/**
+ * 管理端控制器：Apply Controller。
+ *
+ * @package app\admin\controller
+ */
 class ApplyController extends BaseController
 {
     protected $applyService;

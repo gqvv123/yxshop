@@ -2,6 +2,11 @@
 
 namespace app\utility;
 
+/**
+ * 组件：String Helper。
+ *
+ * @package app\utility
+ */
 class StringHelper
 {
     public static function randomString(int $length = 16): string

@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Order Log。
+ *
+ * @package app\model
+ */
 class OrderLog extends BaseModel
 {
     protected $table = 'yxshop_order_logs';

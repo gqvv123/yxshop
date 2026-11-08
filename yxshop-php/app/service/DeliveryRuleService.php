@@ -2,224 +2,132 @@
 
 namespace app\service;
 
+use app\model\DeliveryRule;
 use app\repository\DeliveryRuleRepository;
-use app\exception\BusinessException;
-use Exception;
 
 /**
- * 配送模板服务类
+ * 配送计费规则服务。
  *
- * @property DeliveryRuleRepository $repository
+ * 从 C 端 DeliveryController 中抽离，供两处复用：
+ *   1. C 端运费试算（/api/v1/delivery/freight）
+ *   2. 下单时真实计算运费（OrderService::calculateShippingFee）
+ *
+ * 计费规则（yxshop_delivery_rules）：
+ * - delivery_type 10=按件数 20=按金额 30=两者同时满足
+ * - first/first_fee                首件（首额）与其运费
+ * - additional/additional_fee      续件（续额）与其运费
+ * - min_price/min_num              免邮门槛（金额 / 件数）
+ * - region                         适用地区，空或 '0' 表示全国
  */
-class DeliveryRuleService extends BaseService
+class DeliveryRuleService
 {
-    public function __construct(?DeliveryRuleRepository $repository = null)
+    protected DeliveryRuleRepository $ruleRepository;
+
+    public function __construct(?DeliveryRuleRepository $ruleRepository = null)
     {
-        parent::__construct($repository ?? new DeliveryRuleRepository());
+        $this->ruleRepository = $ruleRepository ?? new DeliveryRuleRepository();
     }
 
     /**
-     * 获取配送模板列表
+     * 试算运费
+     *
+     * @param int    $deliveryId 配送模板 ID
+     * @param int    $quantity   商品件数
+     * @param float  $amount     商品金额
+     * @param int    $regionId   收货地区 ID（用于匹配地区规则）
+     * @return array{freight: float, free: bool, rule: ?DeliveryRule, reason: string}
      */
-    public function getDeliveryList($appId = 0)
+    public function calcFreight(int $deliveryId, int $quantity, float $amount, int $regionId = 0): array
     {
-        try {
-            $this->logInfo('获取配送模板列表开始', ['app_id' => $appId]);
-
-            $deliveries = $this->repository->getDeliveries($appId);
-
-            $this->logInfo('获取配送模板列表成功', ['app_id' => $appId]);
-            return $deliveries;
-
-        } catch (Exception $e) {
-            $this->logError('获取配送模板列表失败', [
-                'app_id' => $appId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
+        if ($deliveryId <= 0) {
+            return ['freight' => 0.0, 'free' => true, 'rule' => null, 'reason' => '未选择配送方式'];
         }
+
+        $rules = $this->ruleRepository->query()
+            ->where('delivery_id', $deliveryId)
+            ->get();
+
+        $matched = $this->matchRule($rules, $regionId);
+        if (!$matched) {
+            return ['freight' => 0.0, 'free' => true, 'rule' => null, 'reason' => '该地区暂无可用配送规则，默认包邮'];
+        }
+
+        [$freight, $free, $reason] = $this->calculateByRule($matched, max(1, $quantity), $amount);
+
+        return ['freight' => $freight, 'free' => $free, 'rule' => $matched, 'reason' => $reason];
     }
 
     /**
-     * 创建配送模板
+     * 按地区挑一条最合适的规则：优先精确匹配，否则取全国默认规则
+     *
+     * @param iterable $rules
      */
-    public function createDelivery(array $data)
+    public function matchRule($rules, int $regionId): ?DeliveryRule
     {
-        try {
-            $this->logInfo('创建配送模板开始', ['data' => $data]);
+        $exact = null;
+        $default = null;
 
-
-            // 如果是默认模板，先取消其他默认模板
-            if (!empty($data['is_default'])) {
-                $this->repository->clearDefaultForApp((int) $data['app_id']);
+        foreach ($rules as $rule) {
+            $region = trim((string) ($rule->region ?? ''));
+            if ($region === '' || $region === '0' || $region === '[]') {
+                $default = $default ?? $rule;
+                continue;
             }
-
-            $delivery = $this->repository->create($data);
-
-            $this->logInfo('创建配送模板成功', ['delivery_id' => $delivery->delivery_id]);
-            return $delivery;
-
-        } catch (Exception $e) {
-            $this->logError('创建配送模板失败', [
-                'data' => $data,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 更新配送模板
-     */
-    public function updateDelivery($id, array $data)
-    {
-        try {
-            $this->logInfo('更新配送模板开始', ['id' => $id, 'data' => $data]);
-
-
-            $delivery = $this->repository->findOrFail($id);
-
-            // 如果是默认模板，先取消其他默认模板
-            if (!empty($data['is_default'])) {
-                $this->repository->clearDefaultForApp((int) $delivery->app_id, $id);
+            // region 存的是地区 id 列表（JSON 或逗号分隔）
+            $ids = [];
+            if (str_starts_with($region, '[')) {
+                $decoded = json_decode($region, true);
+                $ids = is_array($decoded) ? array_map('intval', $decoded) : [];
+            } else {
+                $ids = array_map('intval', array_filter(explode(',', $region)));
             }
-
-            $delivery = $this->repository->update($id, $data);
-
-            $this->logInfo('更新配送模板成功', ['delivery_id' => $id]);
-            return $delivery;
-
-        } catch (Exception $e) {
-            $this->logError('更新配送模板失败', [
-                'id' => $id,
-                'data' => $data,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 删除配送模板
-     */
-    public function deleteDelivery($id)
-    {
-        try {
-            $this->logInfo('删除配送模板开始', ['id' => $id]);
-
-            $delivery = $this->repository->findOrFail($id);
-
-            // 检查是否有订单使用
-            if ($delivery->orders()->count() > 0) {
-                throw new BusinessException('该配送模板有订单使用，无法删除');
+            if ($regionId && in_array($regionId, $ids, true)) {
+                $exact = $exact ?? $rule;
             }
-
-            $this->repository->delete($id);
-
-            $this->logInfo('删除配送模板成功', ['delivery_id' => $id]);
-            return true;
-
-        } catch (Exception $e) {
-            $this->logError('删除配送模板失败', [
-                'id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
         }
+
+        return $exact ?? $default;
     }
 
     /**
-     * 获取默认配送模板
+     * 按规则计算运费
+     *
+     * @return array{0: float, 1: bool, 2: string} [运费, 是否包邮, 说明]
      */
-    public function getDefaultDelivery($appId = 0)
+    public function calculateByRule(DeliveryRule $rule, int $quantity, float $amount): array
     {
-        try {
-            return $this->repository->getDefaultDelivery($appId);
+        $type = (int) $rule->delivery_type;
+        $minPrice = (float) $rule->min_price;
+        $minNum = (int) $rule->min_num;
 
-        } catch (Exception $e) {
-            $this->logError('获取默认配送模板失败', [
-                'app_id' => $appId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
+        // 免邮判定
+        if ($type === DeliveryRule::DELIVERY_TYPE_AMOUNT && $minPrice > 0 && $amount >= $minPrice) {
+            return [0.0, true, '满 ' . $minPrice . ' 元包邮'];
         }
-    }
-
-    /**
-     * 设置默认配送模板
-     */
-    public function setDefaultDelivery($id, $appId = 0)
-    {
-        try {
-            $this->logInfo('设置默认配送模板开始', ['id' => $id, 'app_id' => $appId]);
-
-            $this->repository->setDefaultDelivery($id, $appId);
-
-            $this->logInfo('设置默认配送模板成功', ['delivery_id' => $id]);
-            return true;
-
-        } catch (Exception $e) {
-            $this->logError('设置默认配送模板失败', [
-                'id' => $id,
-                'app_id' => $appId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
+        if ($type === DeliveryRule::DELIVERY_TYPE_QUANTITY && $minNum > 0 && $quantity >= $minNum) {
+            return [0.0, true, '满 ' . $minNum . ' 件包邮'];
         }
-    }
-
-    /**
-     * 获取配送模板统计
-     */
-    public function getDeliveryStats($appId = 0)
-    {
-        try {
-            return $this->repository->getDeliveryStats($appId);
-
-        } catch (Exception $e) {
-            $this->logError('获取配送模板统计失败', [
-                'app_id' => $appId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
+        if ($type === DeliveryRule::DELIVERY_TYPE_BOTH) {
+            $amountFree = $minPrice > 0 && $amount >= $minPrice;
+            $numFree = $minNum > 0 && $quantity >= $minNum;
+            if ($amountFree || $numFree) {
+                return [0.0, true, '满足包邮条件'];
+            }
         }
-    }
 
-    public function getRuleList($page, $limit, array $filters = [])
-    {
-        return $this->repository->paginateRules((int) $page, (int) $limit, $filters);
-    }
+        $first = max(1, (int) $rule->first);
+        $firstFee = (float) $rule->first_fee;
+        $additional = max(0, (int) $rule->additional);
+        $additionalFee = (float) $rule->additional_fee;
 
-    public function getRuleById($id)
-    {
-        return $this->repository->findOrFail($id);
-    }
+        if ($quantity <= $first) {
+            return [$firstFee, false, '首件计费'];
+        }
 
-    public function createRule(array $data)
-    {
-        return $this->repository->create($data);
-    }
+        $rest = $quantity - $first;
+        $restUnits = $additional > 0 ? (int) ceil($rest / $additional) : $rest;
+        $freight = round($firstFee + $restUnits * $additionalFee, 2);
 
-    public function updateRule($id, array $data)
-    {
-        return $this->repository->update($id, $data);
-    }
-
-    public function deleteRule($id)
-    {
-        return $this->repository->delete($id);
-    }
-
-    public function updateRuleStatus($id, $status)
-    {
-        $rule = $this->repository->findOrFail($id);
-        $rule->status = $status;
-        $rule->save();
-        return $rule;
-    }
-
-    public function getRuleStats($appId = 0)
-    {
-        return $this->getDeliveryStats($appId);
+        return [$freight, false, '首件 + 续件计费'];
     }
 }

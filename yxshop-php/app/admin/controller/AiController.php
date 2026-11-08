@@ -86,7 +86,7 @@ class AiController extends BaseController
     public function createCredits(Request $request)
     {
         $appId = $this->getAppId($request);
-        $adminId = $this->admin['id'] ?? 0;
+        $adminId = $this->getAdminId($request);
         $data = $request->post();
 
         $result = $this->aiService->createCreditPackage($appId, $adminId, $data);
@@ -158,7 +158,7 @@ class AiController extends BaseController
     {
         try {
             $appId = $this->getAppId($request);
-            $adminId = $this->admin['id'] ?? 0;
+            $adminId = $this->getAdminId($request);
             $itemId = $request->post('item_id');
             $style = $request->post('style', 'professional');
             $type = $request->post('type', 'full');
@@ -253,7 +253,7 @@ class AiController extends BaseController
     {
         try {
             $appId = $this->getAppId($request);
-            $adminId = $this->admin['id'] ?? 0;
+            $adminId = $this->getAdminId($request);
             $question = $request->post('question', '请分析近期销售情况');
             $period = $request->post('period', '30d');
 

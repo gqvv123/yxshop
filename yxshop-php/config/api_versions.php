@@ -3,10 +3,10 @@
 return [
     // 支持的API版本
     'supported_versions' => ['v1', 'v2'],
-    
+
     // 默认版本
     'default_version' => 'v1',
-    
+
     // 版本状态配置
     'version_status' => [
         'v1' => [
@@ -26,7 +26,7 @@ return [
             'breaking_changes' => true
         ]
     ],
-    
+
     // 版本特性配置
     'version_features' => [
         'v1' => [
@@ -69,7 +69,7 @@ return [
             ]
         ]
     ],
-    
+
     // 版本迁移配置
     'migration' => [
         'v1_to_v2' => [
@@ -83,7 +83,7 @@ return [
             ]
         ]
     ],
-    
+
     // 版本弃用计划
     'deprecation_plan' => [
         'v1' => [
@@ -97,7 +97,7 @@ return [
             ]
         ]
     ],
-    
+
     // 版本兼容性配置
     'compatibility' => [
         'cross_version_support' => true,
@@ -108,7 +108,7 @@ return [
             'v1' => ['v2'] // V1版本向前兼容V2（部分功能）
         ]
     ],
-    
+
     // 版本文档配置
     'documentation' => [
         'v1' => [
@@ -132,7 +132,7 @@ return [
             ]
         ]
     ],
-    
+
     // 版本监控配置
     'monitoring' => [
         'version_usage_tracking' => true,
@@ -146,4 +146,4 @@ return [
             'user_count' => true
         ]
     ]
-]; 
+];

@@ -188,7 +188,7 @@ class RegionService extends BaseService
     /**
      * 删除地区
      */
-    public function deleteRegion($id)
+    public function deleteRegion($id): bool
     {
         try {
             $this->logInfo('删除地区开始', ['id' => $id]);

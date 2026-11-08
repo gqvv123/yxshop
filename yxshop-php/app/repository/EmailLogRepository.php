@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\EmailLog;
 
+/**
+ * 数据仓储：Email Log Repository。
+ *
+ * @package app\repository
+ */
 class EmailLogRepository extends BaseRepository
 {
     protected $model = EmailLog::class;

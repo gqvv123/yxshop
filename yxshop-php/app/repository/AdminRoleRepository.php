@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\AdminRole;
 
+/**
+ * 数据仓储：Admin Role Repository。
+ *
+ * @package app\repository
+ */
 class AdminRoleRepository extends BaseRepository
 {
     protected $model = AdminRole::class;

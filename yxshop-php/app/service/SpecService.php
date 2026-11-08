@@ -5,8 +5,6 @@ namespace app\service;
 use app\repository\SpecRepository;
 use app\repository\ItemSpecItemRepository;
 use app\model\ItemSpec;
-use app\model\ItemSpecItem;
-use Exception;
 
 class SpecService extends BaseService
 {

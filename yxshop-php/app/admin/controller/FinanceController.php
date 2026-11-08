@@ -80,8 +80,8 @@ class FinanceController extends BaseController
         $startDate = $request->post('start_date', date('Y-m-d', strtotime('-1 day')));
         $endDate = $request->post('end_date', date('Y-m-d', strtotime('-1 day')));
 
-        $operatorId = $this->admin['id'] ?? 0;
-        $operatorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $operatorName = $this->getAdminName($request);
 
         try {
             $result = $this->financeService->generateStatement($appId, $type, $startDate, $endDate, $operatorId, $operatorName);
@@ -93,8 +93,8 @@ class FinanceController extends BaseController
 
     public function statementConfirm(Request $request, $id)
     {
-        $operatorId = $this->admin['id'] ?? 0;
-        $operatorName = $this->admin['name'] ?? null;
+        $operatorId = $this->getAdminId($request);
+        $operatorName = $this->getAdminName($request);
         $this->financeService->confirmStatement((int) $id, $operatorId, $operatorName);
         return $this->success(null, '确认成功');
     }

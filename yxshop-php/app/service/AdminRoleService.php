@@ -4,12 +4,15 @@ namespace app\service;
 
 use app\repository\AdminRoleRepository;
 use app\repository\RoleRepository;
-use app\model\AdminRole;
-use app\model\AdminMenu;
 use app\exception\BusinessException;
 use app\validate\AdminRoleValidate;
 use Exception;
 
+/**
+ * 业务服务：Admin Role Service。
+ *
+ * @package app\service
+ */
 class AdminRoleService extends BaseService
 {
     protected $roleRepository;
@@ -97,7 +100,7 @@ class AdminRoleService extends BaseService
         }
     }
 
-    public function updateRole($id, array $data)
+    public function updateRole($id, array $data): bool
     {
         try {
             $this->validateWith(AdminRoleValidate::class, 'update', $data);
@@ -135,7 +138,7 @@ class AdminRoleService extends BaseService
         }
     }
 
-    public function deleteRole($id)
+    public function deleteRole($id): bool
     {
         try {
             $role = $this->roleRepository->findOrFail($id);
@@ -156,7 +159,7 @@ class AdminRoleService extends BaseService
         }
     }
 
-    public function assignPermissions($id, array $authIds)
+    public function assignPermissions($id, array $authIds): bool
     {
         try {
             $role = $this->roleRepository->findOrFail($id);
@@ -171,7 +174,7 @@ class AdminRoleService extends BaseService
         }
     }
 
-    public function getRolePermissions($id)
+    public function getRolePermissions($id): array
     {
         try {
             $role = $this->roleRepository->findWithAuths($id);

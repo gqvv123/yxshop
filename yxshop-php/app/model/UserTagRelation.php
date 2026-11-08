@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Tag Relation。
+ *
+ * @package app\model
+ */
 class UserTagRelation extends BaseModel
 {
     protected $table = 'yxshop_user_tag_relations';

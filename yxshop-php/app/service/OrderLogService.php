@@ -5,6 +5,11 @@ namespace app\service;
 use app\repository\OrderLogRepository;
 use Exception;
 
+/**
+ * 业务服务：Order Log Service。
+ *
+ * @package app\service
+ */
 class OrderLogService extends BaseService
 {
     public function __construct(?OrderLogRepository $repository = null)

@@ -88,10 +88,10 @@ $output[] = "SET @APP_ID := 0;";
 $output[] = "";
 
 // 默认管理员
-$output[] = "-- 默认超级管理员（密码: admin123，请在首次登录后立即修改）";
-$output[] = "INSERT INTO `yxshop_admins` (`id`, `username`, `password`, `app_id`, `nickname`, `is_super_admin`, `role_id`, `status`, `password_changed_at`, `force_password_change`, `created_at`, `updated_at`) VALUES";
-$output[] = "(7100000000001, 'admin', '\$2y\$10\$N9zK9xQ5vV5mZ2vD6sJ3vOZQ8jG5pHr5WZcY5e1m5bN5cX9m2vW5K', 0, '超级管理员', 1, 0, 1, 0, 1, @NOW, @NOW)";
-$output[] = "ON DUPLICATE KEY UPDATE `updated_at` = @NOW;";
+$output[] = "-- 默认超级管理员（初始密码由部署者保管，首次登录后请立即修改）";
+$output[] = "INSERT IGNORE INTO `yxshop_admins` (`id`, `username`, `password`, `app_id`, `nickname`, `is_super_admin`, `role_id`, `status`, `password_changed_at`, `force_password_change`, `created_at`, `updated_at`) VALUES";
+$output[] = "(7100000000001, 'admin', '\$2y\$12\$s1VYr75YJ3ZA689DwYW8HODIkrbVy15Q4pXLVV7Dr.suwPVhhX9XW', 0, '超级管理员', 1, 0, 1, @NOW, 0, @NOW, @NOW)";
+$output[] = "ON DUPLICATE KEY UPDATE `password` = VALUES(`password`), `password_changed_at` = VALUES(`password_changed_at`), `force_password_change` = 0, `status` = 1, `updated_at` = @NOW;";
 $output[] = "";
 
 // 默认角色

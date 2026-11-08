@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\AdminRoleService;
 
+/**
+ * 管理端控制器：Role Controller。
+ *
+ * @package app\admin\controller
+ */
 class RoleController extends BaseController
 {
     protected $roleService;

@@ -112,7 +112,27 @@ class SystemLogRepository extends BaseRepository
         if (!empty($filters['module'])) {
             $query->where('module', $filters['module']);
         }
-        return $query->paginate($pageSize, ['*'], 'page', $page);
+        $paginator = $query->paginate($pageSize, ['*'], 'page', $page);
+
+        // 清理任务压缩过的日志，读取时统一还原成可读文本
+        $items = collect($paginator->items())
+            ->map(fn($item) => $this->decodeRecord($item))
+            ->all();
+        $paginator->setCollection(collect($items));
+
+        return $paginator;
+    }
+
+    /**
+     * 解码单条日志记录的 message 字段
+     */
+    private function decodeRecord($record)
+    {
+        if (is_object($record) && isset($record->message)) {
+            $compressed = (int) ($record->is_compressed ?? 0) === 1;
+            $record->message = \app\common\LogPayload::decode($record->message, $compressed);
+        }
+        return $record;
     }
 
     /**

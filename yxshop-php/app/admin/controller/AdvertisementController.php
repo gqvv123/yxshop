@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\AdvertisementService;
 
+/**
+ * 管理端控制器：Advertisement Controller。
+ *
+ * @package app\admin\controller
+ */
 class AdvertisementController extends BaseController
 {
     protected $advertisementService;
@@ -28,7 +33,7 @@ class AdvertisementController extends BaseController
     {
         $data = $request->all();
         $data['app_id'] = $this->getAppId($request);
-        $result = $this->advertisementService->create($data);
+        $result = $this->advertisementService->createAd($data);
         return $this->success($result, '创建成功');
     }
 
@@ -44,7 +49,7 @@ class AdvertisementController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->all();
-        $result = $this->advertisementService->update($id, $data);
+        $result = $this->advertisementService->updateAd($id, $data);
         return $this->success(null, '更新成功');
     }
 

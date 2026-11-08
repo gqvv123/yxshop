@@ -10,7 +10,7 @@ class Currency extends BaseModel
     protected $table = 'yxshop_currencies';
 
     protected $fillable = [
-        'name', 'code', 'symbol', 'exchange_rate', 'status', 
+        'name', 'code', 'symbol', 'exchange_rate', 'status',
         'is_default', 'sort'
     ];
 

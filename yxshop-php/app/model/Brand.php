@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Brand。
+ *
+ * @package app\model
+ */
 class Brand extends BaseModel
 {
     protected $table = 'yxshop_brands';

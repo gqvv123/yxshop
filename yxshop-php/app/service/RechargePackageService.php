@@ -45,7 +45,7 @@ class RechargePackageService extends BaseService
         }
     }
 
-    public function getStats(array $conditions = [])
+    public function getStats(array $conditions = []): array
     {
         try {
             return $this->repository->getStats($conditions);

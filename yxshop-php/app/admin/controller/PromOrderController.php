@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\PromOrderService;
 
+/**
+ * 管理端控制器：Prom Order Controller。
+ *
+ * @package app\admin\controller
+ */
 class PromOrderController extends BaseController
 {
     protected $promOrderService;

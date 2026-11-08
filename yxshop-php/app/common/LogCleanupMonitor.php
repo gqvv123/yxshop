@@ -42,4 +42,4 @@ class LogCleanupMonitor
     {
         return "log_cleanup:alert:{$type}";
     }
-} 
+}

@@ -10,7 +10,6 @@ use app\repository\CommentRepository;
 use app\model\PointTask;
 use app\model\UserPointTask;
 use app\exception\BusinessException;
-use Exception;
 
 /**
  * 积分任务服务
@@ -98,7 +97,7 @@ class PointTaskService extends BaseService
     /**
      * 领取任务奖励
      */
-    public function claimReward(int $userId, $taskId)
+    public function claimReward(int $userId, $taskId): array
     {
         $task = $this->repository->findActive($taskId);
         if (!$task) {
@@ -184,7 +183,7 @@ class PointTaskService extends BaseService
             case PointTask::CODE_FIRST_ORDER:
                 return $this->orderRepository->query()
                     ->where('user_id', $userId)
-                    ->where('pay_status', 1)
+                    ->where('pay_status', 20)
                     ->exists();
 
             case PointTask::CODE_REVIEW:

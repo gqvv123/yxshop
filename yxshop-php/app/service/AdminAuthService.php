@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\AdminAuthRepository;
-use app\model\AdminMenu;
 use app\exception\BusinessException;
 use app\validate\AdminAuthValidate;
 use Exception;
@@ -156,7 +155,7 @@ class AdminAuthService extends BaseService
     /**
      * 删除权限
      */
-    public function deleteAuth($id)
+    public function deleteAuth($id): bool
     {
         try {
             $this->logInfo('删除权限开始', ['id' => $id]);

@@ -70,7 +70,7 @@ class NotificationBlacklistRepository extends BaseRepository
     /**
      * 获取黑名单统计（修复累加 where bug，使用 clone）
      */
-    public function getBlacklistStats($appId = 0)
+    public function getBlacklistStats($appId = 0): array
     {
         $base = $this->query();
 

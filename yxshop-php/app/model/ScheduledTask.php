@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Scheduled Task。
+ *
+ * @package app\model
+ */
 class ScheduledTask extends BaseModel
 {
     protected $table = 'yxshop_scheduled_tasks';

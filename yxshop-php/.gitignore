@@ -28,6 +28,9 @@
 /yarn-error.log
 
 *.bak
+/database/backup_*.sql
+/database/*.sql.bak.*
+*.js.bak.*
 *.log
 
 # ========== 管理后台前端已拆分为独立仓库 ==========
@@ -127,3 +130,24 @@
 /database/seed_page_fix/seed_purchase_orders.sql
 /database/warehouse_function_todo.md
 /database/yxshop_community_*
+
+# ========== 开源版兼容重建的降级 chunk (2026-11-05) ==========
+# 上方「商业版编译产物」规则会连带忽略这些文件。它们是本地按调用形状重建的
+# 兼容模块（非商业版实现），必须纳入版本控制，否则提交/部署后 dist 会再次缺文件。
+# 精确放行，不放宽其它商业版产物。规则须位于忽略规则之后才生效。
+!/public/yxadmin/assets/GroupBuy-C_WSLGhy.js
+!/public/yxadmin/assets/GroupBuy-C_WSLGhy.js.gz
+!/public/yxadmin/assets/GroupBuy-YaDyqQhL.css
+!/public/yxadmin/assets/GroupBuy-YaDyqQhL.css.gz
+!/public/yxadmin/assets/GroupBuyEditor-Ch0roR_E.js
+!/public/yxadmin/assets/GroupBuyEditor-Ch0roR_E.js.gz
+!/public/yxadmin/assets/Seckill-CMfRxPJU.js
+!/public/yxadmin/assets/Seckill-CMfRxPJU.js.gz
+!/public/yxadmin/assets/Seckill-C--QKhgA.css
+!/public/yxadmin/assets/Seckill-C--QKhgA.css.gz
+!/public/yxadmin/assets/SeckillEditor-0UvdOST7.js
+!/public/yxadmin/assets/SeckillEditor-0UvdOST7.js.gz
+!/public/yxadmin/assets/community-DkbL50GJ.js
+!/public/yxadmin/assets/community-DkbL50GJ.js.gz
+!/public/yxadmin/assets/invoice-4HBxIZOc.js
+!/public/yxadmin/assets/invoice-4HBxIZOc.js.gz

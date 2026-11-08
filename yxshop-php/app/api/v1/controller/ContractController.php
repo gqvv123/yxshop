@@ -51,7 +51,7 @@ class ContractController extends BaseController
             return $this->error('参数错误');
         }
 
-        $result = $this->contractService->getDetail($id, $userId);
+        $result = $this->contractService->getDetailForUser($id, $userId);
         if (!$result) {
             return $this->error('合同不存在');
         }
@@ -71,7 +71,7 @@ class ContractController extends BaseController
             return $this->error('用户未登录');
         }
 
-        $stats = $this->contractService->getStats($userId);
+        $stats = $this->contractService->getStatsByUser($userId);
 
         return $this->success($stats);
     }

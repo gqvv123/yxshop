@@ -8,10 +8,8 @@ use app\repository\AiUsageLogRepository;
 use app\repository\AiCreditPackageRepository;
 use app\repository\AiChatSessionRepository;
 use app\model\AiUsageLog;
-use app\model\AiChatSession;
 use app\model\AiCreditPackage;
 use app\exception\BusinessException;
-use Exception;
 
 /**
  * AI 服务层（算力计费 + 配额管理 + 统一入口）

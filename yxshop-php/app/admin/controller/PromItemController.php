@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\PromItemService;
 
+/**
+ * 管理端控制器：Prom Item Controller。
+ *
+ * @package app\admin\controller
+ */
 class PromItemController extends BaseController
 {
     protected $promItemService;

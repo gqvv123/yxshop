@@ -2,6 +2,11 @@
 
 namespace app\utility;
 
+/**
+ * 组件：Order Helper。
+ *
+ * @package app\utility
+ */
 class OrderHelper
 {
     const ORDER_STATUS = [

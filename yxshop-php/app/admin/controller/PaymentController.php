@@ -4,10 +4,14 @@ namespace app\admin\controller;
 
 use support\Request;
 use app\service\PaymentService;
-use app\service\OrderService;
 use app\validate\PaymentValidate;
 use app\exception\ValidationException;
 
+/**
+ * 管理端控制器：Payment Controller。
+ *
+ * @package app\admin\controller
+ */
 class PaymentController extends BaseController
 {
     protected $paymentService;

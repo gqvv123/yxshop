@@ -5,7 +5,6 @@ namespace app\service;
 use app\repository\UserContractRepository;
 use app\model\UserContract;
 use app\model\BaseModel;
-use Exception;
 
 /**
  * 用户合同服务
@@ -22,7 +21,7 @@ class UserContractService extends BaseService
     /**
      * 获取用户合同列表（分页）
      */
-    public function getMyList(int $userId, int $page = 1, int $pageSize = 20)
+    public function getMyList(int $userId, int $page = 1, int $pageSize = 20): array
     {
         $result = $this->repository->getByUserPaginated($userId, $page, $pageSize);
         $now = time();
@@ -68,7 +67,7 @@ class UserContractService extends BaseService
     /**
      * 获取合同详情
      */
-    public function getDetail(int $id, int $userId): ?array
+    public function getDetailForUser(int $id, int $userId): ?array
     {
         $contract = $this->repository->findByUser($id, $userId);
         if (!$contract) {
@@ -108,7 +107,7 @@ class UserContractService extends BaseService
     /**
      * 获取用户合同统计
      */
-    public function getStats(int $userId): array
+    public function getStatsByUser(int $userId): array
     {
         return $this->repository->getStatsByUser($userId);
     }

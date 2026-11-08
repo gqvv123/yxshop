@@ -4,8 +4,6 @@ namespace app\service;
 
 use app\repository\CartRepository;
 use app\repository\UserCouponRepository;
-use app\model\Cart;
-use app\model\UserCoupon;
 use app\exception\BusinessException;
 use Exception;
 
@@ -29,7 +27,7 @@ class CartService extends BaseService
     /**
      * 获取用户购物车（含汇总金额/数量/选中金额/店铺分组）
      */
-    public function getCartList($userId, $appId)
+    public function getCartList($userId, $appId): array
     {
         try {
             $cartItems = $this->repository->getUserCart($userId, $appId);
@@ -114,6 +112,8 @@ class CartService extends BaseService
 
             if ($existing) {
                 $existing->quantity += $quantity;
+                // 刚加回购物车的商品默认勾选，符合用户预期
+                $existing->is_selected = 1;
                 $existing->save();
                 $cartItem = $existing;
             } else {
@@ -128,6 +128,7 @@ class CartService extends BaseService
                     'spec_key_name' => $data['spec_key_name'] ?? '',
                     'price'         => $item->getPrice($data['spec_id'] ?? 0),
                     'quantity'      => $quantity,
+                    'is_selected'   => 1,
                     'app_id'        => $data['app_id'],
                     'created_at'    => $now,
                     'updated_at'    => $now,
@@ -176,7 +177,7 @@ class CartService extends BaseService
     /**
      * 删除购物车单条
      */
-    public function removeCartItem($cartId, $userId)
+    public function removeCartItem($cartId, $userId): bool
     {
         try {
             $cartItem = $this->repository->findUserCartItem((int) $cartId, (int) $userId);
@@ -195,7 +196,7 @@ class CartService extends BaseService
     /**
      * 清空购物车
      */
-    public function clearCart($userId, $appId)
+    public function clearCart($userId, $appId): bool
     {
         try {
             $this->repository->clearUserCart($userId, $appId);
@@ -224,7 +225,7 @@ class CartService extends BaseService
     /**
      * 获取购物车数量徽标（轻量接口，仅返回总件数）
      */
-    public function getCartCount($userId, $appId)
+    public function getCartCount($userId, $appId): array
     {
         try {
             $stats = $this->repository->getCartStats($userId, $appId);
@@ -349,12 +350,17 @@ class CartService extends BaseService
                 ->toArray();
 
             // 运费预估（简化：免邮商品为0，非免邮默认10元，实际应走运费模板）
+            // 批量取出选中商品，避免逐条查询（N+1）
             $shippingFee = 0;
-            foreach ($selectedItems as $item) {
-                $realItem = $this->itemService->find($item->item_id);
-                if ($realItem && !$realItem->isFreeShipping()) {
-                    $shippingFee = 10;
-                    break;
+            if ($selectedItems) {
+                $selectedItemIds = array_values(array_unique(array_filter(
+                    array_map(fn($i) => (int) ($i['item_id'] ?? 0), $selectedItems)
+                )));
+                foreach ($this->itemService->findByIds($selectedItemIds) as $realItem) {
+                    if (!$realItem->isFreeShipping()) {
+                        $shippingFee = 10;
+                        break;
+                    }
                 }
             }
 

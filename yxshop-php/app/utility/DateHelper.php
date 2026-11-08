@@ -4,6 +4,11 @@ namespace app\utility;
 
 use Illuminate\Support\Carbon;
 
+/**
+ * 组件：Date Helper。
+ *
+ * @package app\utility
+ */
 class DateHelper
 {
     public static function diffForHumans($date): string

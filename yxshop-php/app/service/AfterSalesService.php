@@ -56,7 +56,7 @@ class AfterSalesService extends BaseService
     /**
      * 详情（含操作日志 + 退款记录）
      */
-    public function getDetail(int $id): ?AfterSales
+    public function getDetail($id): ?AfterSales
     {
         try {
             return $this->repository->getDetail($id);

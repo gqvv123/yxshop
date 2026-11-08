@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Article Category。
+ *
+ * @package app\model
+ */
 class ArticleCategory extends BaseModel
 {
     protected $table = 'yxshop_article_categories';

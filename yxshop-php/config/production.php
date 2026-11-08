@@ -10,7 +10,7 @@ return [
             'max_files' => 30,
         ],
     ],
-    
+
     // 数据库配置
     'database' => [
         'default' => 'mysql',
@@ -43,7 +43,7 @@ return [
             ],
         ],
     ],
-    
+
     // Redis配置
     'redis' => [
         'default' => [
@@ -81,7 +81,7 @@ return [
             ],
         ],
     ],
-    
+
     // 缓存配置
     'cache' => [
         'default' => 'redis',
@@ -98,7 +98,7 @@ return [
         ],
         'prefix' => env('CACHE_PREFIX', 'yxadmin_cache'),
     ],
-    
+
     // 会话配置
     'session' => [
         'driver' => 'redis',
@@ -118,7 +118,7 @@ return [
         'http_only' => true,
         'same_site' => 'lax',
     ],
-    
+
     // 队列配置
     'queue' => [
         'default' => env('QUEUE_CONNECTION', 'redis'),
@@ -144,7 +144,7 @@ return [
             'table' => 'failed_jobs',
         ],
     ],
-    
+
     // 邮件配置
     'mail' => [
         'default' => env('MAIL_MAILER', 'smtp'),
@@ -165,7 +165,7 @@ return [
             'name' => env('MAIL_FROM_NAME', 'Example'),
         ],
     ],
-    
+
     // 文件上传配置
     'upload' => [
         'disk' => env('UPLOAD_DISK', 'local'),
@@ -173,7 +173,7 @@ return [
         'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx'],
         'path' => 'uploads',
     ],
-    
+
     // 日志配置
     'logging' => [
         'default' => env('LOG_CHANNEL', 'stack'),
@@ -207,7 +207,7 @@ return [
             ],
         ],
     ],
-    
+
     // 安全配置
     'security' => [
         'csrf' => [
@@ -221,7 +221,7 @@ return [
             'enabled' => true,
         ],
     ],
-    
+
     // 性能配置
     'performance' => [
         'cache' => [
@@ -239,7 +239,7 @@ return [
             'minify_js' => true,
         ],
     ],
-    
+
     // 监控配置
     'monitoring' => [
         'enabled' => true,
@@ -256,4 +256,4 @@ return [
             'storage' => runtime_path() . '/profiling',
         ],
     ],
-]; 
+];

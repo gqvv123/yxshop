@@ -128,6 +128,18 @@ class Article extends Model
 
     public function getStatusTextAttribute(): string
     {
+        return $this->getStatusText();
+    }
+
+    /**
+     * 状态文案。
+     *
+     * Service 层（publish / unpublish / updateArticleStatus）在状态校验失败时
+     * 会调用 $article->getStatusText()，此前只有 getStatusTextAttribute() 访问器，
+     * 导致「Call to undefined method Article::getStatusText()」500。
+     */
+    public function getStatusText(): string
+    {
         return [
             self::STATUS_DRAFT     => '草稿',
             self::STATUS_PUBLISHED => '已发布',
@@ -136,12 +148,12 @@ class Article extends Model
         ][$this->status] ?? '未知';
     }
 
-    public function incrementViews()
+    public function incrementViews(): void
     {
         $this->increment('views');
     }
 
-    public function incrementLikes()
+    public function incrementLikes(): void
     {
         $this->increment('likes');
     }

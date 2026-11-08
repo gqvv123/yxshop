@@ -8,6 +8,11 @@ use app\service\AfterSalesService;
 use app\exception\BusinessException;
 use app\exception\NotFoundException;
 
+/**
+ * 组件：After Sales Controller。
+ *
+ * @package app\controller
+ */
 class AfterSalesController extends BaseController
 {
     protected $afterSalesService;

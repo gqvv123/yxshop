@@ -3,8 +3,12 @@
 namespace app\admin\controller;
 
 use support\Request;
-use app\service\AuthService;
 
+/**
+ * 管理端控制器：Permission Controller。
+ *
+ * @package app\admin\controller
+ */
 class PermissionController extends BaseController
 {
 

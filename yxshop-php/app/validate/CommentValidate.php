@@ -23,7 +23,7 @@ class CommentValidate extends Validate
         'user_id' => 'require|number|min:1',
         'order_id' => 'require|number|min:1',
         'item_id' => 'require|number|min:1',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
     ];
 
     /**
@@ -48,9 +48,8 @@ class CommentValidate extends Validate
         'item_id.require' => '商品ID不能为空',
         'item_id.number' => '商品ID必须是数字',
         'item_id.min' => '商品ID不能小于1',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
     ];
 
     /**

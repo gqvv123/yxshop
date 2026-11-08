@@ -4,12 +4,13 @@ namespace app\service;
 
 use app\repository\PaymentRepository;
 use app\repository\SettingRepository;
-use app\model\Payment;
-use app\model\Order;
-use support\Db;
-use support\Log;
 use Exception;
 
+/**
+ * 业务服务：Wechat Pay Service。
+ *
+ * @package app\service
+ */
 class WechatPayService extends BaseService
 {
     protected SettingRepository $settingRepository;
@@ -396,6 +397,7 @@ class WechatPayService extends BaseService
                 }
             }
         } catch (\Exception $e) {
+            // 平台证书匹配失败时按未匹配处理
         }
 
         return 0;

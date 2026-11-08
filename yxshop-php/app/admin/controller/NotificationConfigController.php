@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationConfigService;
 
+/**
+ * 管理端控制器：Notification Config Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationConfigController extends BaseController
 {
     protected $notificationConfigService;

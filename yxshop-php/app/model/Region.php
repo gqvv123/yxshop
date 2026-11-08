@@ -38,12 +38,12 @@ class Region extends BaseModel
     {
         $address = [$this->name];
         $parent = $this->parent;
-        
+
         while ($parent) {
             array_unshift($address, $parent->name);
             $parent = $parent->parent;
         }
-        
+
         return implode('', $address);
     }
 

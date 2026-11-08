@@ -49,7 +49,9 @@ class SecurityService
             if ($cached) {
                 return json_decode($cached, true);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // 读取缓存失败时回落到默认配置
+        }
 
         $result = self::DEFAULT_SECURITY_CONFIG;
         try {
@@ -65,11 +67,15 @@ class SecurityService
                     }
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // 读取系统配置失败时使用默认值
+        }
 
         try {
             \support\Redis::setex('security_config', 3600, json_encode($result));
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // 写缓存失败不影响配置读取
+        }
 
         return $result;
     }
@@ -131,7 +137,9 @@ class SecurityService
     {
         try {
             \support\Redis::del('security_config');
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // 清缓存失败不影响主流程
+        }
     }
 
     public function checkLoginLock(Admin $admin): ?string

@@ -16,7 +16,7 @@ class ItemFavoriteService extends BaseService
 {
     protected $itemService;
 
-    public function __construct(ItemFavoriteRepository $repository = null)
+    public function __construct(?ItemFavoriteRepository $repository = null)
     {
         $repository = $repository ?? new ItemFavoriteRepository();
         parent::__construct($repository);

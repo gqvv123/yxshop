@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Param Template Item。
+ *
+ * @package app\model
+ */
 class ParamTemplateItem extends BaseModel
 {
     protected $table = 'yxshop_param_template_items';

@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：User Feedback。
+ *
+ * @package app\model
+ */
 class UserFeedback extends BaseModel
 {
     protected $table = 'yxshop_user_feedbacks';

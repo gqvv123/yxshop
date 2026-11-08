@@ -46,7 +46,8 @@ class MiniPageController
                 try {
                     $theme = $this->themeService->find($page->theme_id);
                 } catch (\Throwable $e) {
-                }
+            // 主题读取失败不影响页面主体数据，按无主题降级
+        }
             }
 
             $tabBar = $this->tabBarService->getTabBar($appId);
@@ -143,11 +144,12 @@ class MiniPageController
         }
     }
 
-    protected function setCache($key, $data, $ttl = 60)
+    protected function setCache($key, $data, $ttl = 60): void
     {
         try {
             \support\Redis::setex($key, $ttl, json_encode($data, JSON_UNESCAPED_UNICODE));
         } catch (\Throwable $e) {
+            // 写缓存失败不影响主流程
         }
     }
 }

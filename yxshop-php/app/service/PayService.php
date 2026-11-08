@@ -6,8 +6,6 @@ use app\repository\PaymentRepository;
 use app\repository\OrderRepository;
 use app\model\Payment;
 use app\model\Order;
-use support\Db;
-use support\Log;
 use app\exception\BusinessException;
 use Exception;
 

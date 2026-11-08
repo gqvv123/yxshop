@@ -13,7 +13,7 @@ use Exception;
  */
 class CategoryService extends BaseService
 {
-    public function __construct(CategoryRepository $repository = null)
+    public function __construct(?CategoryRepository $repository = null)
     {
         $repository = $repository ?? new CategoryRepository();
         parent::__construct($repository);
@@ -128,7 +128,7 @@ class CategoryService extends BaseService
     /**
      * 删除分类
      */
-    public function deleteCategory($id)
+    public function deleteCategory($id): bool
     {
         try {
             $this->logInfo('删除分类开始', ['id' => $id]);

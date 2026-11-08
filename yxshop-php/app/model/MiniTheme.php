@@ -4,6 +4,11 @@ namespace app\model;
 
 use app\model\BaseModel;
 
+/**
+ * 数据模型：Mini Theme。
+ *
+ * @package app\model
+ */
 class MiniTheme extends BaseModel
 {
     protected $table = 'yxshop_mini_themes';

@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Article Log。
+ *
+ * @package app\model
+ */
 class ArticleLog extends BaseModel
 {
     protected $table = 'yxshop_article_logs';

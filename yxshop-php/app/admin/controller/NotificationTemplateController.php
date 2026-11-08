@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationTemplateService;
 
+/**
+ * 管理端控制器：Notification Template Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationTemplateController extends BaseController
 {
     protected $templateService;
@@ -92,10 +97,10 @@ class NotificationTemplateController extends BaseController
     public function test(Request $request, $id)
     {
         $testData = $request->post('test_data', []);
-        $result = $this->templateService->testTemplate($id, $testData);
-        if (!$result) {
-            return $this->error($this->templateService->getError() ?: '测试发送失败');
+        if (!is_array($testData)) {
+            $testData = [];
         }
-        return $this->success(null, '测试发送成功');
+        $result = $this->templateService->testTemplate($id, $testData);
+        return $this->success($result, '模板渲染成功（仅预览，未实际发送）');
     }
 }

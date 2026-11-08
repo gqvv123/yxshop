@@ -31,7 +31,7 @@ class AdminAuthRepository extends BaseRepository
     /**
      * 权限统计（每项 clone 防累加 where）
      */
-    public function getAuthStats($appId = 0)
+    public function getAuthStats($appId = 0): array
     {
         $base = $this->query();
         if ($appId > 0) {

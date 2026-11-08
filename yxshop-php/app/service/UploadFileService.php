@@ -24,7 +24,7 @@ class UploadFileService extends BaseService
     protected AppStorageQuotaRepository $quotaRepository;
     protected FileDownloadLogRepository $logRepo;
 
-    public function __construct(UploadFileRepository $repository = null)
+    public function __construct(?UploadFileRepository $repository = null)
     {
         $repository = $repository ?? new UploadFileRepository();
         parent::__construct($repository);
@@ -109,7 +109,7 @@ class UploadFileService extends BaseService
                 // 删除物理文件
                 $filePath = public_path($file->file_path ?: $file->file_name);
                 if ($filePath && file_exists($filePath)) {
-                    @unlink($filePath);
+                    \app\common\SafeHelper::unlink($filePath);
                 }
 
                 return (bool) $file->delete();

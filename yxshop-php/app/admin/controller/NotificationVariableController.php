@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationVariableService;
 
+/**
+ * 管理端控制器：Notification Variable Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationVariableController extends BaseController
 {
     protected $notificationVariableService;
@@ -28,7 +33,7 @@ class NotificationVariableController extends BaseController
     {
         $data = $request->post();
         $data['app_id'] = $this->getAppId($request);
-        $result = $this->notificationVariableService->create($data);
+        $result = $this->notificationVariableService->createVariable($data);
         return $this->success($result, '创建成功');
     }
 
@@ -44,7 +49,7 @@ class NotificationVariableController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->post();
-        $result = $this->notificationVariableService->update($id, $data);
+        $result = $this->notificationVariableService->updateVariable($id, $data);
         return $this->success(null, '更新成功');
     }
 

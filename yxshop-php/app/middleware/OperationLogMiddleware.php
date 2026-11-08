@@ -91,6 +91,7 @@ class OperationLogMiddleware implements MiddlewareInterface
                 'created_at' => time()
             ]);
         } catch (\Exception $e) {
+            // 记录操作日志失败不能影响主业务流程
         }
     }
 
@@ -194,6 +195,7 @@ class OperationLogMiddleware implements MiddlewareInterface
                 }
             }
         } catch (\Exception $e) {
+            // 请求体解析失败按无 body 处理
         }
         return null;
     }

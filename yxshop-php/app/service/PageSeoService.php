@@ -2,6 +2,7 @@
 
 namespace app\service;
 
+use app\exception\BusinessException;
 use app\repository\PageSeoRepository;
 use Exception;
 
@@ -77,6 +78,11 @@ class PageSeoService extends BaseService
     public function upsert(string $pageKey, string $langCode, array $data, int $appId = 0)
     {
         try {
+            if (trim($pageKey) === '') {
+                throw new BusinessException('请填写页面标识(page_key)');
+            }
+            $pageKey = trim($pageKey);
+            $langCode = trim($langCode) ?: 'zh-CN';
             $this->logInfo('批量创建或更新SEO配置开始', [
                 'page_key' => $pageKey,
                 'lang_code' => $langCode
@@ -98,6 +104,15 @@ class PageSeoService extends BaseService
     {
         try {
             $this->logInfo('创建SEO配置开始', ['data' => $data]);
+
+            $pageKey = trim((string) ($data['page_key'] ?? ''));
+            if ($pageKey === '') {
+                throw new BusinessException('请填写页面标识(page_key)');
+            }
+            $data['page_key'] = $pageKey;
+            $data['lang_code'] = trim((string) ($data['lang_code'] ?? '')) ?: 'zh-CN';
+            $data['app_id'] = (int) ($data['app_id'] ?? 0);
+
             $seo = $this->repository->create($data);
             $this->logInfo('创建SEO配置成功', ['id' => $seo->id]);
             return $seo;

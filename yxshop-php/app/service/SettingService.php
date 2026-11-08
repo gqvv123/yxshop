@@ -16,7 +16,7 @@ class SettingService extends BaseService
 {
     protected $encryptService;
 
-    public function __construct(SettingRepository $repository = null)
+    public function __construct(?SettingRepository $repository = null)
     {
         $repository = $repository ?? new SettingRepository();
         parent::__construct($repository);
@@ -174,7 +174,7 @@ class SettingService extends BaseService
 
             foreach ($settings as $setting) {
                 $value = $setting->value;
-                
+
                 // 根据类型解析值
                 switch ($setting->type) {
                     case 'json':
@@ -219,7 +219,7 @@ class SettingService extends BaseService
 
             foreach ($settings as $key => $setting) {
                 $value = $setting->value;
-                
+
                 // 根据类型解析值
                 switch ($setting->type) {
                     case 'json':
@@ -255,7 +255,7 @@ class SettingService extends BaseService
     /**
      * 批量设置
      */
-    public function batchSetSettings(array $settings, $appId = 0)
+    public function batchSetSettings(array $settings, $appId = 0): bool
     {
         try {
             $this->logInfo('批量设置开始', ['settings' => $settings, 'app_id' => $appId]);
@@ -280,7 +280,7 @@ class SettingService extends BaseService
     /**
      * 删除设置
      */
-    public function deleteSetting($key, $appId = 0)
+    public function deleteSetting($key, $appId = 0): bool
     {
         try {
             $this->logInfo('删除设置开始', ['key' => $key, 'app_id' => $appId]);

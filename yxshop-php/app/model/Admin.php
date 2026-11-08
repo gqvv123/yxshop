@@ -80,7 +80,7 @@ class Admin extends BaseModel
     /**
      * 检查密码
      */
-    public function checkPassword($password)
+    public function checkPassword($password): bool
     {
         if (!password_verify($password, $this->password)) {
             return false;

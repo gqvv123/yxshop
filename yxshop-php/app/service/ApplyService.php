@@ -14,7 +14,7 @@ use Exception;
  */
 class ApplyService extends BaseService
 {
-    public function __construct(ApplyRepository $repository = null)
+    public function __construct(?ApplyRepository $repository = null)
     {
         $repository = $repository ?? new ApplyRepository();
         parent::__construct($repository);

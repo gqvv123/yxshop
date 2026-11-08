@@ -8,6 +8,11 @@ use app\service\PromOrderService;
 use app\service\NotificationSendService;
 use app\service\MarketingService;
 
+/**
+ * 管理端控制器：Marketing Controller。
+ *
+ * @package app\admin\controller
+ */
 class MarketingController extends BaseController
 {
     protected $promOrderService;

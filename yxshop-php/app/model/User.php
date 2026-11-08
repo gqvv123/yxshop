@@ -16,7 +16,7 @@ class User extends BaseModel
     protected $table = 'yxshop_users';
 
     protected $fillable = [
-        'phone', 'openid', 'unionid', 'email', 'nickname', 'avatar_url', 'gender', 'country', 'province', 'city',
+        'username', 'phone', 'openid', 'unionid', 'email', 'nickname', 'avatar_url', 'gender', 'country', 'province', 'city',
         'default_address_id', 'money', 'total_spent', 'commission', 'deleted_at', 'app_id', 'password',
         'pid', 'level', 'sign', 'integral', 'path', 'agio', 'freeze_money', 'level_id',
         'is_dealer', 'first_num', 'second_num', 'third_num', 'referrer_id', 'referrer_spent',
@@ -64,10 +64,18 @@ class User extends BaseModel
 
     /**
      * 用户等级关联
+     *
+     * 注意 1：users 表本身有一个 legacy 的 `level` 列（varchar），
+     * 关系不能叫 level()，否则 $user->level 永远取到列值而不是关联对象。
+     *
+     * 注意 2：users.level_id 存的是**等级序号**（1/2/3…，见 UserService 注册时写 level_id=1、
+     * UserRepository 用 level_id > 1 判 VIP），不是 user_levels 的自增主键（7100000000001…）。
+     * 所以这里必须匹配 user_levels.level，否则关系永远为空，$user->level_name 只能回退到
+     * legacy 的 level 列（NULL → "普通用户"），会员中心和折扣全部失效。
      */
-    public function level()
+    public function userLevel()
     {
-        return $this->belongsTo(UserLevel::class, 'level_id', 'id');
+        return $this->belongsTo(UserLevel::class, 'level_id', 'level');
     }
 
     /**
@@ -228,7 +236,7 @@ class User extends BaseModel
      */
     public function getLevelNameAttribute()
     {
-        return $this->level ? $this->level->name : '普通用户';
+        return optional($this->userLevel)->name ?: ($this->attributes['level'] ?? '普通用户');
     }
 
     /**
@@ -236,7 +244,7 @@ class User extends BaseModel
      */
     public function getDiscountAttribute()
     {
-        return $this->level ? $this->level->agio : 10.00;
+        return optional($this->userLevel)->agio ?? 10.00;
     }
 
     /**

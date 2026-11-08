@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Delivery。
+ *
+ * @package app\model
+ */
 class Delivery extends BaseModel
 {
     protected $table = 'yxshop_deliveries';

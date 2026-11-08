@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\CurrencyService;
 
+/**
+ * 管理端控制器：Currency Controller。
+ *
+ * @package app\admin\controller
+ */
 class CurrencyController extends BaseController
 {
     protected $currencyService;

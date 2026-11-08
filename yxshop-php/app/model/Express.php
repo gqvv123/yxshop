@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Express。
+ *
+ * @package app\model
+ */
 class Express extends BaseModel
 {
     protected $table = 'yxshop_expresses';

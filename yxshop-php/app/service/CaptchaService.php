@@ -7,7 +7,7 @@ class CaptchaService
     /**
      * 生成传统数字字母验证码
      */
-    public function generate()
+    public function generate(): array
     {
         $code = strtoupper(substr(md5(uniqid()), 0, 4));
         $uuid = \app\uuid\Snowflake::generate();
@@ -27,7 +27,7 @@ class CaptchaService
         imagepng($image);
         $imageData = ob_get_contents();
         ob_end_clean();
-        imagedestroy($image);
+        // PHP 8.0+ 会自动释放 GD 图像资源；imagedestroy() 在 8.5 已废弃，不能调用
 
         $base64 = 'data:image/png;base64,' . base64_encode($imageData);
 
@@ -61,7 +61,7 @@ class CaptchaService
     /**
      * 生成拼图滑块验证码
      */
-    public function generatePuzzle()
+    public function generatePuzzle(): array
     {
         $uuid = \app\uuid\Snowflake::generate();
 

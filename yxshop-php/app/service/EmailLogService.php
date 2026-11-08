@@ -3,8 +3,12 @@
 namespace app\service;
 
 use app\repository\EmailLogRepository;
-use app\model\EmailLog;
 
+/**
+ * 业务服务：Email Log Service。
+ *
+ * @package app\service
+ */
 class EmailLogService extends BaseService
 {
     public function __construct(?EmailLogRepository $repository = null)

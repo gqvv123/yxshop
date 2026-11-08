@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\UserFeedbackRepository;
-use app\model\UserFeedback;
 use Exception;
 
 /**
@@ -120,7 +119,7 @@ class UserFeedbackService extends BaseService
         }
     }
 
-    public function getStats(array $conditions = [])
+    public function getStats(array $conditions = []): array
     {
         try {
             return $this->repository->getStats($conditions);

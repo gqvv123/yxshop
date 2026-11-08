@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\FileLog;
 
+/**
+ * 数据仓储：File Log Repository。
+ *
+ * @package app\repository
+ */
 class FileLogRepository extends BaseRepository
 {
     protected $model = FileLog::class;

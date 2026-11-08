@@ -8,12 +8,12 @@ use app\service\CartService;
 class CartController extends BaseController
 {
     protected $cartService;
-    
+
     public function __construct()
     {
         $this->cartService = new CartService();
     }
-    
+
     /**
      * 获取购物车列表
      */
@@ -21,16 +21,16 @@ class CartController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $appId = (int) $request->get('app_id', 0);
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         $result = $this->cartService->getCartList($userId, $appId);
-        
+
         return $this->success($result);
     }
-    
+
     /**
      * 添加商品到购物车
      */
@@ -56,7 +56,7 @@ class CartController extends BaseController
 
         $data['user_id'] = $userId;
         $data['app_id'] = (int) ($data['app_id'] ?? 0);
-        
+
         try {
             $result = $this->cartService->addToCart($data);
             return $this->success($result, '添加成功');
@@ -64,7 +64,7 @@ class CartController extends BaseController
             return $this->error($e->getMessage());
         }
     }
-    
+
     /**
      * 更新购物车商品数量
      */
@@ -73,19 +73,19 @@ class CartController extends BaseController
         $userId = $this->getCurrentUserId($request);
         $cartId = $request->post('cart_id');
         $quantity = $request->post('quantity');
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         if (!$cartId) {
             return $this->error('购物车ID不能为空');
         }
-        
+
         if ($quantity < 0) {
             return $this->error('商品数量不能小于0');
         }
-        
+
         try {
             $result = $this->cartService->updateCartItem($cartId, $userId, $quantity);
             return $this->success($result, '更新成功');
@@ -93,7 +93,7 @@ class CartController extends BaseController
             return $this->error($e->getMessage());
         }
     }
-    
+
     /**
      * 删除购物车商品
      */
@@ -101,15 +101,15 @@ class CartController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $cartId = $request->post('cart_id');
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         if (!$cartId) {
             return $this->error('购物车ID不能为空');
         }
-        
+
         try {
             $this->cartService->removeCartItem($cartId, $userId);
             return $this->success(null, '删除成功');
@@ -117,7 +117,7 @@ class CartController extends BaseController
             return $this->error($e->getMessage());
         }
     }
-    
+
     /**
      * 清空购物车
      */
@@ -125,11 +125,11 @@ class CartController extends BaseController
     {
         $userId = $this->getCurrentUserId($request);
         $appId = (int) $request->post('app_id', 0);
-        
+
         if (!$userId) {
             return $this->error('用户未登录');
         }
-        
+
         try {
             $this->cartService->clearCart($userId, $appId);
             return $this->success(null, '清空成功');
@@ -137,7 +137,7 @@ class CartController extends BaseController
             return $this->error($e->getMessage());
         }
     }
-    
+
     /**
      * 获取购物车数量徽标（轻量接口，用于 tabbar 红点）
      */

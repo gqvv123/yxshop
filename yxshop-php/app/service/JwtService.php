@@ -10,7 +10,7 @@ class JwtService
     private $secret;
     private $algorithm;
     private $expireTime;
-    
+
     /**
      * 已知的弱密钥/默认密钥，禁止在生产环境使用
      */
@@ -63,7 +63,7 @@ class JwtService
             \support\Log::warning('JwtService: JWT_SECRET 未配置，已生成临时密钥。生产环境务必在 .env 中配置固定密钥。');
         }
     }
-    
+
     /**
      * 生成JWT token
      */
@@ -71,7 +71,7 @@ class JwtService
     {
         $now = time();
         $ttl = $expireTime ?? $this->expireTime;
-        
+
         $token = [
             'iat' => $now,
             'exp' => $now + $ttl,
@@ -80,7 +80,7 @@ class JwtService
             'aud' => 'merchant',
             'data' => $payload
         ];
-        
+
         return JWT::encode($token, $this->secret, $this->algorithm);
     }
 
@@ -89,7 +89,7 @@ class JwtService
         $payload['scope'] = $scope;
         return $this->generateToken($payload, $expireTime);
     }
-    
+
     /**
      * 验证JWT token
      */
@@ -97,10 +97,10 @@ class JwtService
     {
         try {
             $decoded = JWT::decode($token, new Key($this->secret, $this->algorithm));
-            
+
             // 将对象转换为数组
             $decodedArray = json_decode(json_encode($decoded), true);
-            
+
             return [
                 'success' => true,
                 'data' => $decodedArray['data'],
@@ -113,45 +113,45 @@ class JwtService
             ];
         }
     }
-    
+
     /**
      * 刷新JWT token
      */
     public function refreshToken(string $token): array
     {
         $validation = $this->validateToken($token);
-        
+
         if (!$validation['success']) {
             return $validation;
         }
-        
+
         // 生成新的token
         $newToken = $this->generateToken($validation['data']);
-        
+
         return [
             'success' => true,
             'token' => $newToken,
             'message' => 'Token刷新成功'
         ];
     }
-    
+
     /**
      * 从token中获取用户信息
      */
     public function getUserFromToken(string $token): array
     {
         $validation = $this->validateToken($token);
-        
+
         if (!$validation['success']) {
             return $validation;
         }
-        
+
         return [
             'success' => true,
             'user' => $validation['data']
         ];
     }
-    
+
     /**
      * 检查token是否即将过期
      */
@@ -184,4 +184,4 @@ class JwtService
     {
         return (bool) \support\Redis::get("jwt_blacklist:" . md5($token));
     }
-} 
+}

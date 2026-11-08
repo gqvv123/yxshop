@@ -4,7 +4,6 @@ namespace app\service;
 
 use app\repository\UserMoneyLogRepository;
 use app\model\UserMoneyLog;
-use Exception;
 
 class UserMoneyLogService extends BaseService
 {

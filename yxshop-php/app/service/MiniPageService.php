@@ -3,7 +3,6 @@
 namespace app\service;
 
 use app\repository\MiniPageRepository;
-use app\repository\MiniPageVersionRepository;
 use app\model\MiniPage;
 use app\exception\BusinessException;
 use support\Db;
@@ -275,7 +274,7 @@ class MiniPageService extends BaseService
         return false;
     }
 
-    protected function validatePageDataSize($pageData)
+    protected function validatePageDataSize($pageData): void
     {
         $jsonSize = strlen(json_encode($pageData));
         if ($jsonSize > 200 * 1024) {
@@ -283,19 +282,20 @@ class MiniPageService extends BaseService
         }
     }
 
-    protected function validatePageDataCount($pageData)
+    protected function validatePageDataCount($pageData): void
     {
         if (is_array($pageData) && count($pageData) > 50) {
             throw new BusinessException('组件数量已达上限(50)');
         }
     }
 
-    protected function clearPageCache($appId)
+    protected function clearPageCache($appId): void
     {
         try {
             $key = "mini_page:home:{$appId}";
             \support\Redis::del($key);
         } catch (\Throwable $e) {
+            // 清缓存失败不影响主流程
         }
     }
 
@@ -328,6 +328,7 @@ class MiniPageService extends BaseService
                 $appId
             );
         } catch (\Throwable $e) {
+            // 审计日志写入失败不影响主流程
         }
     }
 }

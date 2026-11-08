@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Refund Record。
+ *
+ * @package app\model
+ */
 class RefundRecord extends BaseModel
 {
     protected $table = 'yxshop_refund_records';

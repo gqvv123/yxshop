@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Notification。
+ *
+ * @package app\model
+ */
 class Notification extends BaseModel
 {
     protected $table = 'yxshop_notifications';

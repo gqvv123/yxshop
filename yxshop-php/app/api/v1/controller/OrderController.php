@@ -47,19 +47,47 @@ class OrderController extends BaseController
         if (empty($data['items']) || !is_array($data['items'])) {
             return $this->error('订单商品不能为空');
         }
-        if (empty($data['app_id'])) {
+        // 单租户商城 app_id 允许为 0，不能用 empty 判断
+        if (!isset($data['app_id']) || $data['app_id'] === '') {
             // 兜底从中间件携带的 user 上读取 app_id
             $user = $request->user ?? null;
-            $data['app_id'] = $user->app_id ?? 0;
+            $data['app_id'] = (int) ($user->app_id ?? 0);
         }
-        if (empty($data['app_id'])) {
-            return $this->error('app_id 不能为空');
-        }
+        $data['app_id'] = (int) $data['app_id'];
 
         $data['user_id'] = $userId;
         // OrderService 失败时抛 Exception，由全局 ExceptionHandler 转为 JSON
         $order = $this->orderService->createOrder($data);
         return $this->success($order, '订单创建成功');
+    }
+
+    /**
+     * 结算试算
+     *
+     * POST /api/v1/order/preview
+     * 入参：items[{item_id,quantity,spec_id?}]、coupon_id?、address_id?、delivery_id?
+     * 返回：商品金额、会员折扣、优惠券折扣、运费、实付、可用券列表
+     */
+    public function preview(Request $request)
+    {
+        $userId = $this->getCurrentUserId($request);
+        if (!$userId) {
+            return $this->error('用户未登录');
+        }
+
+        $data = $request->post();
+        $items = $data['items'] ?? [];
+        if (!is_array($items) || !$items) {
+            return $this->error('订单商品不能为空');
+        }
+
+        $data['user_id'] = $userId;
+        if (!isset($data['app_id']) || $data['app_id'] === '') {
+            $user = $request->user ?? null;
+            $data['app_id'] = (int) ($user->app_id ?? 0);
+        }
+
+        return $this->success($this->orderService->previewOrder($data), '试算成功');
     }
 
     /**

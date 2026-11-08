@@ -7,6 +7,11 @@ use support\Response;
 use app\service\SecurityService;
 use app\exception\BusinessException;
 
+/**
+ * 管理端控制器：Security Controller。
+ *
+ * @package app\admin\controller
+ */
 class SecurityController extends BaseController
 {
     protected $securityService;

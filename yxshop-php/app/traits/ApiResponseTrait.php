@@ -2,6 +2,12 @@
 
 namespace app\traits;
 
+/**
+ * 公共组件：统一 API 响应封装 Trait。
+ *
+ * @package app\traits
+ */
+
 use support\Response;
 
 trait ApiResponseTrait

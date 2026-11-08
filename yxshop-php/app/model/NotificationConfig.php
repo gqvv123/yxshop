@@ -77,7 +77,7 @@ class NotificationConfig extends BaseModel
     /**
      * 设置配置值（自动编码JSON）
      */
-    public function setConfigValueAttribute($value)
+    public function setConfigValueAttribute($value): void
     {
         if (is_array($value) || is_object($value)) {
             $this->attributes['config_value'] = json_encode($value);

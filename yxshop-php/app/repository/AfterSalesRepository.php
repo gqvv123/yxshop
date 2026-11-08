@@ -102,7 +102,7 @@ class AfterSalesRepository extends BaseRepository
         return $query->get();
     }
 
-    public function getAfterSalesStats($appId = 0)
+    public function getAfterSalesStats($appId = 0): array
     {
         $base = $this->query();
         if ($appId > 0) {

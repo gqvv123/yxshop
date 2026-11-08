@@ -18,7 +18,7 @@ class PromOrderRepository extends BaseRepository
     public function getPaginatedListWithRelations(int $appId = 0, int $pageSize = 20, string $keyword = '', int $page = 1): LengthAwarePaginator
     {
         $query = $this->query()
-            ->with(['promotion:id,title,type', 'order:id,order_no,total_price,status,pay_status', 'user:id,nickname,username'])
+            ->with(['promotion:id,title,type', 'order:id,order_no,total_price,status,pay_status', 'user:id,nickname,avatar_url'])
             ->orderBy('id', 'desc');
 
         if ($appId > 0) {
@@ -76,7 +76,7 @@ class PromOrderRepository extends BaseRepository
     /**
      * 获取促销订单统计
      */
-    public function getPromOrderStats($startTime = null, $endTime = null, $appId = 0)
+    public function getPromOrderStats($startTime = null, $endTime = null, $appId = 0): array
     {
         $query = $this->query();
 
@@ -107,7 +107,7 @@ class PromOrderRepository extends BaseRepository
     /**
      * 获取用户促销订单统计
      */
-    public function getUserPromOrderStats($userId, $appId = 0)
+    public function getUserPromOrderStats($userId, $appId = 0): array
     {
         $query = $this->query()->where('user_id', $userId);
 
@@ -122,4 +122,33 @@ class PromOrderRepository extends BaseRepository
             'success_amount' => $query->where('prom_status', PromOrder::STATUS_SUCCESS)->sum('prom_amount'),
         ];
     }
+
+    /**
+     * 按活动 ID 批量统计订单数，返回以 prom_id 为键的数组。
+     *
+     * 用于消除「循环里逐个 count」的 N+1 查询。
+     *
+     * @param array<int, mixed> $promIds
+     * @return array<string, int>
+     */
+    public function countByPromIds(array $promIds): array
+    {
+        $promIds = array_values(array_unique(array_filter(array_map('intval', $promIds))));
+        if (!$promIds) {
+            return [];
+        }
+
+        $rows = $this->query()
+            ->whereIn('prom_id', $promIds)
+            ->groupBy('prom_id')
+            ->selectRaw('prom_id, COUNT(*) as cnt')
+            ->get();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(string) $row->prom_id] = (int) $row->cnt;
+        }
+        return $map;
+    }
+
 }

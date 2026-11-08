@@ -4,6 +4,11 @@ namespace app\repository;
 
 use app\model\MiniTabBar;
 
+/**
+ * 数据仓储：Mini Tab Bar Repository。
+ *
+ * @package app\repository
+ */
 class MiniTabBarRepository extends BaseRepository
 {
     public function __construct()

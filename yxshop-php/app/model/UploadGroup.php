@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Upload Group。
+ *
+ * @package app\model
+ */
 class UploadGroup extends BaseModel
 {
     protected $table = 'yxshop_upload_groups';

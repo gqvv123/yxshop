@@ -10,8 +10,8 @@ class Advertisement extends BaseModel
     protected $table = 'yxshop_advertisements';
 
     protected $fillable = [
-        'title', 'content', 'image', 'link', 'position', 'sort', 'is_show',
-        'start_time', 'end_time', 'app_id'
+        'title', 'content', 'count', 'image', 'link', 'position', 'sort', 'is_show',
+        'start_time', 'end_time', 'status', 'app_id'
     ];
 
     protected $casts = [
@@ -39,9 +39,9 @@ class Advertisement extends BaseModel
     public function isValid()
     {
         $now = time();
-        return $this->is_show == 1 && 
+        return $this->is_show == 1 &&
                $this->deleted_at == 0 &&
-               $this->start_time <= $now && 
+               $this->start_time <= $now &&
                $this->end_time >= $now;
     }
 

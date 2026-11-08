@@ -14,7 +14,7 @@ class ViewFactoryAdapter implements ViewFactoryContract
         $this->blade = $blade;
     }
 
-    public function exists($view)
+    public function exists($view): bool
     {
         // 简单实现，总是返回 true
         return true;
@@ -45,7 +45,7 @@ class ViewFactoryAdapter implements ViewFactoryContract
             {
                 return $this->blade->render($this->view, $this->data);
             }
-            
+
             public function __toString()
             {
                 return $this->render();
@@ -59,13 +59,13 @@ class ViewFactoryAdapter implements ViewFactoryContract
         return $this;
     }
 
-    public function composer($views, $callback)
+    public function composer($views, $callback): array
     {
         // 不实现视图合成器功能
         return [];
     }
 
-    public function creator($views, $callback)
+    public function creator($views, $callback): array
     {
         // 不实现视图创建器功能
         return [];

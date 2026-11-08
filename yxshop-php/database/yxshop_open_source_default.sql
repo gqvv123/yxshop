@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- YXShop 开源版完整数据库初始化脚本
 -- 版本: 1.0.0 (2026-08-23)
 -- 
@@ -153,6 +153,16 @@ CREATE TABLE `yxshop_admins`  (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'email',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '头像',
   `last_login_at` int(11) NULL DEFAULT 0 COMMENT '最后登录时间',
+  `two_factor_secret` varchar(255) NULL DEFAULT NULL COMMENT '2FA密钥',
+  `two_factor_enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT '2FA开关',
+  `login_fail_count` int(11) NOT NULL DEFAULT 0 COMMENT '连续登录失败次数',
+  `locked_until` int(11) NULL DEFAULT NULL COMMENT '锁定截止时间',
+  `password_changed_at` int(11) NULL DEFAULT NULL COMMENT '密码修改时间',
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0 COMMENT '强制改密',
+  `wechat_openid` varchar(128) NULL DEFAULT NULL COMMENT '微信openid',
+  `wechat_bound_at` int(11) NOT NULL DEFAULT 0 COMMENT '微信绑定时间',
+  `wechat_nickname` varchar(100) NULL DEFAULT NULL COMMENT '微信昵称',
+  `wechat_avatar` varchar(500) NULL DEFAULT NULL COMMENT '微信头像',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `user_name`(`username`) USING BTREE,
   INDEX `id`(`id`) USING BTREE,
@@ -2268,12 +2278,38 @@ CREATE TABLE `yxshop_system_logs`  (
   `user_agent` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户代理',
   `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `is_compressed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否已压缩(0否 1是)',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_log_level`(`log_level`) USING BTREE,
   INDEX `idx_log_type`(`log_type`) USING BTREE,
   INDEX `idx_module_action`(`module`, `action`) USING BTREE,
   INDEX `idx_created_at`(`created_at`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统操作日志表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for yxshop_system_logs_archive
+-- ----------------------------
+DROP TABLE IF EXISTS `yxshop_system_logs_archive`;
+CREATE TABLE `yxshop_system_logs_archive`  (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `log_level` tinyint(3) UNSIGNED NOT NULL DEFAULT 20 COMMENT '日志级别',
+  `log_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志类型',
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模块名称',
+  `action` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作动作',
+  `message` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '日志消息',
+  `context` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '上下文信息',
+  `file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '文件路径',
+  `line` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '行号',
+  `trace` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '堆栈跟踪',
+  `ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP地址',
+  `user_agent` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户代理',
+  `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '原始创建时间',
+  `archived_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '归档时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_created_at`(`created_at`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统操作日志归档表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for yxshop_upload_files
@@ -2623,17 +2659,17 @@ ON t1.name = t2.name AND t1.parent_id = t2.parent_id AND t1.id > t2.id;
 SET NAMES utf8mb4;
 
 -- yxshop_expresses: create_time → created_at, update_time → updated_at
-ALTER TABLE `yxshop_expresses` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
-ALTER TABLE `yxshop_expresses` CHANGE `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` CHANGE `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
 
 -- yxshop_item_favorites: create_time → created_at
-ALTER TABLE `yxshop_item_favorites` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_favorites` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
 
 -- yxshop_item_views: create_time → created_at
-ALTER TABLE `yxshop_item_views` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_views` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
 
 -- yxshop_item_searches: create_time → created_at
-ALTER TABLE `yxshop_item_searches` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_searches` CHANGE `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
 
 -- ---- 迁移: 2026_03_unify_primary_keys.sql ----
 -- ============================================================
@@ -2645,19 +2681,19 @@ ALTER TABLE `yxshop_item_searches` CHANGE `create_time` `created_at` int(11) UNS
 SET NAMES utf8mb4;
 
 -- yxshop_admin_logs: log_id → id
-ALTER TABLE `yxshop_admin_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
 
 -- yxshop_data_change_logs: log_id → id
-ALTER TABLE `yxshop_data_change_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_data_change_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
 
 -- yxshop_email_logs: log_id → id
-ALTER TABLE `yxshop_email_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_email_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
 
 -- yxshop_file_logs: log_id → id
-ALTER TABLE `yxshop_file_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_file_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
 
 -- yxshop_item_spec_stock_logs: log_id → id
-ALTER TABLE `yxshop_item_spec_stock_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_stock_logs` CHANGE `log_id` `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
 
 -- ---- 迁移: 2026_04_unify_foreign_keys.sql ----
 -- ============================================================
@@ -2669,16 +2705,16 @@ ALTER TABLE `yxshop_item_spec_stock_logs` CHANGE `log_id` `id` int(11) UNSIGNED 
 SET NAMES utf8mb4;
 
 -- yxshop_item_attrs: goods_id → item_id
-ALTER TABLE `yxshop_item_attrs` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
 -- yxshop_spec_items: goods_id → item_id
-ALTER TABLE `yxshop_spec_items` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
 -- yxshop_spec_item_prices: goods_id → item_id
-ALTER TABLE `yxshop_spec_item_prices` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_item_prices` CHANGE `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
 -- yxshop_coupon_goods: goods_id → item_id
-ALTER TABLE `yxshop_coupon_goods` CHANGE `goods_id` `item_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_goods` CHANGE `goods_id` `item_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
 -- ---- 迁移: 2026_06_fix_brands_table.sql ----
 -- ============================================================
@@ -2689,7 +2725,7 @@ ALTER TABLE `yxshop_coupon_goods` CHANGE `goods_id` `item_id` int(11) UNSIGNED N
 
 SET NAMES utf8mb4;
 
-ALTER TABLE `yxshop_brands` DROP COLUMN `sort_order`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_brands` DROP COLUMN `sort_order`;
 
 -- ---- 迁移: 2026_07_03_000001_create_mini_page_tables.sql ----
 -- 小程序首页动态装修 — 数据库迁移
@@ -2789,11 +2825,11 @@ SET @NOW = UNIX_TIMESTAMP();
 -- -----------------------------------------------------------
 -- 93: 小程序装修（顶级菜单，插入到 内容管理(25) 之后）
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (93, 0, '小程序装修', 'mini-page', NULL, 'icon-apps', 65, 1, NULL, 'GET', @APP_ID, @NOW, @NOW);
 
 -- 小程序装修子菜单
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (94, 93, '页面管理', 'mini-page', '/mini-page', 'icon-list', 10, 1, 'mini-page/index', 'GET', @APP_ID, @NOW, @NOW),
 (95, 93, '主题管理', 'mini-page', '/mini-page/theme', 'icon-skin', 20, 1, 'mini-page/themes', 'GET', @APP_ID, @NOW, @NOW),
 (96, 93, 'TabBar配置', 'mini-page', '/mini-page/tabbar', 'icon-nav', 30, 1, 'mini-page/tabbar', 'GET', @APP_ID, @NOW, @NOW);
@@ -2801,7 +2837,7 @@ INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `ic
 -- -----------------------------------------------------------
 -- 自动授权：给超级管理员角色(role_id=1)授予所有新菜单权限
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, `id`, @NOW, @NOW FROM `yxshop_admin_menus`
 WHERE `id` >= 93 AND `is_show` = 1
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
@@ -2811,8 +2847,8 @@ ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 -- 原 varchar(5) 仅能存 light/dark，扩展为 varchar(7) 以支持任意 HEX 颜色(#RRGGBB)
 
 -- 迁移旧数据: 将 light/dark 文本值转换为对应 HEX
-ALTER TABLE `yxshop_mini_themes`
-  MODIFY COLUMN `nav_text_color` varchar(7) NOT NULL DEFAULT '#333333' COMMENT '导航栏文字色(HEX)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_mini_themes`
+-- [DISABLED-REDUNDANT-MIGRATION]   MODIFY COLUMN `nav_text_color` varchar(7) NOT NULL DEFAULT '#333333' COMMENT '导航栏文字色(HEX)';
 UPDATE `yxshop_mini_themes` SET `nav_text_color` = '#000000' WHERE `nav_text_color` = 'dark';
 
 -- ---- 迁移: 2026_07_03_000004_user_list_menu.sql ----
@@ -2836,14 +2872,14 @@ WHERE `id` = 16 AND `app_id` = @APP_ID;
 -- -----------------------------------------------------------
 -- 2) 新增"用户列表"菜单（parent=用户管理 15，component=user/list）
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (97, 15, '用户列表', 'user', '/user/index', 'icon-user', 8, 1, 'user/list', 'GET', @APP_ID, @NOW, @NOW)
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `url` = VALUES(`url`), `permission` = VALUES(`permission`), `updated_at` = @NOW;
 
 -- -----------------------------------------------------------
 -- 3) 自动授权：给超级管理员角色(role_id=1)授予新菜单权限
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, 97, @NOW, @NOW
 WHERE NOT EXISTS (
     SELECT 1 FROM `yxshop_admin_role_auths` WHERE `role_id` = 1 AND `auth_id` = 97
@@ -2864,16 +2900,16 @@ SET NAMES utf8mb4;
 -- 执行顺序：Phase 2.5
 -- 日期：2026-06-20
 -- ============================================================
-ALTER TABLE `yxshop_user_levels`
-  ADD COLUMN `level` int(11) NOT NULL DEFAULT 1 COMMENT '等级值' AFTER `name`,
-  ADD COLUMN `experience` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '升级所需经验值' AFTER `level`,
-  ADD COLUMN `discount` decimal(5,2) NOT NULL DEFAULT 100.00 COMMENT '折扣(百分比 0-100)' AFTER `experience`,
-  ADD COLUMN `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否默认等级: 1是 0否' AFTER `status`,
-  ADD COLUMN `description` varchar(255) NULL DEFAULT NULL COMMENT '等级描述' AFTER `is_default`,
-  ADD INDEX `idx_app_level` (`app_id`, `level`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `level` int(11) NOT NULL DEFAULT 1 COMMENT '等级值' AFTER `name`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `experience` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '升级所需经验值' AFTER `level`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `discount` decimal(5,2) NOT NULL DEFAULT 100.00 COMMENT '折扣(百分比 0-100)' AFTER `experience`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否默认等级: 1是 0否' AFTER `status`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `description` varchar(255) NULL DEFAULT NULL COMMENT '等级描述' AFTER `is_default`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_app_level` (`app_id`, `level`);
 
-ALTER TABLE `yxshop_expresses` CHANGE `express_name` `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '快递公司名称';
-ALTER TABLE `yxshop_expresses` CHANGE `express_code` `code` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '快递公司编码';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` CHANGE `express_name` `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '快递公司名称';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` CHANGE `express_code` `code` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '快递公司编码';
 
 -- ---- 迁移: 2026_08_fix_comments_table.sql ----
 -- ============================================================
@@ -2885,8 +2921,8 @@ ALTER TABLE `yxshop_expresses` CHANGE `express_code` `code` varchar(100) CHARACT
 
 SET NAMES utf8mb4;
 
-ALTER TABLE `yxshop_comments` CHANGE `is_picture` `images` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '评价图片(JSON数组)';
-ALTER TABLE `yxshop_comments` CHANGE `reply` `reply_content` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '商家回复内容';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` CHANGE `is_picture` `images` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '评价图片(JSON数组)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` CHANGE `reply` `reply_content` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '商家回复内容';
 
 -- ---- 迁移: 2026_09_table_comments.sql ----
 -- ============================================================
@@ -2897,14 +2933,14 @@ ALTER TABLE `yxshop_comments` CHANGE `reply` `reply_content` text CHARACTER SET 
 
 SET NAMES utf8mb4;
 
-ALTER TABLE `yxshop_item_attributes` COMMENT='属性定义表（定义属性名称和类型）';
-ALTER TABLE `yxshop_item_attrs` COMMENT='商品-属性值关联表（记录商品的属性值）';
-ALTER TABLE `yxshop_item_types` COMMENT='商品类型表（实物/虚拟/服务）';
-ALTER TABLE `yxshop_notification_variables` COMMENT='系统通知变量定义（如{{order_no}}、{{user_name}}）';
-ALTER TABLE `yxshop_notification_template_variables` COMMENT='模板-变量关联表（记录模板使用了哪些变量）';
-ALTER TABLE `yxshop_promotions` COMMENT='促销活动主表（定义活动规则）';
-ALTER TABLE `yxshop_prom_orders` COMMENT='订单级促销记录（满减/折扣等）';
-ALTER TABLE `yxshop_prom_goods` COMMENT='商品级促销记录（特价/限时等）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attributes` COMMENT='属性定义表（定义属性名称和类型）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` COMMENT='商品-属性值关联表（记录商品的属性值）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_types` COMMENT='商品类型表（实物/虚拟/服务）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_variables` COMMENT='系统通知变量定义（如{{order_no}}、{{user_name}}）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_template_variables` COMMENT='模板-变量关联表（记录模板使用了哪些变量）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_promotions` COMMENT='促销活动主表（定义活动规则）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_orders` COMMENT='订单级促销记录（满减/折扣等）';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_goods` COMMENT='商品级促销记录（特价/限时等）';
 
 -- ---- 迁移: 2026_10_add_indexes_and_charset.sql ----
 -- ============================================================
@@ -2916,46 +2952,46 @@ ALTER TABLE `yxshop_prom_goods` COMMENT='商品级促销记录（特价/限时�
 SET NAMES utf8mb4;
 
 -- yxshop_orders 索引
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_status`(`status`);
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_pay_status`(`pay_status`);
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_user_id`(`user_id`);
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_created_at`(`created_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_status`(`status`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_pay_status`(`pay_status`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_user_id`(`user_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_created_at`(`created_at`);
 
 -- yxshop_items 索引
-ALTER TABLE `yxshop_items` ADD INDEX `idx_is_on_sale`(`is_on_sale`);
-ALTER TABLE `yxshop_items` ADD INDEX `idx_category_id`(`category_id`);
-ALTER TABLE `yxshop_items` ADD INDEX `idx_brand_id`(`brand_id`);
-ALTER TABLE `yxshop_items` ADD INDEX `idx_created_at`(`created_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_is_on_sale`(`is_on_sale`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_category_id`(`category_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_brand_id`(`brand_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_created_at`(`created_at`);
 
 -- yxshop_users 索引
-ALTER TABLE `yxshop_users` ADD INDEX `idx_phone`(`phone`);
-ALTER TABLE `yxshop_users` ADD INDEX `idx_status`(`status`);
-ALTER TABLE `yxshop_users` ADD INDEX `idx_created_at`(`created_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` ADD INDEX `idx_phone`(`phone`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` ADD INDEX `idx_status`(`status`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` ADD INDEX `idx_created_at`(`created_at`);
 
 -- 字符集统一为utf8mb4
-ALTER TABLE `yxshop_admin_logs` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_admin_auths` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_admin_menus` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_admin_roles` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_admins` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_advertisements` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_agent_capitals` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_agent_withdraws` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_app_helps` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_app_navbars` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_app_pages` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_app_prepay_ids` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_applies` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_apps` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_brands` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_categories` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_comments` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_coupon_goods` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_coupons` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_expresses` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_items` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_orders` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE `yxshop_users` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_logs` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_auths` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_menus` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agent_capitals` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agent_withdraws` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_helps` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_navbars` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_prepay_ids` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_apps` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_brands` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_categories` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_goods` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- ---- 迁移: 2026_11_create_role_auths_pivot.sql ----
 SET NAMES utf8mb4;
@@ -2973,7 +3009,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_admin_role_auths` (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色权限关联表' ROW_FORMAT = DYNAMIC;
 
 -- 为超级管理员角色分配所有菜单权限
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, `id`, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() FROM `yxshop_admin_menus` WHERE `is_show` = 1;
 
 -- ---- 迁移: 2026_12_rebuild_menus_tree.sql ----
@@ -2981,7 +3017,7 @@ SET NAMES utf8mb4;
 
 TRUNCATE TABLE `yxshop_admin_menus`;
 
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (1, 0, '仪表盘', 'dashboard', '/dashboard', 'icon-dashboard', 10, 1, 'dashboard/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (2, 0, '商品管理', 'product', NULL, 'icon-apps', 20, 1, NULL, 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (3, 2, '商品列表', 'product', '/product/items', 'icon-list', 10, 1, 'item/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -3056,7 +3092,7 @@ INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `ic
 (72, 55, '邮件日志', 'log', '/log/email', 'icon-mail', 60, 1, 'email-logs/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (73, 55, '文件日志', 'log', '/log/file', 'icon-folder', 70, 1, 'file-logs/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, `id`, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() FROM `yxshop_admin_menus` WHERE `is_show` = 1
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
@@ -3101,7 +3137,7 @@ INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `ur
 (72, 55, '邮件日志', 'log', '/log/email', 'icon-mail', 60, 1, 'email-logs/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (73, 55, '文件日志', 'log', '/log/file', 'icon-folder', 70, 1, 'file-logs/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, `id`, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() FROM `yxshop_admin_menus` WHERE `id` >= 59 AND `id` <= 73 AND `is_show` = 1
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
@@ -3167,205 +3203,205 @@ CREATE TABLE IF NOT EXISTS `yxshop_agents` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代理商';
 
 -- 修复 app_pages 表：添加缺失的 sort 字段
-ALTER TABLE `yxshop_app_pages` ADD COLUMN `sort` int unsigned NOT NULL DEFAULT 0 COMMENT '排序' AFTER `page_data`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` ADD COLUMN `sort` int unsigned NOT NULL DEFAULT 0 COMMENT '排序' AFTER `page_data`;
 
 -- 修复 applies 表：确保 apply_type 和 apply_status 字段有默认值
-ALTER TABLE `yxshop_applies` MODIFY COLUMN `apply_type` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '申请类型';
-ALTER TABLE `yxshop_applies` MODIFY COLUMN `apply_status` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '申请状态';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` MODIFY COLUMN `apply_type` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '申请类型';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` MODIFY COLUMN `apply_status` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '申请状态';
 
 -- ---- 迁移: 2026_15_fix_upload_tables.sql ----
 -- Fix upload_files: add missing columns, rename extension -> file_ext
-ALTER TABLE `yxshop_upload_files`
-  ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`,
-  ADD COLUMN `file_path` varchar(255) NOT NULL DEFAULT '' AFTER `file_name`,
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `file_path` varchar(255) NOT NULL DEFAULT '' AFTER `file_name`,
+-- [DISABLED-REDUNDANT-MIGRATION] 
+-- [DISABLED-REDUNDANT-MIGRATION] -- ---- 迁移: 2026_16_normalize_all_tables.sql ----
+-- [DISABLED-REDUNDANT-MIGRATION] -- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] -- yxshop Database Normalization Migration
+-- [DISABLED-REDUNDANT-MIGRATION] -- Order: PART2 first (rename time cols), then PART1 (add deleted_at), then PART3 (add status), then PART4 (snowflake PK)
+-- [DISABLED-REDUNDANT-MIGRATION] -- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] 
+-- [DISABLED-REDUNDANT-MIGRATION] -- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] -- PART 2: create_time/update_time -> created_at/updated_at (MUST be first)
+-- [DISABLED-REDUNDANT-MIGRATION] -- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] 
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_price_histories` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_price_histories` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
--- ---- 迁移: 2026_16_normalize_all_tables.sql ----
--- ============================================================
--- yxshop Database Normalization Migration
--- Order: PART2 first (rename time cols), then PART1 (add deleted_at), then PART3 (add status), then PART4 (snowflake PK)
--- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_sales` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_sales` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
--- ============================================================
--- PART 2: create_time/update_time -> created_at/updated_at (MUST be first)
--- ============================================================
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_stock_logs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_stock_logs` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_item_spec_price_histories` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_spec_price_histories` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tags` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tags` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_item_spec_sales` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_spec_sales` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tag_relations` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tag_relations` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_item_spec_stock_logs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_spec_stock_logs` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_addresses` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_addresses` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_item_tags` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_tags` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_item_tag_relations` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_tag_relations` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_order_addresses` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order_addresses` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_goods` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_goods` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_order_agents` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order_agents` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_order_deliveries` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order_deliveries` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_order_goods` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order_goods` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_prizes` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_prizes` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_services` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_services` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_prize_lists` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_prize_lists` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_details` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_details` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_profit_logs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_profit_logs` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_images` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_images` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_services` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_services` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
 
-ALTER TABLE `yxshop_service_details` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_service_details` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_service_images` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_service_images` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_signs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_signs` ADD COLUMN `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `created_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_types` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_types` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
-ALTER TABLE `yxshop_specs` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_specs` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-
-ALTER TABLE `yxshop_spec_items` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_spec_items` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-
-ALTER TABLE `yxshop_upload_types` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_upload_types` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-
-ALTER TABLE `yxshop_user_coupons` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_user_coupons` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0;
 
 -- ============================================================
 -- PART 1: is_delete -> deleted_at (after time cols are renamed)
 -- ============================================================
 
-ALTER TABLE `yxshop_admins` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_admins` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_admins` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_admin_roles` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_admin_roles` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_admin_roles` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_advertisements` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_advertisements` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_advertisements` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_app_pages` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_app_pages` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_app_pages` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_comments` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_comments` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_comments` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_coupons` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_coupons` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_coupons` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_coupon_goods` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_goods` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_coupon_goods` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_coupon_goods` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_goods` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_discounts` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_discounts` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_discounts` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_items` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_items` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_items` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_orders` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_orders` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_orders` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_services` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_services` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_services` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_services` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_services` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_service_details` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_details` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_service_details` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_service_details` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_details` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_upload_files` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_upload_files` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_upload_files` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_upload_groups` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_groups` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_upload_groups` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_upload_groups` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_groups` DROP COLUMN `is_delete`;
 
-ALTER TABLE `yxshop_users` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` ADD COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间' AFTER `updated_at`;
 UPDATE `yxshop_users` SET `deleted_at` = `updated_at` WHERE `is_delete` = 1;
-ALTER TABLE `yxshop_users` DROP COLUMN `is_delete`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` DROP COLUMN `is_delete`;
 
 -- ============================================================
 -- PART 3: Add status to core business tables
 -- ============================================================
 
-ALTER TABLE `yxshop_advertisements` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
-ALTER TABLE `yxshop_item_tags` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
-ALTER TABLE `yxshop_item_types` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
-ALTER TABLE `yxshop_specs` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
-ALTER TABLE `yxshop_user_coupons` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1可用 0不可用' AFTER `app_id`;
-ALTER TABLE `yxshop_deliveries` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
-ALTER TABLE `yxshop_expresses` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tags` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_types` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1可用 0不可用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_deliveries` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` ADD COLUMN `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1启用 0禁用' AFTER `app_id`;
 
 -- ============================================================
 -- PART 4: Core tables - remove AUTO_INCREMENT, use snowflake ID
 -- ============================================================
 
-ALTER TABLE `yxshop_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_users` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_advertisements` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_articles` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_article_categories` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_comments` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_coupons` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_deliveries` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_discounts` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_expresses` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_games` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_payments` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_promotions` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_services` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_service_details` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_service_images` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_specs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_spec_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_spec_item_prices` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_item_types` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_item_tags` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_item_attributes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_item_images` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_notifications` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_notification_configs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_notification_scenes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_notification_templates` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_settings` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_user_addresses` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_user_coupons` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_upload_groups` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_upload_types` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_prizes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
-ALTER TABLE `yxshop_prize_lists` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_articles` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_article_categories` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_deliveries` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payments` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_promotions` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_services` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_details` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service_images` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_item_prices` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_types` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tags` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attributes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_images` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notifications` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_configs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_scenes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_templates` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_settings` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_addresses` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_groups` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_types` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL;
 
 -- ---- 迁移: 2026_17_enterprise_refactor.sql ----
 /*
@@ -3408,35 +3444,35 @@ RENAME TABLE `yxshop_prom_goods` TO `yxshop_prom_items`;
 -- -----------------------------------------------------------
 -- Phase 1.1b: 字段重命名（goods_* → item_*）
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_price` `item_price` decimal(10, 2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '商品价格';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_attr` `item_attr` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品规格信息';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_no` `item_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品编码';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_weight` `item_weight` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品重量(g)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_price` `item_price` decimal(10, 2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '商品价格';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_attr` `item_attr` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品规格信息';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_no` `item_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品编码';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `goods_weight` `item_weight` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品重量(g)';
 
-ALTER TABLE `yxshop_coupon_items` CHANGE COLUMN `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` CHANGE COLUMN `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
-ALTER TABLE `yxshop_item_attrs` CHANGE COLUMN `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` CHANGE COLUMN `goods_id` `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
 
 -- -----------------------------------------------------------
 -- Phase 1.2: 主键统一为 id
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_roles` CHANGE COLUMN `role_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `yxshop_roles` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_roles` CHANGE COLUMN `role_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_roles` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `yxshop_order_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_order_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `yxshop_payment_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_payment_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `yxshop_user_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_user_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_logs` CHANGE COLUMN `log_id` `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
 
 -- -----------------------------------------------------------
 -- Phase 1.3: 时间字段统一
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
-ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `create_time` `created_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `update_time` `updated_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
 
 -- -----------------------------------------------------------
 -- Phase 1.4: 单数表名改复数
@@ -3448,18 +3484,18 @@ RENAME TABLE `yxshop_user_money_log` TO `yxshop_user_money_logs`;
 -- -----------------------------------------------------------
 -- Phase 1.5: camelCase 字段改 snake_case
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_cards` CHANGE COLUMN `nickName` `nick_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持有人昵称';
-ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `reasonsText` `reasons_text` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '申请原因文本';
-ALTER TABLE `yxshop_games` CHANGE COLUMN `setnum` `set_num` int(5) NOT NULL COMMENT '中奖次数';
-ALTER TABLE `yxshop_games` CHANGE COLUMN `setup` `set_up` int(1) NOT NULL COMMENT '1为每日中奖次数,0为本轮活动中奖次数';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards` CHANGE COLUMN `nickName` `nick_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持有人昵称';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `reasonsText` `reasons_text` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '申请原因文本';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` CHANGE COLUMN `setnum` `set_num` int(5) NOT NULL COMMENT '中奖次数';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` CHANGE COLUMN `setup` `set_up` int(1) NOT NULL COMMENT '1为每日中奖次数,0为本轮活动中奖次数';
 
 -- -----------------------------------------------------------
 -- Phase 1.6: COMMENT 乱码修复
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_app_pages` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_comments` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_coupon_items` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_discounts` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
 
 
 -- ============================================================
@@ -3469,9 +3505,9 @@ ALTER TABLE `yxshop_discounts` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT N
 -- -----------------------------------------------------------
 -- Phase 2.1: 合并 yxshop_roles → yxshop_admin_roles
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_admin_roles` ADD COLUMN `permissions` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '权限列表(JSON格式)' AFTER `role_desc`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles` ADD COLUMN `permissions` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '权限列表(JSON格式)' AFTER `role_desc`;
 
-INSERT INTO `yxshop_admin_roles` (`id`, `role_name`, `role_desc`, `permissions`, `app_id`, `created_at`, `updated_at`, `deleted_at`)
+INSERT IGNORE INTO `yxshop_admin_roles` (`id`, `role_name`, `role_desc`, `permissions`, `app_id`, `created_at`, `updated_at`, `deleted_at`)
 SELECT `id`, `role_name`, `role_desc`, `permissions`, `app_id`, `created_at`, `updated_at`, 0
 FROM `yxshop_roles`
 WHERE `role_name` NOT IN (SELECT `role_name` FROM `yxshop_admin_roles`);
@@ -3481,7 +3517,7 @@ DROP TABLE IF EXISTS `yxshop_roles`;
 -- -----------------------------------------------------------
 -- Phase 2.2: 合并 yxshop_spec_item_prices → yxshop_item_spec_prices
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_item_spec_prices` (`item_id`, `spec_key`, `spec_key_name`, `price`, `cost_price`, `market_price`, `store_count`, `weight`, `sku`, `image`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_item_spec_prices` (`item_id`, `spec_key`, `spec_key_name`, `price`, `cost_price`, `market_price`, `store_count`, `weight`, `sku`, `image`, `app_id`, `created_at`, `updated_at`)
 SELECT 
   sip.`goods_id`,
   sip.`key`,
@@ -3511,25 +3547,25 @@ DROP TABLE IF EXISTS `yxshop_spec_item_prices`;
 -- ============================================================
 
 -- 售后相关字段（已通过 yxshop_after_sales 关联查询）
-ALTER TABLE `yxshop_orders` DROP COLUMN `sub_status`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `sub_type`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `sub_status`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `sub_type`;
 
 -- 拼团相关字段（将迁移至 group_buy_members 表）
-ALTER TABLE `yxshop_orders` DROP COLUMN `prom_type`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `prom_num`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `prom_statis`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `prom_time`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `prom_type`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `prom_num`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `prom_statis`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `prom_time`;
 
 -- 退款相关字段（已通过 yxshop_refund_records 关联查询）
-ALTER TABLE `yxshop_orders` DROP COLUMN `refund_no`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `refund_desc`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `refund_status`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `refund_amount`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `refund_time`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `refund_no`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `refund_desc`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `refund_status`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `refund_amount`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `refund_time`;
 
 -- 其他冗余字段
-ALTER TABLE `yxshop_orders` DROP COLUMN `car_no`;
-ALTER TABLE `yxshop_orders` DROP COLUMN `selected_date`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `car_no`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP COLUMN `selected_date`;
 
 
 -- ============================================================
@@ -4348,37 +4384,37 @@ CREATE TABLE `yxshop_page_seos` (
 -- -----------------------------------------------------------
 -- Phase 5.1: app_id 索引补全
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_advertisements` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_after_sales` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_after_sales_details` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_after_sales_images` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_applies` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_cards` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_delivery_rules` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_discounts` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_games` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_item_images` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_order_agents` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_order_deliveries` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_order_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_prize_lists` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_prizes` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_profit_logs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_prom_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_signs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_spec_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
-ALTER TABLE `yxshop_specs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_details` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_images` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_delivery_rules` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_images` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` ADD INDEX `idx_app_id`(`app_id`) USING BTREE;
 
 -- -----------------------------------------------------------
 -- Phase 5.2: 高频查询索引补全
 -- -----------------------------------------------------------
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_delivery_status_time`(`delivery_status`, `created_at`) USING BTREE;
-ALTER TABLE `yxshop_orders` ADD INDEX `idx_receipt_status`(`receipt_status`) USING BTREE;
-ALTER TABLE `yxshop_items` ADD INDEX `idx_is_recommended`(`is_recommended`) USING BTREE;
-ALTER TABLE `yxshop_items` ADD INDEX `idx_is_hot`(`is_hot`) USING BTREE;
-ALTER TABLE `yxshop_items` ADD INDEX `idx_is_new`(`is_new`) USING BTREE;
-ALTER TABLE `yxshop_users` ADD INDEX `idx_source`(`source`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_delivery_status_time`(`delivery_status`, `created_at`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD INDEX `idx_receipt_status`(`receipt_status`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_is_recommended`(`is_recommended`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_is_hot`(`is_hot`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` ADD INDEX `idx_is_new`(`is_new`) USING BTREE;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` ADD INDEX `idx_source`(`source`) USING BTREE;
 
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -4389,33 +4425,33 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 /*
 -- Phase 5 回滚
-ALTER TABLE `yxshop_users` DROP INDEX `idx_source`;
-ALTER TABLE `yxshop_items` DROP INDEX `idx_is_new`;
-ALTER TABLE `yxshop_items` DROP INDEX `idx_is_hot`;
-ALTER TABLE `yxshop_items` DROP INDEX `idx_is_recommended`;
-ALTER TABLE `yxshop_orders` DROP INDEX `idx_receipt_status`;
-ALTER TABLE `yxshop_orders` DROP INDEX `idx_delivery_status_time`;
-ALTER TABLE `yxshop_specs` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_spec_items` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_signs` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_prom_items` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_profit_logs` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_prizes` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_prize_lists` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_order_items` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_order_deliveries` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_order_agents` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_item_images` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_games` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_discounts` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_delivery_rules` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_coupon_items` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_cards` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_applies` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_after_sales_images` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_after_sales_details` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_after_sales` DROP INDEX `idx_app_id`;
-ALTER TABLE `yxshop_advertisements` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` DROP INDEX `idx_source`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` DROP INDEX `idx_is_new`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` DROP INDEX `idx_is_hot`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` DROP INDEX `idx_is_recommended`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP INDEX `idx_receipt_status`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP INDEX `idx_delivery_status_time`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_items` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_images` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_delivery_rules` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_images` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_details` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` DROP INDEX `idx_app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` DROP INDEX `idx_app_id`;
 
 -- Phase 4 回滚
 DROP TABLE IF EXISTS `yxshop_page_seos`;
@@ -4476,31 +4512,31 @@ DROP TABLE IF EXISTS `yxshop_suppliers`;
 -- yxshop_roles 和 yxshop_spec_item_prices 需从数据库备份恢复
 
 -- Phase 1 回滚
-ALTER TABLE `yxshop_discounts` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
-ALTER TABLE `yxshop_coupon_items` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
-ALTER TABLE `yxshop_comments` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
-ALTER TABLE `yxshop_app_pages` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
-ALTER TABLE `yxshop_games` CHANGE COLUMN `set_up` `setup` int(1) NOT NULL COMMENT '1为每日中奖次数,0为本轮活动中奖次数';
-ALTER TABLE `yxshop_games` CHANGE COLUMN `set_num` `setnum` int(5) NOT NULL COMMENT '中奖次数';
-ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `reasons_text` `reasonsText` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '申请原因文本';
-ALTER TABLE `yxshop_cards` CHANGE COLUMN `nick_name` `nickName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持有人昵称';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '??????';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` CHANGE COLUMN `set_up` `setup` int(1) NOT NULL COMMENT '1为每日中奖次数,0为本轮活动中奖次数';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` CHANGE COLUMN `set_num` `setnum` int(5) NOT NULL COMMENT '中奖次数';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `reasons_text` `reasonsText` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '申请原因文本';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards` CHANGE COLUMN `nick_name` `nickName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持有人昵称';
 RENAME TABLE `yxshop_user_money_logs` TO `yxshop_user_money_log`;
 RENAME TABLE `yxshop_integral_logs` TO `yxshop_integral_log`;
 RENAME TABLE `yxshop_cards` TO `yxshop_card`;
-ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `updated_at` `update_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
-ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `created_at` `create_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
-ALTER TABLE `yxshop_user_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_user_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
-ALTER TABLE `yxshop_payment_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_payment_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
-ALTER TABLE `yxshop_order_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
-ALTER TABLE `yxshop_order_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
-ALTER TABLE `yxshop_item_attrs` CHANGE COLUMN `item_id` `goods_id` mediumint(8) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品id';
-ALTER TABLE `yxshop_coupon_items` CHANGE COLUMN `item_id` `goods_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_weight` `goods_weight` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品重量(g)';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_no` `goods_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品编码';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_attr` `goods_attr` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品规格信息';
-ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_price` `goods_price` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '商品价格';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `updated_at` `update_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_stock_warnings` CHANGE COLUMN `created_at` `create_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_logs` CHANGE COLUMN `id` `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_logs` DROP PRIMARY KEY, ADD PRIMARY KEY (`log_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` CHANGE COLUMN `item_id` `goods_id` mediumint(8) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品id';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` CHANGE COLUMN `item_id` `goods_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_weight` `goods_weight` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品重量(g)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_no` `goods_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品编码';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_attr` `goods_attr` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品规格信息';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` CHANGE COLUMN `item_price` `goods_price` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '商品价格';
 RENAME TABLE `yxshop_prom_items` TO `yxshop_prom_goods`;
 RENAME TABLE `yxshop_coupon_items` TO `yxshop_coupon_goods`;
 RENAME TABLE `yxshop_order_items` TO `yxshop_order_goods`;
@@ -4518,11 +4554,11 @@ SET @NOW = UNIX_TIMESTAMP();
 -- -----------------------------------------------------------
 -- 74: 供应链管理（顶级菜单，插入到 物流配送(43) 之后，营销管理(50) 之前）
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (74, 0, '供应链管理', 'supply', NULL, 'icon-shop', 45, 1, NULL, 'GET', @APP_ID, @NOW, @NOW);
 
 -- 供应链子菜单
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (75, 74, '供应商管理', 'supply', '/supply/supplier', 'icon-user-tie', 10, 1, 'supplier/index', 'GET', @APP_ID, @NOW, @NOW),
 (76, 74, '仓库管理', 'supply', '/supply/warehouse', 'icon-warehouse', 20, 1, 'warehouse/index', 'GET', @APP_ID, @NOW, @NOW),
 (77, 74, '采购订单', 'supply', '/supply/purchase-order', 'icon-shopping-cart', 30, 1, 'purchase-order/index', 'GET', @APP_ID, @NOW, @NOW),
@@ -4534,7 +4570,7 @@ INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `ic
 -- -----------------------------------------------------------
 -- 82: 营销管理子菜单：秒杀/拼团/赠品
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (82, 20, '秒杀管理', 'marketing', '/marketing/seckill', 'icon-thunder', 15, 1, 'seckill/index', 'GET', @APP_ID, @NOW, @NOW),
 (83, 20, '拼团管理', 'marketing', '/marketing/group-buy', 'icon-team', 25, 1, 'group-buy/index', 'GET', @APP_ID, @NOW, @NOW),
 (84, 20, '赠品活动', 'marketing', '/marketing/gift-activity', 'icon-gift', 35, 1, 'gift-activity/index', 'GET', @APP_ID, @NOW, @NOW);
@@ -4542,12 +4578,12 @@ INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `ic
 -- -----------------------------------------------------------
 -- 其他独立菜单
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (85, 0, '商品审核', 'audit', NULL, 'icon-check-circle', 47, 1, NULL, 'GET', @APP_ID, @NOW, @NOW),
 (86, 85, '商品审核', 'audit', '/audit/item-audit', 'icon-audit', 10, 1, 'item-audit/index', 'GET', @APP_ID, @NOW, @NOW);
 
 -- 系统设置子菜单：定时任务/用户反馈/友情链接/充值套餐/页面SEO
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (87, 46, '定时任务', 'system', '/system/scheduled-task', 'icon-clock', 45, 1, 'scheduled-task/index', 'GET', @APP_ID, @NOW, @NOW),
 (88, 46, '用户反馈', 'system', '/system/user-feedback', 'icon-message', 50, 1, 'user-feedback/index', 'GET', @APP_ID, @NOW, @NOW),
 (89, 46, '友情链接', 'system', '/system/friendly-link', 'icon-link', 55, 1, 'friendly-link/index', 'GET', @APP_ID, @NOW, @NOW),
@@ -4558,7 +4594,7 @@ INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `ic
 -- -----------------------------------------------------------
 -- 自动授权：给超级管理员角色(role_id=1)授予所有新菜单权限
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_role_auths` (`role_id`, `auth_id`, `created_at`, `updated_at`)
 SELECT 1, `id`, @NOW, @NOW FROM `yxshop_admin_menus`
 WHERE `id` >= 74 AND `is_show` = 1
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
@@ -4595,26 +4631,26 @@ SET UNIQUE_CHECKS = 0;
 -- =====================================================
 
 -- 1. yxshop_coupon_items: 索引名与字段错位
-ALTER TABLE `yxshop_coupon_items` DROP INDEX `coupon`;
-ALTER TABLE `yxshop_coupon_items` DROP INDEX `coupon_id`;
-ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_coupon_id`(`coupon_id`);
-ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_item_id`(`item_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` DROP INDEX `coupon`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` DROP INDEX `coupon_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_coupon_id`(`coupon_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` ADD INDEX `idx_item_id`(`item_id`);
 
 -- 2. yxshop_user_levels: 索引名/字段错位 + 字段注释错误
-ALTER TABLE `yxshop_user_levels` DROP INDEX `order_id`;
-ALTER TABLE `yxshop_user_levels` ADD INDEX `idx_integral`(`integral`);
-ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `integral` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '升级所需积分';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` DROP INDEX `order_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` ADD INDEX `idx_integral`(`integral`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `integral` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '升级所需积分';
 
 -- 3. yxshop_upload_files: 唯一索引命名规范
-ALTER TABLE `yxshop_upload_files` DROP INDEX `path_idx`;
-ALTER TABLE `yxshop_upload_files` ADD UNIQUE INDEX `uk_file_name`(`file_name`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files` DROP INDEX `path_idx`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files` ADD UNIQUE INDEX `uk_file_name`(`file_name`);
 
 -- 4. yxshop_regions: 索引命名规范
-ALTER TABLE `yxshop_regions` DROP INDEX `name,level`;
-ALTER TABLE `yxshop_regions` ADD INDEX `idx_name`(`name`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` DROP INDEX `name,level`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` ADD INDEX `idx_name`(`name`);
 
 -- 5. yxshop_admins: 删除与主键重复的索引
-ALTER TABLE `yxshop_admins` DROP INDEX `id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` DROP INDEX `id`;
 
 -- =====================================================
 -- P1: 字段类型修正
@@ -4624,46 +4660,46 @@ ALTER TABLE `yxshop_admins` DROP INDEX `id`;
 -- =====================================================
 
 -- 1. yxshop_item_attrs: attr_price varchar(255) -> decimal(10,2)
-ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `attr_price` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '属性价格';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `attr_price` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '属性价格';
 
 -- 2. yxshop_items: commission_amount varchar(20) -> decimal(10,2)
-ALTER TABLE `yxshop_items` MODIFY COLUMN `commission_amount` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '分销金额';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `commission_amount` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '分销金额';
 
 -- 3. yxshop_order_agents: proportion float(5,2) -> decimal(5,2)
-ALTER TABLE `yxshop_order_agents` MODIFY COLUMN `proportion` decimal(5, 2) NOT NULL COMMENT '分成比例';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` MODIFY COLUMN `proportion` decimal(5, 2) NOT NULL COMMENT '分成比例';
 
 -- 4. yxshop_profit_logs: proportion float(5,2) -> decimal(5,2)
-ALTER TABLE `yxshop_profit_logs` MODIFY COLUMN `proportion` decimal(5, 2) NOT NULL COMMENT '分成比例';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` MODIFY COLUMN `proportion` decimal(5, 2) NOT NULL COMMENT '分成比例';
 
 -- 5. yxshop_regions: lng/lat varchar(100) -> decimal(10,6)
-ALTER TABLE `yxshop_regions` MODIFY COLUMN `lng` decimal(10, 6) NULL DEFAULT NULL COMMENT '经度';
-ALTER TABLE `yxshop_regions` MODIFY COLUMN `lat` decimal(10, 6) NULL DEFAULT NULL COMMENT '纬度';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` MODIFY COLUMN `lng` decimal(10, 6) NULL DEFAULT NULL COMMENT '经度';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` MODIFY COLUMN `lat` decimal(10, 6) NULL DEFAULT NULL COMMENT '纬度';
 
 -- 6. yxshop_order_deliveries: id int(7) -> bigint(20) UNSIGNED (数据量为 0)
-ALTER TABLE `yxshop_order_deliveries` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 -- 7. yxshop_signs: id int(7) -> bigint(20) UNSIGNED (数据量为 0)
-ALTER TABLE `yxshop_signs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 -- 8. yxshop_regions: id int(11) -> bigint(20) UNSIGNED (字典表 3748 行,ALTER 较快)
-ALTER TABLE `yxshop_regions` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID';
 
 -- =====================================================
 -- P2: 冗余索引清理 (单列索引被复合索引覆盖)
 -- =====================================================
 
 -- yxshop_orders: idx_pay_status 被 idx_pay_status_time 覆盖,idx_user_id 被 idx_app_user_status 覆盖
-ALTER TABLE `yxshop_orders` DROP INDEX `idx_pay_status`;
-ALTER TABLE `yxshop_orders` DROP INDEX `idx_user_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP INDEX `idx_pay_status`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` DROP INDEX `idx_user_id`;
 
 -- yxshop_order_items: item_id 与 idx_item_id 重复
-ALTER TABLE `yxshop_order_items` DROP INDEX `item_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` DROP INDEX `item_id`;
 
 -- yxshop_admin_auths: idx_admin_id 被 idx_admin_auth 第一列覆盖
-ALTER TABLE `yxshop_admin_auths` DROP INDEX `idx_admin_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_auths` DROP INDEX `idx_admin_id`;
 
 -- yxshop_admin_role_auths: idx_role_id 被 idx_role_auth 第一列覆盖
-ALTER TABLE `yxshop_admin_role_auths` DROP INDEX `idx_role_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_role_auths` DROP INDEX `idx_role_id`;
 
 -- =====================================================
 -- P3: 清理 Snowflake 表的 AUTO_INCREMENT 大值残留
@@ -4671,8 +4707,8 @@ ALTER TABLE `yxshop_admin_role_auths` DROP INDEX `idx_role_id`;
 --   Navicat 导出时的快照,实际从未使用。改为 1 重置。
 -- =====================================================
 
-ALTER TABLE `yxshop_item_spec_prices` AUTO_INCREMENT = 1;
-ALTER TABLE `yxshop_login_logs` AUTO_INCREMENT = 1;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_prices` AUTO_INCREMENT = 1;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_login_logs` AUTO_INCREMENT = 1;
 
 -- =====================================================
 -- P4: 表 COMMENT 加 ID 策略标识 (静态拼接,兼容 MySQL 5.7)
@@ -4682,153 +4718,153 @@ ALTER TABLE `yxshop_login_logs` AUTO_INCREMENT = 1;
 --   因此脚本只可执行一次,如需重复执行请先清理 COMMENT
 -- =====================================================
 
-ALTER TABLE `yxshop_admin_api_token_logs` COMMENT = '管理员API令牌日志表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_admin_api_tokens` COMMENT = '管理员API令牌表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_admin_auths` COMMENT = '管理员权限关联表 [Snowflake ID]';
-ALTER TABLE `yxshop_admin_logs` COMMENT = '管理员操作日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_admin_menus` COMMENT = '后台菜单表 [Snowflake ID]';
-ALTER TABLE `yxshop_admin_role_auths` COMMENT = '角色权限关联表 [Snowflake ID]';
-ALTER TABLE `yxshop_admin_roles` COMMENT = '管理员角色表 [Snowflake ID]';
-ALTER TABLE `yxshop_admins` COMMENT = '商家用户记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_after_sales` COMMENT = '订单评价记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_after_sales_details` COMMENT = '订单评价记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_after_sales_images` COMMENT = '评价图片表 [Snowflake ID]';
-ALTER TABLE `yxshop_agent_capitals` COMMENT = '分销商资金明细表 [Snowflake ID]';
-ALTER TABLE `yxshop_agent_withdraws` COMMENT = '分销商提现明细表 [Snowflake ID]';
-ALTER TABLE `yxshop_agents` COMMENT = '代理商 [Snowflake ID]';
-ALTER TABLE `yxshop_app_helps` COMMENT = '微信小程序帮助 [Snowflake ID]';
-ALTER TABLE `yxshop_app_navbars` COMMENT = '微信小程序导航栏设置 [Snowflake ID]';
-ALTER TABLE `yxshop_app_pages` COMMENT = '微信小程序diy页面表 [Snowflake ID]';
-ALTER TABLE `yxshop_app_prepay_ids` COMMENT = '小程序prepay_id记录 [Snowflake ID]';
-ALTER TABLE `yxshop_applies` COMMENT = '分销商资金明细表 [Snowflake ID]';
-ALTER TABLE `yxshop_apps` COMMENT = '应用表 [Snowflake ID]';
-ALTER TABLE `yxshop_arrival_notifications` COMMENT = '到货通知表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_article_categories` COMMENT = '文章分类 [Snowflake ID]';
-ALTER TABLE `yxshop_articles` COMMENT = '文章 [Snowflake ID]';
-ALTER TABLE `yxshop_brands` COMMENT = '商品品牌表 [Snowflake ID]';
-ALTER TABLE `yxshop_cards` COMMENT = '虚拟商品卡密表 [Snowflake ID]';
-ALTER TABLE `yxshop_carts` COMMENT = '购物车表 [Snowflake ID]';
-ALTER TABLE `yxshop_categories` COMMENT = '商品分类表 [Snowflake ID]';
-ALTER TABLE `yxshop_comments` COMMENT = '订单评价记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_coupon_items` COMMENT = '优惠券指定商品记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_coupon_receive_logs` COMMENT = '优惠券领取流水 [Snowflake ID]';
-ALTER TABLE `yxshop_coupons` COMMENT = '优惠券记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_currencies` COMMENT = '货币表 [Snowflake ID]';
-ALTER TABLE `yxshop_daily_statistics` COMMENT = '日统计表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_data_change_logs` COMMENT = '数据变更日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_dealer_referees` COMMENT = '分销商资金明细表 [Snowflake ID]';
-ALTER TABLE `yxshop_deliveries` COMMENT = '配送模板主表 [Snowflake ID]';
-ALTER TABLE `yxshop_delivery_rules` COMMENT = '配送模板区域及运费表 [Snowflake ID]';
-ALTER TABLE `yxshop_delivery_tracks` COMMENT = '物流轨迹表 [Snowflake ID]';
-ALTER TABLE `yxshop_discounts` COMMENT = '优惠活动表 [Snowflake ID]';
-ALTER TABLE `yxshop_email_logs` COMMENT = '邮件日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_expresses` COMMENT = '物流公司记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_file_logs` COMMENT = '文件操作日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_friendly_links` COMMENT = '友情链接表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_gift_activities` COMMENT = '赠品活动表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_gift_activity_items` COMMENT = '赠品活动明细表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_group_buy_members` COMMENT = '拼团参与记录表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_group_buys` COMMENT = '拼团活动表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_idempotency_records` COMMENT = '幂等记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_integral_logs` COMMENT = '积分日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_invoice_headers` COMMENT = '发票抬头表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_invoice_records` COMMENT = '发票开具记录表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_item_attributes` COMMENT = '属性定义表（定义属性名称和类型） [Snowflake ID]';
-ALTER TABLE `yxshop_item_attrs` COMMENT = '商品-属性值关联表（记录商品的属性值） [Snowflake ID]';
-ALTER TABLE `yxshop_item_audit_logs` COMMENT = '商品审核日志表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_item_consultations` COMMENT = '商品咨询表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_item_favorites` COMMENT = '商品收藏表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_images` COMMENT = '商品图片表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_param_values` COMMENT = '商品参数值表 [Community] [Snowflake ID]';
-ALTER TABLE `yxshop_item_searches` COMMENT = '商品搜索记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_spec_price_histories` COMMENT = '商品规格价格历史表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_spec_prices` COMMENT = '商品规格价格表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_spec_sales` COMMENT = '商品规格销量统计表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_statistics` COMMENT = '商品统计表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_item_stock_warnings` COMMENT = '商品规格库存预警表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_tag_relations` COMMENT = '商品标签关联表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_tags` COMMENT = '商品标签表 [Snowflake ID]';
-ALTER TABLE `yxshop_item_translations` COMMENT = '商品翻译表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_item_types` COMMENT = '商品类型表（实物/虚拟/服务） [Snowflake ID]';
-ALTER TABLE `yxshop_item_views` COMMENT = '商品浏览记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_items` COMMENT = '商品表 [Snowflake ID]';
-ALTER TABLE `yxshop_languages` COMMENT = '语言表 [Snowflake ID]';
-ALTER TABLE `yxshop_login_logs` COMMENT = '登录日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_merchant_applies` COMMENT = '商户入驻申请表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_monthly_statistics` COMMENT = '月统计表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_notification_blacklists` COMMENT = '通知黑名单表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_configs` COMMENT = '通知配置表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_queues` COMMENT = '通知队列表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_scene_templates` COMMENT = '通知场景模板关联表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_scenes` COMMENT = '通知场景配置表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_sends` COMMENT = '通知发送记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_statistics` COMMENT = '通知统计表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_template_variables` COMMENT = '模板-变量关联表（记录模板使用了哪些变量） [Snowflake ID]';
-ALTER TABLE `yxshop_notification_templates` COMMENT = '通知模板表 [Snowflake ID]';
-ALTER TABLE `yxshop_notification_variables` COMMENT = '系统通知变量定义（如{{order_no}}、{{user_name}}） [Snowflake ID]';
-ALTER TABLE `yxshop_notifications` COMMENT = '消息推送 [Snowflake ID]';
-ALTER TABLE `yxshop_order_addresses` COMMENT = '订单收货地址记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_order_agents` COMMENT = '分销商订单记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_order_items` COMMENT = '订单商品记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_orders` COMMENT = '订单记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_packages` COMMENT = '商品套餐表 [Snowflake ID]';
-ALTER TABLE `yxshop_page_seos` COMMENT = '页面SEO表 [Community] [Snowflake ID]';
-ALTER TABLE `yxshop_param_template_items` COMMENT = '参数模板项表 [Community] [Snowflake ID]';
-ALTER TABLE `yxshop_param_templates` COMMENT = '商品参数模板表 [Community] [Snowflake ID]';
-ALTER TABLE `yxshop_payment_logs` COMMENT = '支付日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_payments` COMMENT = '支付记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_permissions` COMMENT = '权限表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_profit_logs` COMMENT = '分销商订单记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_prom_items` COMMENT = '商品级促销记录（特价/限时等） [Snowflake ID]';
-ALTER TABLE `yxshop_prom_orders` COMMENT = '订单级促销记录（满减/折扣等） [Snowflake ID]';
-ALTER TABLE `yxshop_promotions` COMMENT = '促销活动主表（定义活动规则） [Snowflake ID]';
-ALTER TABLE `yxshop_purchase_order_items` COMMENT = '采购单明细表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_purchase_orders` COMMENT = '采购单表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_recharge_orders` COMMENT = '充值订单表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_recharge_packages` COMMENT = '充值套餐表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_refund_records` COMMENT = '退款记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_regions` COMMENT = '省市表 [Snowflake ID]';
-ALTER TABLE `yxshop_scheduled_task_logs` COMMENT = '定时任务日志表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_scheduled_tasks` COMMENT = '定时任务表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_schema_migrations` COMMENT = '迁移版本记录 [Snowflake ID]';
-ALTER TABLE `yxshop_seckill_items` COMMENT = '秒杀商品表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_seckill_sessions` COMMENT = '秒杀场次表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_settings` COMMENT = '商城设置记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_settlements` COMMENT = '结算单表 [Snowflake ID]';
-ALTER TABLE `yxshop_sms_logs` COMMENT = '短信日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_spec_items` COMMENT = '规格名称表 [Snowflake ID]';
-ALTER TABLE `yxshop_specs` COMMENT = '规格表 [Snowflake ID]';
-ALTER TABLE `yxshop_stock_transfer_items` COMMENT = '库存调拨明细表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_stock_transfers` COMMENT = '库存调拨表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_supplier_settlements` COMMENT = '商户结算表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_suppliers` COMMENT = '供应商表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_system_logs` COMMENT = '系统操作日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_upload_files` COMMENT = '文件库记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_upload_groups` COMMENT = '文件库分组记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_addresses` COMMENT = '用户收货地址表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_coupons` COMMENT = '用户优惠券记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_feedbacks` COMMENT = '用户反馈表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_user_integral_accounts` COMMENT = '用户积分账户表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_levels` COMMENT = '等级表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_logs` COMMENT = '用户操作日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_money_logs` COMMENT = '用户余额变动日志表 [Snowflake ID]';
-ALTER TABLE `yxshop_user_oauths` COMMENT = '用户第三方OAuth绑定表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_users` COMMENT = '用户记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_warehouse_stocks` COMMENT = '仓库库存表 [Enterprise] [Snowflake ID]';
-ALTER TABLE `yxshop_warehouses` COMMENT = '仓库表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_api_token_logs` COMMENT = '管理员API令牌日志表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_api_tokens` COMMENT = '管理员API令牌表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_auths` COMMENT = '管理员权限关联表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_logs` COMMENT = '管理员操作日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_menus` COMMENT = '后台菜单表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_role_auths` COMMENT = '角色权限关联表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles` COMMENT = '管理员角色表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` COMMENT = '商家用户记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` COMMENT = '订单评价记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_details` COMMENT = '订单评价记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_images` COMMENT = '评价图片表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agent_capitals` COMMENT = '分销商资金明细表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agent_withdraws` COMMENT = '分销商提现明细表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agents` COMMENT = '代理商 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_helps` COMMENT = '微信小程序帮助 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_navbars` COMMENT = '微信小程序导航栏设置 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_pages` COMMENT = '微信小程序diy页面表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app_prepay_ids` COMMENT = '小程序prepay_id记录 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_applies` COMMENT = '分销商资金明细表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_apps` COMMENT = '应用表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_arrival_notifications` COMMENT = '到货通知表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_article_categories` COMMENT = '文章分类 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_articles` COMMENT = '文章 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_brands` COMMENT = '商品品牌表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards` COMMENT = '虚拟商品卡密表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_carts` COMMENT = '购物车表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_categories` COMMENT = '商品分类表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` COMMENT = '订单评价记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_items` COMMENT = '优惠券指定商品记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon_receive_logs` COMMENT = '优惠券领取流水 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` COMMENT = '优惠券记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_currencies` COMMENT = '货币表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_daily_statistics` COMMENT = '日统计表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_data_change_logs` COMMENT = '数据变更日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_dealer_referees` COMMENT = '分销商资金明细表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_deliveries` COMMENT = '配送模板主表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_delivery_rules` COMMENT = '配送模板区域及运费表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_delivery_tracks` COMMENT = '物流轨迹表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_discounts` COMMENT = '优惠活动表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_email_logs` COMMENT = '邮件日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_expresses` COMMENT = '物流公司记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_file_logs` COMMENT = '文件操作日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_friendly_links` COMMENT = '友情链接表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_gift_activities` COMMENT = '赠品活动表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_gift_activity_items` COMMENT = '赠品活动明细表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_group_buy_members` COMMENT = '拼团参与记录表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_group_buys` COMMENT = '拼团活动表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_idempotency_records` COMMENT = '幂等记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_integral_logs` COMMENT = '积分日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_invoice_headers` COMMENT = '发票抬头表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_invoice_records` COMMENT = '发票开具记录表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attributes` COMMENT = '属性定义表（定义属性名称和类型） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` COMMENT = '商品-属性值关联表（记录商品的属性值） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_audit_logs` COMMENT = '商品审核日志表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_consultations` COMMENT = '商品咨询表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_favorites` COMMENT = '商品收藏表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_images` COMMENT = '商品图片表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_param_values` COMMENT = '商品参数值表 [Community] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_searches` COMMENT = '商品搜索记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_price_histories` COMMENT = '商品规格价格历史表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_prices` COMMENT = '商品规格价格表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_sales` COMMENT = '商品规格销量统计表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_statistics` COMMENT = '商品统计表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_stock_warnings` COMMENT = '商品规格库存预警表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tag_relations` COMMENT = '商品标签关联表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_tags` COMMENT = '商品标签表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_translations` COMMENT = '商品翻译表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_types` COMMENT = '商品类型表（实物/虚拟/服务） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_views` COMMENT = '商品浏览记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` COMMENT = '商品表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_languages` COMMENT = '语言表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_login_logs` COMMENT = '登录日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_merchant_applies` COMMENT = '商户入驻申请表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_monthly_statistics` COMMENT = '月统计表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_blacklists` COMMENT = '通知黑名单表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_configs` COMMENT = '通知配置表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_queues` COMMENT = '通知队列表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_scene_templates` COMMENT = '通知场景模板关联表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_scenes` COMMENT = '通知场景配置表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_sends` COMMENT = '通知发送记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_statistics` COMMENT = '通知统计表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_template_variables` COMMENT = '模板-变量关联表（记录模板使用了哪些变量） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_templates` COMMENT = '通知模板表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_variables` COMMENT = '系统通知变量定义（如{{order_no}}、{{user_name}}） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notifications` COMMENT = '消息推送 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_addresses` COMMENT = '订单收货地址记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` COMMENT = '分销商订单记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_items` COMMENT = '订单商品记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` COMMENT = '订单记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_packages` COMMENT = '商品套餐表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_page_seos` COMMENT = '页面SEO表 [Community] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_param_template_items` COMMENT = '参数模板项表 [Community] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_param_templates` COMMENT = '商品参数模板表 [Community] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment_logs` COMMENT = '支付日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payments` COMMENT = '支付记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_permissions` COMMENT = '权限表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` COMMENT = '分销商订单记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_items` COMMENT = '商品级促销记录（特价/限时等） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_orders` COMMENT = '订单级促销记录（满减/折扣等） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_promotions` COMMENT = '促销活动主表（定义活动规则） [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_purchase_order_items` COMMENT = '采购单明细表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_purchase_orders` COMMENT = '采购单表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_recharge_orders` COMMENT = '充值订单表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_recharge_packages` COMMENT = '充值套餐表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_refund_records` COMMENT = '退款记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_regions` COMMENT = '省市表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_scheduled_task_logs` COMMENT = '定时任务日志表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_scheduled_tasks` COMMENT = '定时任务表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_schema_migrations` COMMENT = '迁移版本记录 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_seckill_items` COMMENT = '秒杀商品表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_seckill_sessions` COMMENT = '秒杀场次表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_settings` COMMENT = '商城设置记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_settlements` COMMENT = '结算单表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_sms_logs` COMMENT = '短信日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_spec_items` COMMENT = '规格名称表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_specs` COMMENT = '规格表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_stock_transfer_items` COMMENT = '库存调拨明细表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_stock_transfers` COMMENT = '库存调拨表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_supplier_settlements` COMMENT = '商户结算表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_suppliers` COMMENT = '供应商表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_system_logs` COMMENT = '系统操作日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files` COMMENT = '文件库记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_groups` COMMENT = '文件库分组记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_addresses` COMMENT = '用户收货地址表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons` COMMENT = '用户优惠券记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_feedbacks` COMMENT = '用户反馈表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_integral_accounts` COMMENT = '用户积分账户表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` COMMENT = '等级表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_logs` COMMENT = '用户操作日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_money_logs` COMMENT = '用户余额变动日志表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_oauths` COMMENT = '用户第三方OAuth绑定表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` COMMENT = '用户记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_warehouse_stocks` COMMENT = '仓库库存表 [Enterprise] [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_warehouses` COMMENT = '仓库表 [Enterprise] [Snowflake ID]';
 
-ALTER TABLE `yxshop_order_logs` COMMENT = '订单变化日志表 [Auto Increment ID]';
-ALTER TABLE `yxshop_item_spec_stock_logs` COMMENT = '商品规格库存变动记录表 [Auto Increment ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_logs` COMMENT = '订单变化日志表 [Auto Increment ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_spec_stock_logs` COMMENT = '商品规格库存变动记录表 [Auto Increment ID]';
 
 
 -- 补充:以下 7 张表原 SQL 无 COMMENT,直接赋完整 COMMENT
-ALTER TABLE `yxshop_advertisements` COMMENT = '广告表 [Snowflake ID]';
-ALTER TABLE `yxshop_games` COMMENT = '营销活动表 [Snowflake ID]';
-ALTER TABLE `yxshop_order_deliveries` COMMENT = '订单发货记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_prize_lists` COMMENT = '中奖记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_prizes` COMMENT = '奖品表 [Snowflake ID]';
-ALTER TABLE `yxshop_signs` COMMENT = '签到记录表 [Snowflake ID]';
-ALTER TABLE `yxshop_upload_types` COMMENT = '上传类型关联表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements` COMMENT = '广告表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_games` COMMENT = '营销活动表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_deliveries` COMMENT = '订单发货记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prize_lists` COMMENT = '中奖记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prizes` COMMENT = '奖品表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_signs` COMMENT = '签到记录表 [Snowflake ID]';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_types` COMMENT = '上传类型关联表 [Snowflake ID]';
 -- =====================================================
 -- P5: 冗余字段删除 (含自动备份)
 -- =====================================================
@@ -4836,12 +4872,12 @@ ALTER TABLE `yxshop_upload_types` COMMENT = '上传类型关联表 [Snowflake ID
 -- P5.1: yxshop_payments 删除 amount/status(保留 payment_amount/payment_status)
 DROP TABLE IF EXISTS `yxshop_payments_backup_20260626`;
 CREATE TABLE `yxshop_payments_backup_20260626` AS SELECT * FROM `yxshop_payments`;
-ALTER TABLE `yxshop_payments` DROP COLUMN `amount`, DROP COLUMN `status`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payments` DROP COLUMN `amount`, DROP COLUMN `status`;
 
 -- P5.2: yxshop_settings 删除 description(保留 describe)
 DROP TABLE IF EXISTS `yxshop_settings_backup_20260626`;
 CREATE TABLE `yxshop_settings_backup_20260626` AS SELECT * FROM `yxshop_settings`;
-ALTER TABLE `yxshop_settings` DROP COLUMN `description`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_settings` DROP COLUMN `description`;
 
 -- P5.3: yxshop_login_logs 暂不删除冗余字段(login_message/fail_reason 等),
 --       因为业务代码耦合度高,建议后续逐字段迁移
@@ -4927,7 +4963,7 @@ CREATE TABLE `yxshop_app_helps_backup_20260627` AS SELECT * FROM `yxshop_app_hel
 -- 注意: articles.id 是 bigint(20) UNSIGNED NOT NULL (雪花 ID)
 --       如果业务代码依赖 app_helps.id 的具体值,迁移后 ID 会变化!
 --       建议在迁移前先确认是否有外部引用 (API/URL/缓存)
-INSERT INTO `yxshop_articles` (
+INSERT IGNORE INTO `yxshop_articles` (
     `title`, `category_id`, `author`, `cover`, `description`,
     `content`, `sort`, `status`, `is_top`, `view_count`,
     `app_id`, `created_at`, `updated_at`, `deleted_at`
@@ -5000,14 +5036,14 @@ SET UNIQUE_CHECKS = 0;
 -- =====================================================
 -- P1: yxshop_item_attrs 索引重命名
 -- =====================================================
-ALTER TABLE `yxshop_item_attrs` DROP INDEX `goods_id`;
-ALTER TABLE `yxshop_item_attrs` ADD INDEX `idx_item_id`(`item_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` DROP INDEX `goods_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_attrs` ADD INDEX `idx_item_id`(`item_id`);
 
 
 -- =====================================================
 -- P2: yxshop_coupons.goods_ids -> item_ids
 -- =====================================================
-ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_ids` `item_ids` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_ids` `item_ids` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL;
 
 
 -- =====================================================
@@ -5015,13 +5051,13 @@ ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_ids` `item_ids` mediumtext CHA
 -- =====================================================
 
 -- yxshop_after_sales
-ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_after_sales_details
-ALTER TABLE `yxshop_after_sales_details` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales_details` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_comments
-ALTER TABLE `yxshop_comments` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comments` CHANGE COLUMN `order_goods_id` `order_item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -5065,13 +5101,13 @@ SET UNIQUE_CHECKS = 0;
 -- =====================================================
 -- 1. yxshop_after_sales.goods_status -> item_status
 -- =====================================================
-ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `goods_status` `item_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '货物状态';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` CHANGE COLUMN `goods_status` `item_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '货物状态';
 
 
 -- =====================================================
 -- 2. yxshop_coupons.goods_limit_type -> item_limit_type
 -- =====================================================
-ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_limit_type` `item_limit_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 10 COMMENT '限制商品类型(10全部 20指定分类 30指定品牌)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_limit_type` `item_limit_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 10 COMMENT '限制商品类型(10全部 20指定分类 30指定品牌)';
 
 
 -- =====================================================
@@ -5079,7 +5115,7 @@ ALTER TABLE `yxshop_coupons` CHANGE COLUMN `goods_limit_type` `item_limit_type` 
 --    原注释: '商品所属类型id，取值表goods_type的cat_id'
 --    改后:   '商品所属类型id，取值表yxshop_item_types'
 -- =====================================================
-ALTER TABLE `yxshop_items` MODIFY COLUMN `type_id` smallint(5) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品所属类型id，取值表yxshop_item_types';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `type_id` smallint(5) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品所属类型id，取值表yxshop_item_types';
 
 
 -- =====================================================
@@ -5087,7 +5123,7 @@ ALTER TABLE `yxshop_items` MODIFY COLUMN `type_id` smallint(5) UNSIGNED NOT NULL
 --    原注释: '商品规格类型，取值表goods_type的cat_id'
 --    改后:   '商品规格类型，取值表yxshop_item_types'
 -- =====================================================
-ALTER TABLE `yxshop_items` MODIFY COLUMN `spec_type` smallint(5) NULL DEFAULT 0 COMMENT '商品规格类型，取值表yxshop_item_types';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `spec_type` smallint(5) NULL DEFAULT 0 COMMENT '商品规格类型，取值表yxshop_item_types';
 
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -5200,11 +5236,11 @@ CREATE TABLE IF NOT EXISTS `yxshop_supplier_settlement_logs` (
 -- ============================================================
 -- 售后工单企业级改造：操作日志表 + 乐观锁 + 软删除
 -- ============================================================
-ALTER TABLE `yxshop_supplier_settlements`
-  ADD COLUMN `version` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
-  ADD COLUMN `deleted_at` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记',
-  ADD INDEX `idx_status` (`status`),
-  ADD INDEX `idx_deleted_at` (`deleted_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_supplier_settlements`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `deleted_at` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_status` (`status`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_deleted_at` (`deleted_at`);
 
 -- -----------------------------------------------------------
 -- 1. yxshop_after_sales_logs 售后工单操作日志
@@ -5254,12 +5290,12 @@ CREATE TABLE IF NOT EXISTS `yxshop_refund_records` (
   KEY `idx_order_id`       (`order_id`),
   KEY `idx_user_id`        (`user_id`),
   KEY `idx_refund_status`  (`refund_status`)
-ALTER TABLE `yxshop_after_sales`
-  ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
-  ADD COLUMN `deleted_at`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删，时间戳=已删）',
-  ADD COLUMN `process_deadline` INT UNSIGNED DEFAULT NULL COMMENT '处理截止时间（SLA，Unix时间戳）',
-  ADD INDEX `idx_status`       (`status`),
-  ADD INDEX `idx_deleted_at`    (`deleted_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `deleted_at`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删，时间戳=已删）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `process_deadline` INT UNSIGNED DEFAULT NULL COMMENT '处理截止时间（SLA，Unix时间戳）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_status`       (`status`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_deleted_at`    (`deleted_at`);
 
 -- ---- 迁移: 2026_24_article_enterprise.sql ----
 -- ============================================================
@@ -5315,17 +5351,17 @@ CREATE TABLE IF NOT EXISTS `yxshop_article_logs` (
 -- 3. 给 yxshop_articles 加字段
 -- -----------------------------------------------------------
 -- 软删除支持：确保 deleted_at 全为 0
-ALTER TABLE `yxshop_articles`
-  ADD COLUMN `version`          INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
-  ADD COLUMN `deleted_at`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删）',
-  ADD COLUMN `published_at`     INT UNSIGNED DEFAULT NULL COMMENT '发布时间（Unix戳）',
-  ADD COLUMN `scheduled_at`     INT UNSIGNED DEFAULT NULL COMMENT '定时发布时间（Unix戳）',
-  ADD COLUMN `change_summary`   VARCHAR(255) DEFAULT NULL COMMENT '最近一次变更摘要',
-  ADD COLUMN `modifier_id`      BIGINT UNSIGNED DEFAULT NULL COMMENT '最后修改人ID',
-  ADD COLUMN `modifier_name`    VARCHAR(64) DEFAULT NULL COMMENT '最后修改人姓名',
-  ADD INDEX `idx_deleted_at`    (`deleted_at`),
-  ADD INDEX `idx_scheduled_at`  (`scheduled_at`),
-  ADD INDEX `idx_published_at`  (`published_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_articles`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version`          INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `deleted_at`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `published_at`     INT UNSIGNED DEFAULT NULL COMMENT '发布时间（Unix戳）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `scheduled_at`     INT UNSIGNED DEFAULT NULL COMMENT '定时发布时间（Unix戳）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `change_summary`   VARCHAR(255) DEFAULT NULL COMMENT '最近一次变更摘要',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `modifier_id`      BIGINT UNSIGNED DEFAULT NULL COMMENT '最后修改人ID',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `modifier_name`    VARCHAR(64) DEFAULT NULL COMMENT '最后修改人姓名',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_deleted_at`    (`deleted_at`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_scheduled_at`  (`scheduled_at`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_published_at`  (`published_at`);
 
 -- ---- 迁移: 2026_25_file_enterprise.sql ----
 -- ============================================================
@@ -5375,17 +5411,17 @@ CREATE TABLE IF NOT EXISTS `yxshop_file_download_logs` (
 -- -----------------------------------------------------------
 -- 4. 初始化默认配额（所有 app 默认 10GB）
 -- -----------------------------------------------------------
-INSERT INTO `yxshop_app_storage_quotas` (`app_id`, `quota_bytes`, `warn_percent`, `used_bytes`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_app_storage_quotas` (`app_id`, `quota_bytes`, `warn_percent`, `used_bytes`, `created_at`, `updated_at`)
 SELECT `id`, 10737418240, 80, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() FROM `yxshop_apps`
-ALTER TABLE `yxshop_upload_files`
-  ADD COLUMN `audit_status`  TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核状态：0=待审核 1=通过 2=违规',
-  ADD COLUMN `is_sensitive`  TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '敏感标记：0=正常 1=敏感',
-  ADD COLUMN `audit_remark`  VARCHAR(255) DEFAULT NULL COMMENT '审核备注',
-  ADD COLUMN `auditor_id`    BIGINT UNSIGNED DEFAULT NULL COMMENT '审核人ID',
-  ADD COLUMN `audited_at`    INT UNSIGNED DEFAULT NULL COMMENT '审核时间',
-  ADD COLUMN `download_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '下载次数',
-  ADD INDEX `idx_audit_status`  (`audit_status`),
-  ADD INDEX `idx_is_sensitive`  (`is_sensitive`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_files`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audit_status`  TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核状态：0=待审核 1=通过 2=违规',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `is_sensitive`  TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '敏感标记：0=正常 1=敏感',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audit_remark`  VARCHAR(255) DEFAULT NULL COMMENT '审核备注',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `auditor_id`    BIGINT UNSIGNED DEFAULT NULL COMMENT '审核人ID',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audited_at`    INT UNSIGNED DEFAULT NULL COMMENT '审核时间',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `download_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '下载次数',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_audit_status`  (`audit_status`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_is_sensitive`  (`is_sensitive`);
 
 -- ---- 迁移: 2026_26_coupon_finance.sql ----
 -- ============================================================
@@ -5442,8 +5478,8 @@ CREATE TABLE IF NOT EXISTS `yxshop_coupon_issues` (
   PRIMARY KEY (`id`),
   KEY `idx_coupon_id`  (`coupon_id`),
   KEY `idx_app_id`    (`app_id`)
-ALTER TABLE `yxshop_user_coupons`
-  ADD COLUMN `version` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupons`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号';
 
 -- ---- 迁移: 2026_27_user_risk_tag.sql ----
 -- ============================================================
@@ -5519,13 +5555,13 @@ CREATE TABLE IF NOT EXISTS `yxshop_user_risk_logs` (
 -- ============================================================
 -- 会员卡企业级改造：卡套餐 + 充值规则 + 充值赠送
 -- ============================================================
-ALTER TABLE `yxshop_users`
-  ADD COLUMN `risk_level`     TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '风险等级：0=正常 1=低 2=中 3=高',
-  ADD COLUMN `risk_remark`   VARCHAR(255) DEFAULT NULL COMMENT '风险备注',
-  ADD COLUMN `frozen_reason` VARCHAR(255) DEFAULT NULL COMMENT '冻结原因',
-  ADD COLUMN `login_security_status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录安全状态：0=正常 1=异常',
-  ADD INDEX `idx_risk_level`   (`risk_level`),
-  ADD INDEX `idx_login_security_status` (`login_security_status`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `risk_level`     TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '风险等级：0=正常 1=低 2=中 3=高',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `risk_remark`   VARCHAR(255) DEFAULT NULL COMMENT '风险备注',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `frozen_reason` VARCHAR(255) DEFAULT NULL COMMENT '冻结原因',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `login_security_status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录安全状态：0=正常 1=异常',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_risk_level`   (`risk_level`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_login_security_status` (`login_security_status`);
 
 -- -----------------------------------------------------------
 -- 1. yxshop_card_packages 会员卡套餐表
@@ -5602,12 +5638,12 @@ CREATE TABLE IF NOT EXISTS `yxshop_card_recharge_logs` (
 -- ============================================================
 -- 财务报表企业级改造：对账功能 + 账单导出
 -- ============================================================
-ALTER TABLE `yxshop_cards`
-  ADD COLUMN `package_id`      BIGINT UNSIGNED DEFAULT NULL COMMENT '所属套餐ID',
-  ADD COLUMN `open_threshold`  DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '开卡门槛金额',
-  ADD COLUMN `recharge_total` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '累计充值金额',
-  ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
-  ADD INDEX `idx_package_id`   (`package_id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cards`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `package_id`      BIGINT UNSIGNED DEFAULT NULL COMMENT '所属套餐ID',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `open_threshold`  DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '开卡门槛金额',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `recharge_total` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '累计充值金额',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_package_id`   (`package_id`);
 
 -- -----------------------------------------------------------
 -- 1. yxshop_account_statements 平台对账单
@@ -5773,16 +5809,16 @@ CREATE TABLE IF NOT EXISTS `yxshop_dealer_logs` (
 -- ============================================================
 -- 仓库/供应商企业级改造：状态机 + 操作日志 + 软删除
 -- ============================================================
-ALTER TABLE `yxshop_users`
-  ADD COLUMN `dealer_level_id`   BIGINT UNSIGNED DEFAULT NULL COMMENT '经销商等级ID',
-  ADD COLUMN `dealer_status`     TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '经销商状态：0=非经销商 1=正常 2=冻结',
-  ADD COLUMN `total_commission`  DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '累计佣金',
-  ADD COLUMN `pending_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '待结佣金',
-  ADD COLUMN `withdrawn_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '已提佣金',
-  ADD COLUMN `frozen_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '冻结佣金',
-  ADD COLUMN `dealer_apply_time` INT UNSIGNED DEFAULT NULL COMMENT '申请成为经销商时间',
-  ADD COLUMN `dealer_active_time` INT UNSIGNED DEFAULT NULL COMMENT '经销商激活时间',
-  ADD INDEX `idx_dealer_status`   (`dealer_status`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `dealer_level_id`   BIGINT UNSIGNED DEFAULT NULL COMMENT '经销商等级ID',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `dealer_status`     TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '经销商状态：0=非经销商 1=正常 2=冻结',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `total_commission`  DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '累计佣金',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `pending_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '待结佣金',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `withdrawn_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '已提佣金',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `frozen_commission` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '冻结佣金',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `dealer_apply_time` INT UNSIGNED DEFAULT NULL COMMENT '申请成为经销商时间',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `dealer_active_time` INT UNSIGNED DEFAULT NULL COMMENT '经销商激活时间',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_dealer_status`   (`dealer_status`);
 
 -- -----------------------------------------------------------
 -- 1. yxshop_warehouse_logs 仓库操作日志
@@ -5832,11 +5868,11 @@ CREATE TABLE IF NOT EXISTS `yxshop_supplier_logs` (
 -- -----------------------------------------------------------
 -- ---- 迁移: 2026_32_add_sort_to_item_types.sql ----
 -- 添加 sort 字段到 item_types 表（商品类型管理需要）
-ALTER TABLE `yxshop_suppliers`
-  ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
-  ADD COLUMN `deleted_at`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删）',
-  ADD COLUMN `status`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=禁用 1=启用',
-  ADD INDEX `idx_deleted_at`  (`deleted_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_suppliers`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `version`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '乐观锁版本号',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `deleted_at`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除标记（0=未删）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `status`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=禁用 1=启用',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_deleted_at`  (`deleted_at`);
 
 -- ---- 迁移: 2026_33_order_enhance.sql ----
 CREATE TABLE `yxshop_refund_records` (
@@ -5866,709 +5902,10 @@ CREATE TABLE `yxshop_refund_records` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_refund_status` (`refund_status`),
   KEY `idx_created_at` (`created_at`)
-ALTER TABLE `yxshop_orders`
-  ADD COLUMN `audit_status` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核状态：0=未审核 10=审核通过 20=审核拒绝' AFTER `receipt_status`,
-  ADD COLUMN `audit_remark` varchar(500) NOT NULL DEFAULT '' COMMENT '审核备注' AFTER `audit_status`,
-  ADD COLUMN `audit_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核时间' AFTER `audit_remark`;
-
--- ---- 迁移: 2026_34_community_elderly.sql ----
--- ============================================================
--- 社区养老服务模块 — 数据库迁移
--- 模块代号：community_elderly
--- 日期：2026-08-17
--- ============================================================
-SET NAMES utf8mb4;
-
--- -----------------------------------------------------------
--- 1. yxshop_community_regions — 社区行政区划（街道/社区）
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_community_regions` (
-  `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `pid`           BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父级ID（0=顶级）',
-  `region_id`     BIGINT UNSIGNED DEFAULT NULL COMMENT '关联 yxshop_regions.id（市级或区县级）',
-  `name`          VARCHAR(64) NOT NULL COMMENT '名称（街道/社区名）',
-  `level`         TINYINT UNSIGNED NOT NULL COMMENT '层级：4=街道/镇 5=社区/村',
-  `code`          VARCHAR(12) DEFAULT NULL COMMENT '行政区划编码',
-  `fullname`      VARCHAR(255) DEFAULT NULL COMMENT '完整层级名称',
-  `lng`           DECIMAL(10,6) DEFAULT NULL COMMENT '经度',
-  `lat`           DECIMAL(10,6) DEFAULT NULL COMMENT '纬度',
-  `sort`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `status`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=禁用 1=启用',
-  `app_id`        BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`    INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`    INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_pid`       (`pid`),
-  KEY `idx_region_id`  (`region_id`),
-  KEY `idx_level`      (`level`),
-  KEY `idx_status`     (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区行政区划（街道/社区）';
-
--- -----------------------------------------------------------
--- 2. yxshop_community_elders — 老人档案
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_community_elders` (
-  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id`             BIGINT UNSIGNED DEFAULT NULL COMMENT '关联用户ID',
-  `community_region_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '所属社区ID',
-  `name`                VARCHAR(32) NOT NULL COMMENT '姓名',
-  `id_card`             VARCHAR(18) DEFAULT NULL COMMENT '身份证号',
-  `phone`               VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
-  `gender`              TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '性别：0=未知 1=男 2=女',
-  `birth_date`          DATE DEFAULT NULL COMMENT '出生日期',
-  `age`                 INT UNSIGNED DEFAULT 0 COMMENT '年龄',
-  `avatar`              VARCHAR(255) DEFAULT NULL COMMENT '头像',
-  `address`             VARCHAR(255) DEFAULT NULL COMMENT '居住地址',
-  `address_detail`      VARCHAR(255) DEFAULT NULL COMMENT '详细门牌号',
-  `longitude`           DECIMAL(10,6) DEFAULT NULL COMMENT '住址经度',
-  `latitude`            DECIMAL(10,6) DEFAULT NULL COMMENT '住址纬度',
-  `care_level`          TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '照护等级：0=自理 1=半失能 2=失能 3=特护',
-  `health_status`       TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '健康状态：0=良好 1=一般 2=慢性病 3=术后 4=重病',
-  `special_needs`       TEXT DEFAULT NULL COMMENT '特殊需求/饮食禁忌/过敏等',
-  `emergency_contact`   VARCHAR(32) DEFAULT NULL COMMENT '紧急联系人',
-  `emergency_phone`     VARCHAR(20) DEFAULT NULL COMMENT '紧急联系电话',
-  `status`              TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=禁用 1=正常 2=离院 3=已故',
-  `remark`              TEXT DEFAULT NULL COMMENT '备注',
-  `app_id`              BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`          INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`          INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id`           (`user_id`),
-  KEY `idx_community_region`  (`community_region_id`),
-  KEY `idx_phone`             (`phone`),
-  KEY `idx_status`            (`status`),
-  KEY `idx_care_level`        (`care_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区老人档案';
-
--- -----------------------------------------------------------
--- 3. yxshop_elder_family_bindings — 老人-家属绑定
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_elder_family_bindings` (
-  `id`               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `elder_id`         BIGINT UNSIGNED NOT NULL COMMENT '老人档案ID',
-  `user_id`          BIGINT UNSIGNED NOT NULL COMMENT '家属用户ID',
-  `relation`         VARCHAR(16) NOT NULL DEFAULT 'other' COMMENT '关系：son=子 daughter=女 spouse=配偶 sibling=兄弟姐妹 other=其他',
-  `relation_desc`    VARCHAR(32) DEFAULT NULL COMMENT '关系说明',
-  `can_order`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否可代订餐',
-  `can_book_service` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否可代约服务',
-  `can_view_health`  TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否可查看健康档案',
-  `verify_status`    TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '验证状态：0=待验证 1=已通过 2=已拒绝',
-  `verify_time`      INT UNSIGNED DEFAULT NULL COMMENT '验证时间',
-  `status`           TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=已解除 1=正常',
-  `app_id`           BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`       INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`       INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_elder_user` (`elder_id`, `user_id`),
-  KEY `idx_elder_id` (`elder_id`),
-  KEY `idx_user_id`  (`user_id`),
-  KEY `idx_status`   (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='老人-家属绑定关系';
-
--- -----------------------------------------------------------
--- 4. yxshop_community_canteens — 社区食堂
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_community_canteens` (
-  `id`                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `community_region_id`     BIGINT UNSIGNED DEFAULT NULL COMMENT '所属社区ID',
-  `name`                    VARCHAR(64) NOT NULL COMMENT '食堂名称',
-  `cover_image`             VARCHAR(255) DEFAULT NULL COMMENT '封面图',
-  `phone`                   VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
-  `address`                 VARCHAR(255) NOT NULL COMMENT '食堂地址',
-  `longitude`               DECIMAL(10,6) DEFAULT NULL COMMENT '经度',
-  `latitude`                DECIMAL(10,6) DEFAULT NULL COMMENT '纬度',
-  `delivery_radius`         INT UNSIGNED NOT NULL DEFAULT 3000 COMMENT '送餐半径（米）',
-  `delivery_fee`            DECIMAL(8,2) NOT NULL DEFAULT 0.00 COMMENT '基础配送费',
-  `free_delivery_threshold` DECIMAL(8,2) DEFAULT 0.00 COMMENT '满额免配送费',
-  `service_capacity`        INT UNSIGNED NOT NULL DEFAULT 200 COMMENT '每日最大供餐量',
-  `meal_periods`            JSON DEFAULT NULL COMMENT '供餐时段配置',
-  `license_image`           VARCHAR(255) DEFAULT NULL COMMENT '经营许可证照片',
-  `images`                  JSON DEFAULT NULL COMMENT '环境照片数组',
-  `tags`                    JSON DEFAULT NULL COMMENT '标签',
-  `notice`                  TEXT DEFAULT NULL COMMENT '食堂公告',
-  `status`                  TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=休息 1=营业 2=暂停',
-  `sort`                    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `app_id`                  BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`              INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`              INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`              INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_community`   (`community_region_id`),
-  KEY `idx_status`       (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区食堂';
-
--- -----------------------------------------------------------
--- 5. yxshop_canteen_menus — 食堂每日菜单
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_canteen_menus` (
-  `id`             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `canteen_id`     BIGINT UNSIGNED NOT NULL COMMENT '食堂ID',
-  `menu_date`      DATE NOT NULL COMMENT '菜单日期',
-  `meal_type`      TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '餐次：1=早餐 2=午餐 3=晚餐 4=夜宵',
-  `meal_label`     VARCHAR(16) DEFAULT NULL COMMENT '餐次标签',
-  `order_deadline` INT UNSIGNED DEFAULT NULL COMMENT '点餐截止时间戳',
-  `delivery_start` VARCHAR(5) DEFAULT NULL COMMENT '送餐开始时间',
-  `delivery_end`   VARCHAR(5) DEFAULT NULL COMMENT '送餐结束时间',
-  `status`         TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=已关闭 1=可点餐 2=已售罄',
-  `remark`         VARCHAR(255) DEFAULT NULL COMMENT '备注',
-  `app_id`         BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`     INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`     INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_canteen_date_meal` (`canteen_id`, `menu_date`, `meal_type`),
-  KEY `idx_canteen_id` (`canteen_id`),
-  KEY `idx_menu_date`  (`menu_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='食堂每日菜单';
-
--- -----------------------------------------------------------
--- 6. yxshop_canteen_menu_items — 菜品项
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_canteen_menu_items` (
-  `id`                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `menu_id`              BIGINT UNSIGNED NOT NULL COMMENT '菜单ID',
-  `canteen_id`           BIGINT UNSIGNED NOT NULL COMMENT '食堂ID（冗余）',
-  `name`                 VARCHAR(64) NOT NULL COMMENT '菜品名称',
-  `image`                VARCHAR(255) DEFAULT NULL COMMENT '菜品图片',
-  `description`          TEXT DEFAULT NULL COMMENT '菜品描述',
-  `price`                DECIMAL(8,2) NOT NULL DEFAULT 0.00 COMMENT '售价',
-  `original_price`       DECIMAL(8,2) DEFAULT NULL COMMENT '原价',
-  `subsidy_price`        DECIMAL(8,2) NOT NULL DEFAULT 0.00 COMMENT '政府补贴金额',
-  `category`             VARCHAR(16) NOT NULL DEFAULT 'staple' COMMENT '分类',
-  `nutrition`            JSON DEFAULT NULL COMMENT '营养信息',
-  `allergens`            JSON DEFAULT NULL COMMENT '过敏原',
-  `dietary_tags`         JSON DEFAULT NULL COMMENT '饮食标签',
-  `suitable_care_level`  VARCHAR(32) DEFAULT NULL COMMENT '适合照护等级',
-  `stock`                INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '库存',
-  `sold_count`           INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '已售数量',
-  `max_per_order`        INT UNSIGNED NOT NULL DEFAULT 5 COMMENT '每单限购',
-  `sort`                 INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `status`               TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=下架 1=在售',
-  `app_id`               BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`           INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`           INT UNSIGNED NOT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_menu_id`    (`menu_id`),
-  KEY `idx_canteen_id` (`canteen_id`),
-  KEY `idx_status`     (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜单菜品项';
-
--- -----------------------------------------------------------
--- 7. yxshop_elder_meal_orders — 订餐订单
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_elder_meal_orders` (
-  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `order_no`            VARCHAR(32) NOT NULL COMMENT '订单号',
-  `canteen_id`          BIGINT UNSIGNED NOT NULL COMMENT '食堂ID',
-  `menu_id`             BIGINT UNSIGNED NOT NULL COMMENT '菜单ID',
-  `meal_type`           TINYINT UNSIGNED NOT NULL COMMENT '餐次',
-  `meal_date`           DATE NOT NULL COMMENT '就餐日期',
-  `order_type`          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=自取 2=送餐',
-  `order_user_id`       BIGINT UNSIGNED NOT NULL COMMENT '下单人用户ID',
-  `elder_id`            BIGINT UNSIGNED DEFAULT NULL COMMENT '老人档案ID',
-  `receiver_name`       VARCHAR(32) NOT NULL COMMENT '收餐人姓名',
-  `receiver_phone`      VARCHAR(20) NOT NULL COMMENT '收餐人电话',
-  `delivery_address`    VARCHAR(255) DEFAULT NULL COMMENT '送餐地址',
-  `delivery_longitude`  DECIMAL(10,6) DEFAULT NULL COMMENT '送餐经度',
-  `delivery_latitude`   DECIMAL(10,6) DEFAULT NULL COMMENT '送餐纬度',
-  `delivery_time`       VARCHAR(32) DEFAULT NULL COMMENT '送餐时段',
-  `delivery_fee`        DECIMAL(8,2) NOT NULL DEFAULT 0.00 COMMENT '配送费',
-  `item_amount`         DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '菜品总价',
-  `subsidy_amount`      DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '补贴总额',
-  `discount_amount`     DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '优惠金额',
-  `pay_amount`          DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '实付金额',
-  `pay_method`          TINYINT UNSIGNED DEFAULT NULL COMMENT '支付方式',
-  `pay_time`            INT UNSIGNED DEFAULT NULL COMMENT '支付时间',
-  `status`              TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态：0=待支付 1=待接单 2=备餐中 3=备餐完成 4=配送中 5=已送达 6=已签收 7=已取消 8=已退款',
-  `cancel_reason`       VARCHAR(255) DEFAULT NULL COMMENT '取消原因',
-  `remark`              VARCHAR(500) DEFAULT NULL COMMENT '订单备注',
-  `payment_id`          BIGINT UNSIGNED DEFAULT NULL COMMENT '关联支付流水ID',
-  `app_id`              BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`          INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`          INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_order_no` (`order_no`),
-  KEY `idx_canteen_id`     (`canteen_id`),
-  KEY `idx_order_user`     (`order_user_id`),
-  KEY `idx_elder_id`       (`elder_id`),
-  KEY `idx_status`         (`status`),
-  KEY `idx_meal_date`      (`meal_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='老人订餐订单';
-
--- -----------------------------------------------------------
--- 8. yxshop_elder_meal_order_items — 订餐订单明细
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_elder_meal_order_items` (
-  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `order_id`        BIGINT UNSIGNED NOT NULL COMMENT '订单ID',
-  `menu_item_id`    BIGINT UNSIGNED NOT NULL COMMENT '菜品ID',
-  `name`            VARCHAR(64) NOT NULL COMMENT '菜品名称',
-  `image`           VARCHAR(255) DEFAULT NULL COMMENT '菜品图片',
-  `price`           DECIMAL(8,2) NOT NULL COMMENT '单价',
-  `subsidy_price`   DECIMAL(8,2) NOT NULL DEFAULT 0.00 COMMENT '补贴金额/份',
-  `quantity`        INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '数量',
-  `subtotal`        DECIMAL(10,2) NOT NULL COMMENT '小计',
-  `created_at`      INT UNSIGNED NOT NULL COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_order_id` (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订餐订单明细';
-
--- -----------------------------------------------------------
--- 9. yxshop_care_services — 养老服务项目
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_care_services` (
-  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name`                VARCHAR(64) NOT NULL COMMENT '服务名称',
-  `category`            VARCHAR(32) NOT NULL DEFAULT 'home_care' COMMENT '分类',
-  `icon`                VARCHAR(255) DEFAULT NULL COMMENT '图标',
-  `cover_image`         VARCHAR(255) DEFAULT NULL COMMENT '封面图',
-  `images`              JSON DEFAULT NULL COMMENT '详情图片',
-  `description`         TEXT DEFAULT NULL COMMENT '服务描述',
-  `service_content`     TEXT DEFAULT NULL COMMENT '服务内容',
-  `price`               DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '基础价格',
-  `unit`                VARCHAR(16) NOT NULL DEFAULT '次' COMMENT '计价单位',
-  `duration`            INT UNSIGNED NOT NULL DEFAULT 60 COMMENT '服务时长（分钟）',
-  `suitable_care_level` VARCHAR(32) DEFAULT NULL COMMENT '适合照护等级',
-  `requirements`        TEXT DEFAULT NULL COMMENT '服务要求',
-  `tags`                JSON DEFAULT NULL COMMENT '标签',
-  `min_price`           DECIMAL(10,2) DEFAULT NULL COMMENT '最低价格',
-  `max_price`           DECIMAL(10,2) DEFAULT NULL COMMENT '最高价格',
-  `status`              TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=下架 1=上架',
-  `sort`                INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `app_id`              BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`          INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`          INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_category` (`category`),
-  KEY `idx_status`   (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='养老服务项目';
-
--- -----------------------------------------------------------
--- 10. yxshop_care_service_bookings — 服务预约订单
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_care_service_bookings` (
-  `id`                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `booking_no`        VARCHAR(32) NOT NULL COMMENT '预约号',
-  `service_id`        BIGINT UNSIGNED NOT NULL COMMENT '服务ID',
-  `service_name`      VARCHAR(64) NOT NULL COMMENT '服务名称',
-  `service_category`  VARCHAR(32) NOT NULL COMMENT '服务分类',
-  `provider_id`       BIGINT UNSIGNED DEFAULT NULL COMMENT '服务提供者ID',
-  `book_user_id`      BIGINT UNSIGNED NOT NULL COMMENT '预约人用户ID',
-  `elder_id`          BIGINT UNSIGNED DEFAULT NULL COMMENT '老人档案ID',
-  `elder_name`        VARCHAR(32) NOT NULL COMMENT '老人姓名',
-  `elder_phone`       VARCHAR(20) DEFAULT NULL COMMENT '老人电话',
-  `service_address`   VARCHAR(255) NOT NULL COMMENT '服务地址',
-  `service_longitude` DECIMAL(10,6) DEFAULT NULL COMMENT '经度',
-  `service_latitude`   DECIMAL(10,6) DEFAULT NULL COMMENT '纬度',
-  `service_date`       DATE NOT NULL COMMENT '服务日期',
-  `service_time_start` VARCHAR(5) NOT NULL COMMENT '开始时间',
-  `service_time_end`   VARCHAR(5) DEFAULT NULL COMMENT '结束时间',
-  `duration`          INT UNSIGNED NOT NULL DEFAULT 60 COMMENT '时长（分钟）',
-  `quantity`          INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '数量',
-  `unit_price`        DECIMAL(10,2) NOT NULL COMMENT '单价',
-  `total_amount`      DECIMAL(10,2) NOT NULL COMMENT '总金额',
-  `pay_amount`        DECIMAL(10,2) NOT NULL COMMENT '实付金额',
-  `pay_method`        TINYINT UNSIGNED DEFAULT NULL COMMENT '支付方式',
-  `pay_time`          INT UNSIGNED DEFAULT NULL COMMENT '支付时间',
-  `status`            TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态：0=待支付 1=待分配 2=待服务 3=服务中 4=已完成 5=已确认 6=已取消 7=已退款',
-  `special_request`   TEXT DEFAULT NULL COMMENT '特殊需求',
-  `cancel_reason`     VARCHAR(255) DEFAULT NULL COMMENT '取消原因',
-  `payment_id`        BIGINT UNSIGNED DEFAULT NULL COMMENT '支付流水ID',
-  `confirm_time`      INT UNSIGNED DEFAULT NULL COMMENT '确认时间',
-  `app_id`            BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`        INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`        INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_booking_no` (`booking_no`),
-  KEY `idx_service_id`    (`service_id`),
-  KEY `idx_provider_id`   (`provider_id`),
-  KEY `idx_book_user`     (`book_user_id`),
-  KEY `idx_elder_id`       (`elder_id`),
-  KEY `idx_status`         (`status`),
-  KEY `idx_service_date`   (`service_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='养老服务预约订单';
-
--- -----------------------------------------------------------
--- 11. yxshop_care_providers — 服务提供者
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_care_providers` (
-  `id`                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id`           BIGINT UNSIGNED DEFAULT NULL COMMENT '关联用户ID',
-  `name`              VARCHAR(32) NOT NULL COMMENT '姓名',
-  `phone`             VARCHAR(20) NOT NULL COMMENT '电话',
-  `avatar`            VARCHAR(255) DEFAULT NULL COMMENT '头像',
-  `gender`            TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '性别',
-  `age`               INT UNSIGNED DEFAULT 0 COMMENT '年龄',
-  `id_card`           VARCHAR(18) DEFAULT NULL COMMENT '身份证号',
-  `title`             VARCHAR(32) DEFAULT NULL COMMENT '职称',
-  `org_name`          VARCHAR(64) DEFAULT NULL COMMENT '所属机构',
-  `licenses`          JSON DEFAULT NULL COMMENT '资质证书',
-  `service_categories` JSON DEFAULT NULL COMMENT '可服务分类',
-  `service_area`     VARCHAR(255) DEFAULT NULL COMMENT '服务区域',
-  `service_region_ids` JSON DEFAULT NULL COMMENT '服务社区ID数组',
-  `intro`            TEXT DEFAULT NULL COMMENT '个人简介',
-  `rating`           DECIMAL(2,1) NOT NULL DEFAULT 5.0 COMMENT '评分',
-  `total_orders`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总接单数',
-  `completed_orders` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '完成订单数',
-  `status`           TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态：0=待审核 1=在职 2=休息 3=离职 4=已拒绝',
-  `verify_status`    TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '资质审核',
-  `verify_time`      INT UNSIGNED DEFAULT NULL COMMENT '审核时间',
-  `app_id`           BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`       INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`       INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id`   (`user_id`),
-  KEY `idx_phone`     (`phone`),
-  KEY `idx_status`    (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='养老服务提供者';
-
--- -----------------------------------------------------------
--- 12. yxshop_care_provider_services — 服务-提供者关联
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_care_provider_services` (
-  `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `provider_id`   BIGINT UNSIGNED NOT NULL COMMENT '服务提供者ID',
-  `service_id`    BIGINT UNSIGNED NOT NULL COMMENT '服务项目ID',
-  `custom_price`  DECIMAL(10,2) DEFAULT NULL COMMENT '自定义价格',
-  `is_primary`    TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否主营',
-  `created_at`    INT UNSIGNED NOT NULL COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_provider_service` (`provider_id`, `service_id`),
-  KEY `idx_provider_id` (`provider_id`),
-  KEY `idx_service_id`  (`service_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服务-提供者关联';
-
--- -----------------------------------------------------------
--- 13. yxshop_care_service_logs — 服务执行日志
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_care_service_logs` (
-  `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `booking_id`    BIGINT UNSIGNED NOT NULL COMMENT '预约订单ID',
-  `provider_id`   BIGINT UNSIGNED NOT NULL COMMENT '服务提供者ID',
-  `action`        VARCHAR(20) NOT NULL COMMENT '动作',
-  `content`       TEXT DEFAULT NULL COMMENT '日志内容',
-  `images`        JSON DEFAULT NULL COMMENT '现场照片',
-  `location`      VARCHAR(255) DEFAULT NULL COMMENT '位置',
-  `longitude`     DECIMAL(10,6) DEFAULT NULL COMMENT '经度',
-  `latitude`      DECIMAL(10,6) DEFAULT NULL COMMENT '纬度',
-  `created_at`    INT UNSIGNED NOT NULL COMMENT '日志时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_booking_id`  (`booking_id`),
-  KEY `idx_provider_id` (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服务执行日志';
-
--- -----------------------------------------------------------
--- 14. yxshop_elder_health_records — 健康档案
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_elder_health_records` (
-  `id`                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `elder_id`             BIGINT UNSIGNED NOT NULL COMMENT '老人ID',
-  `record_type`          VARCHAR(20) NOT NULL DEFAULT 'routine' COMMENT '类型',
-  `record_date`          DATE NOT NULL COMMENT '记录日期',
-  `blood_pressure_high`  INT UNSIGNED DEFAULT NULL COMMENT '收缩压',
-  `blood_pressure_low`   INT UNSIGNED DEFAULT NULL COMMENT '舒张压',
-  `heart_rate`           INT UNSIGNED DEFAULT NULL COMMENT '心率',
-  `blood_sugar`          DECIMAL(5,2) DEFAULT NULL COMMENT '血糖',
-  `temperature`          DECIMAL(4,1) DEFAULT NULL COMMENT '体温',
-  `weight`               DECIMAL(5,1) DEFAULT NULL COMMENT '体重(kg)',
-  `height`               DECIMAL(5,1) DEFAULT NULL COMMENT '身高(cm)',
-  `bmi`                  DECIMAL(4,1) DEFAULT NULL COMMENT 'BMI',
-  `medications`          JSON DEFAULT NULL COMMENT '用药记录',
-  `conditions`           JSON DEFAULT NULL COMMENT '疾病诊断',
-  `allergies`            JSON DEFAULT NULL COMMENT '过敏史',
-  `description`          TEXT DEFAULT NULL COMMENT '详细描述',
-  `attachments`          JSON DEFAULT NULL COMMENT '附件',
-  `doctor_name`          VARCHAR(32) DEFAULT NULL COMMENT '检查医生',
-  `hospital`             VARCHAR(64) DEFAULT NULL COMMENT '检查医院',
-  `created_by`           BIGINT UNSIGNED DEFAULT NULL COMMENT '记录创建者',
-  `app_id`               BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`           INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`           INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`           INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_elder_id`    (`elder_id`),
-  KEY `idx_record_type` (`record_type`),
-  KEY `idx_record_date` (`record_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='老人健康档案';
-
--- -----------------------------------------------------------
--- 15. yxshop_elder_assessment_records — 老人能力评估
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `yxshop_elder_assessment_records` (
-  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `elder_id`        BIGINT UNSIGNED NOT NULL COMMENT '老人ID',
-  `assessment_date` DATE NOT NULL COMMENT '评估日期',
-  `assessment_type` VARCHAR(20) NOT NULL DEFAULT 'ADL' COMMENT '评估类型',
-  `score`           DECIMAL(5,2) DEFAULT NULL COMMENT '总分',
-  `level`           VARCHAR(16) DEFAULT NULL COMMENT '评估等级',
-  `items`           JSON DEFAULT NULL COMMENT '评估明细',
-  `eating`          TINYINT UNSIGNED DEFAULT NULL COMMENT '进食',
-  `dressing`        TINYINT UNSIGNED DEFAULT NULL COMMENT '穿衣',
-  `toileting`       TINYINT UNSIGNED DEFAULT NULL COMMENT '如厕',
-  `transferring`    TINYINT UNSIGNED DEFAULT NULL COMMENT '转移',
-  `bathing`         TINYINT UNSIGNED DEFAULT NULL COMMENT '洗澡',
-  `continence`      TINYINT UNSIGNED DEFAULT NULL COMMENT '大小便控制',
-  `cognition`       TINYINT UNSIGNED DEFAULT NULL COMMENT '认知',
-  `mood`            TINYINT UNSIGNED DEFAULT NULL COMMENT '情绪',
-  `assessor`        VARCHAR(32) DEFAULT NULL COMMENT '评估人',
-  `conclusion`      TEXT DEFAULT NULL COMMENT '评估结论',
-  `app_id`          BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`      INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`      INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_elder_id`   (`elder_id`),
-  KEY `idx_assess_type` (`assessment_type`),
-  KEY `idx_assess_date` (`assessment_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='老人能力评估';
-
--- ============================================================
--- 后台菜单种子数据
--- ============================================================
-INSERT INTO `yxshop_admin_menus` (`parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`)
-SELECT 0, '社区养老', 'community', '', 'HeartOutline', 55, 1, NULL, 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
-FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `yxshop_admin_menus` WHERE `model` = 'community' AND `parent_id` = 0);
-
--- 子菜单
-SET @pid = (SELECT `id` FROM `yxshop_admin_menus` WHERE `model` = 'community' AND `parent_id` = 0 LIMIT 1);
-
-INSERT INTO `yxshop_admin_menus` (`parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
-(@pid, '数据看板',   'community', '/community/dashboard',      'Dashboard',       0, 1, 'community/dashboard/index',      'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '老人档案',   'community', '/community/elders',         'UserOutline',     1, 1, 'community/elders/index',         'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '食堂管理',   'community', '/community/canteens',       'Shop',            2, 1, 'community/canteens/index',       'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '订餐管理',   'community', '/community/meal-orders',    'OrderedList',     3, 1, 'community/meal-orders/index',    'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '服务目录',   'community', '/community/care-services',  'Service',         4, 1, 'community/care-services/index',  'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '服务人员',   'community', '/community/care-providers', 'Team',            5, 1, 'community/care-providers/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '服务订单',   'community', '/community/care-orders',    'Schedule',        6, 1, 'community/care-orders/index',    'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '评价管理',   'community', '/community/care-reviews',   'Star',            7, 1, 'community/care-reviews/index',   'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '健康档案',   'community', '/community/health-records', 'FileImage',       8, 1, 'community/health-records/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(@pid, '区域管理',   'community', '/community/regions',        'LocationOutline', 9, 1, 'community/regions/index',        'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- ---- 迁移: 2026_34_create_care_reviews_table.sql ----
--- =====================================================
--- 社区养老服务评价表
--- 日期：2026-08-19
--- 说明：家属对已完成的服务预约进行评价打分
--- =====================================================
-
-CREATE TABLE IF NOT EXISTS `yxshop_care_reviews` (
-  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `booking_id`      BIGINT UNSIGNED NOT NULL COMMENT '预约订单ID',
-  `booking_no`      VARCHAR(32) NOT NULL COMMENT '预约号（冗余，便于查询）',
-  `service_id`      BIGINT UNSIGNED NOT NULL COMMENT '服务项目ID',
-  `service_name`    VARCHAR(64) NOT NULL COMMENT '服务名称（快照）',
-  `provider_id`     BIGINT UNSIGNED DEFAULT NULL COMMENT '服务提供者ID',
-  `provider_name`   VARCHAR(32) DEFAULT NULL COMMENT '服务人员姓名（快照）',
-  `elder_id`        BIGINT UNSIGNED DEFAULT NULL COMMENT '老人档案ID',
-  `elder_name`      VARCHAR(32) DEFAULT NULL COMMENT '老人姓名（快照）',
-  `user_id`         BIGINT UNSIGNED NOT NULL COMMENT '评价人（家属）用户ID',
-  `rating`          TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '总体评分：1-5星',
-  `attitude_rating`   TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '服务态度评分：1-5星',
-  `skill_rating`      TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '专业技能评分：1-5星',
-  `punctuality_rating` TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '守时程度评分：1-5星',
-  `content`         TEXT DEFAULT NULL COMMENT '评价文字内容',
-  `images`          JSON DEFAULT NULL COMMENT '评价图片数组',
-  `is_anonymous`    TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否匿名：0=否 1=是',
-  `reply`           TEXT DEFAULT NULL COMMENT '商家/平台回复内容',
-  `reply_time`      INT UNSIGNED DEFAULT NULL COMMENT '回复时间',
-  `status`          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=隐藏 1=显示',
-  `app_id`          BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`      INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`      INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_booking_id` (`booking_id`) COMMENT '一个预约只能评价一次',
-  KEY `idx_provider_id` (`provider_id`),
-  KEY `idx_service_id`  (`service_id`),
-  KEY `idx_user_id`     (`user_id`),
-  KEY `idx_elder_id`    (`elder_id`),
-  KEY `idx_rating`      (`rating`),
-  KEY `idx_status`      (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='养老服务评价';
-
--- ---- 迁移: 2026_34_setting_encrypt.sql ----
--- ---- 迁移: 2026_35_community_service_refactor.sql ----
--- ============================================================
--- 通用社区服务模块重构 — 数据库迁移
--- 将"养老"硬编码的表名/字段名改为通用术语
--- 日期：2026-08-22
--- ============================================================
-ALTER TABLE `yxshop_settings`
-  ADD COLUMN `is_encrypted` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否加密存储：0=否 1=是' AFTER `type`;
-
--- ============================================================
--- 1. 重命名表
--- ============================================================
-
--- 老人档案 → 服务对象
-RENAME TABLE `yxshop_community_elders` TO `yxshop_community_subjects`;
-
--- 老人-家属绑定 → 对象关联人绑定
-RENAME TABLE `yxshop_elder_family_bindings` TO `yxshop_community_subject_bindings`;
-
--- 老人订餐订单 → 社区订餐订单
-RENAME TABLE `yxshop_elder_meal_orders` TO `yxshop_community_meal_orders`;
-
--- 老人订餐订单明细 → 社区订餐订单明细
-RENAME TABLE `yxshop_elder_meal_order_items` TO `yxshop_community_meal_order_items`;
-
--- 养老服务项目 → 社区服务项目
-RENAME TABLE `yxshop_care_services` TO `yxshop_community_services`;
-
--- 养老服务预约 → 社区服务预约
-RENAME TABLE `yxshop_care_service_bookings` TO `yxshop_community_service_bookings`;
-
--- 养老服务提供者 → 社区服务提供者
-RENAME TABLE `yxshop_care_providers` TO `yxshop_community_providers`;
-
--- 服务-提供者关联
-RENAME TABLE `yxshop_care_provider_services` TO `yxshop_community_provider_services`;
-
--- 服务执行日志
-RENAME TABLE `yxshop_care_service_logs` TO `yxshop_community_service_logs`;
-
--- 养老服务评价 → 社区服务评价
-RENAME TABLE `yxshop_care_reviews` TO `yxshop_community_service_reviews`;
-
--- ============================================================
--- 2. 字段重命名：elder_id → subject_id
--- ============================================================
-
--- yxshop_community_subject_bindings
-  DROP INDEX `idx_elder_id`,
-  DROP INDEX `uk_elder_user`,
-
--- yxshop_community_meal_orders
-  DROP INDEX `idx_elder_id`,
-
--- yxshop_community_service_bookings
-  CHANGE `elder_id` `subject_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '服务对象ID',
-  CHANGE `elder_name` `subject_name` VARCHAR(32) NOT NULL COMMENT '服务对象姓名',
-  DROP INDEX `idx_elder_id`,
-
--- yxshop_community_service_reviews
-  CHANGE `elder_id` `subject_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '服务对象ID',
-
--- yxshop_elder_health_records (保留养老扩展，但字段也通用化)
-  DROP INDEX `idx_elder_id`,
-
--- yxshop_elder_assessment_records (保留养老扩展，但字段也通用化)
-  DROP INDEX `idx_elder_id`,
-
--- ============================================================
--- 3. 通用化 community_subjects 表
--- ============================================================
-
--- 新增 profile_data JSON 字段（存放业务扩展数据）
--- 新增 profile_type 字段（档案类型标识）
--- 将原有 care_level 和 health_status 数据迁移到 profile_data
-UPDATE `yxshop_community_subjects` SET `profile_data` = JSON_OBJECT(
-  'care_level', `care_level`,
-  'health_status', `health_status`
-ALTER TABLE `yxshop_community_subjects`
-  ADD COLUMN `profile_type` VARCHAR(32) DEFAULT NULL COMMENT '档案类型标识（elderly/pet/property/child/...）' AFTER `profile_data`;
-
--- 设置已有数据为 elderly 类型
-UPDATE `yxshop_community_subjects` SET `profile_type` = 'elderly' WHERE `profile_type` IS NULL;
-
--- 删除原 care_level, health_status 字段（已迁移到 profile_data）
-  DROP COLUMN `care_level`,
-
--- 更新表注释
-ALTER TABLE `yxshop_community_subjects` COMMENT = '社区服务对象档案';
-
--- ============================================================
--- 4. 通用化 subject_bindings 表
--- ============================================================
-
--- 新增 relation_label 字段（自定义关系标签，替代硬编码 relation）
--- 将原有 relation 数据迁移到 relation_label
-ALTER TABLE `yxshop_community_subject_bindings`
-  ADD COLUMN `relation_label` VARCHAR(32) DEFAULT NULL COMMENT '自定义关系标签（如：儿子/女儿/主人/监护人...）' AFTER `relation_desc`;
-
--- 更新表注释
-ALTER TABLE `yxshop_community_subject_bindings` COMMENT = '服务对象-关联人绑定关系';
-
--- ============================================================
--- 5. 通用化 community_services 表
--- ============================================================
-
--- 将 suitable_care_level 改为 target_tags
-
--- 更新表注释
-ALTER TABLE `yxshop_community_services` COMMENT = '社区服务项目';
-
--- ============================================================
--- 6. 通用化 canteen_menu_items 表
--- ============================================================
-
-
--- ============================================================
--- 7. 更新其他表注释
--- ============================================================
-ALTER TABLE `yxshop_community_service_bookings` COMMENT = '社区服务预约订单';
-ALTER TABLE `yxshop_community_providers` COMMENT = '社区服务提供者';
-ALTER TABLE `yxshop_community_provider_services` COMMENT = '服务-提供者关联';
-ALTER TABLE `yxshop_community_service_logs` COMMENT = '服务执行日志';
-ALTER TABLE `yxshop_community_service_reviews` COMMENT = '社区服务评价';
-ALTER TABLE `yxshop_community_meal_orders` COMMENT = '社区订餐订单';
-ALTER TABLE `yxshop_community_meal_order_items` COMMENT = '订餐订单明细';
-
--- ============================================================
--- 8. 新增服务分类配置表（替代硬编码常量）
--- ============================================================
-CREATE TABLE IF NOT EXISTS `yxshop_community_service_categories` (
-  `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `parent_id`   BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父级ID（0=顶级）',
-  `name`        VARCHAR(64) NOT NULL COMMENT '分类名称',
-  `icon`        VARCHAR(255) DEFAULT NULL COMMENT '图标',
-  `description` VARCHAR(255) DEFAULT NULL COMMENT '分类描述',
-  `sort`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `status`      TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态：0=禁用 1=启用',
-  `app_id`      BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属应用',
-  `created_at`  INT UNSIGNED NOT NULL COMMENT '创建时间',
-  `updated_at`  INT UNSIGNED NOT NULL COMMENT '更新时间',
-  `deleted_at`  INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_parent_id` (`parent_id`),
-  KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区服务分类配置';
-
--- 迁移原有硬编码分类到配置表
-INSERT INTO `yxshop_community_service_categories` (`parent_id`, `name`, `icon`, `sort`, `status`, `app_id`, `created_at`, `updated_at`) VALUES
-(0, '家政服务', NULL, 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '保洁服务', NULL, 1, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '康复护理', NULL, 2, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '康复训练', NULL, 3, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '助浴服务', NULL, 4, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '陪诊服务', NULL, 5, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '陪伴服务', NULL, 6, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '助行服务', NULL, 7, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '代烹服务', NULL, 8, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(0, '其他服务', NULL, 9, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- ============================================================
--- 9. 更新后台菜单种子数据
--- ============================================================
-UPDATE `yxshop_admin_menus` SET `name` = '社区服务' WHERE `model` = 'community' AND `parent_id` = 0;
-UPDATE `yxshop_admin_menus` SET `name` = '对象档案', `url` = '/community/subjects', `permission` = 'community/subjects/index' WHERE `model` = 'community' AND `url` = '/community/elders';
-UPDATE `yxshop_admin_menus` SET `name` = '服务目录', `url` = '/community/services', `permission` = 'community/services/index' WHERE `model` = 'community' AND `url` = '/community/care-services';
-UPDATE `yxshop_admin_menus` SET `name` = '服务提供者', `url` = '/community/providers', `permission` = 'community/providers/index' WHERE `model` = 'community' AND `url` = '/community/care-providers';
-UPDATE `yxshop_admin_menus` SET `name` = '服务订单', `url` = '/community/service-orders', `permission` = 'community/service-orders/index' WHERE `model` = 'community' AND `url` = '/community/care-orders';
-UPDATE `yxshop_admin_menus` SET `name` = '服务评价', `url` = '/community/service-reviews', `permission` = 'community/service-reviews/index' WHERE `model` = 'community' AND `url` = '/community/care-reviews';
-
--- 新增"服务分类"菜单
-SET @pid = (SELECT `id` FROM `yxshop_admin_menus` WHERE `model` = 'community' AND `parent_id` = 0 LIMIT 1);
-INSERT INTO `yxshop_admin_menus` (`parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`)
-SELECT @pid, '服务分类', 'community', '/community/service-categories', 'MenuOutline', 10, 1, 'community/service-categories/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
-FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `yxshop_admin_menus` WHERE `url` = '/community/service-categories');
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audit_status` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核状态：0=未审核 10=审核通过 20=审核拒绝' AFTER `receipt_status`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audit_remark` varchar(500) NOT NULL DEFAULT '' COMMENT '审核备注' AFTER `audit_status`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `audit_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '审核时间' AFTER `audit_remark`;
 
 -- ---- 迁移: 2026_35_data_change_log_enhance.sql ----
 -- ============================================================
@@ -6583,14 +5920,14 @@ FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM `yxshop_admin_menus` WHERE `url` = '/c
 -- 模型 DealerReferee 定义了 referee_id/referee_type/referee_name 等字段，
 -- 但实际数据库表缺少这些列，此处补全。
 -- ============================================================
-ALTER TABLE `yxshop_data_change_logs`
-  MODIFY COLUMN `record_id` varchar(64) NOT NULL DEFAULT '' COMMENT '记录ID（兼容雪花ID）',
-  MODIFY COLUMN `user_id` varchar(64) NOT NULL DEFAULT '0' COMMENT '操作者ID（兼容雪花ID）',
-  ADD COLUMN `operator_name` varchar(100) NOT NULL DEFAULT '' COMMENT '操作者名称' AFTER `user_type`,
-  ADD INDEX `idx_table_record` (`table_name`, `record_id`),
-  ADD INDEX `idx_operation_type` (`operation_type`),
-  ADD INDEX `idx_user` (`user_id`, `user_type`),
-  ADD INDEX `idx_created_at` (`created_at`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_data_change_logs`
+-- [DISABLED-REDUNDANT-MIGRATION]   MODIFY COLUMN `record_id` varchar(64) NOT NULL DEFAULT '' COMMENT '记录ID（兼容雪花ID）',
+-- [DISABLED-REDUNDANT-MIGRATION]   MODIFY COLUMN `user_id` varchar(64) NOT NULL DEFAULT '0' COMMENT '操作者ID（兼容雪花ID）',
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `operator_name` varchar(100) NOT NULL DEFAULT '' COMMENT '操作者名称' AFTER `user_type`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_table_record` (`table_name`, `record_id`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_operation_type` (`operation_type`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_user` (`user_id`, `user_type`),
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD INDEX `idx_created_at` (`created_at`);
 
 -- 1. 补全 yxshop_dealer_referees 缺失字段
 -- 索引
@@ -6639,8 +5976,8 @@ CALL yxshop_add_index_if_missing('yxshop_dealer_referees', 'idx_referee_id', '`r
 -- 分銷定時任務種子數據
 -- 添加佣金自動結算和等級升降級檢查的定時任務
 -- ============================================================
-ALTER TABLE `yxshop_agents`
-  MODIFY COLUMN `commission_rate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '佣金比例(%)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_agents`
+-- [DISABLED-REDUNDANT-MIGRATION]   MODIFY COLUMN `commission_rate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '佣金比例(%)';
 SET @APP_ID := 0;
 SET @NOW_TS := UNIX_TIMESTAMP();
 
@@ -6657,7 +5994,7 @@ INSERT IGNORE INTO `yxshop_scheduled_tasks` (`task_name`, `task_type`, `cron_exp
 
 -- 获取当前最大ID，确保不冲突
 -- 已有最大ID为73（AUTO_INCREMENT=74），使用74
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`)
 VALUES (74, 30, '分销订单', 'distribution', '/distribution/order-agents', 'icon-file', 45, 1, 'order-agents/index', 'GET', 10001, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 
 -- 如果ID=74已存在，用AUTO_INCREMENT自动分配
@@ -6675,12 +6012,12 @@ VALUES (74, 30, '分销订单', 'distribution', '/distribution/order-agents', 'i
 -- ---- 迁移: 2026_37_login_security.sql ----
 -- 登录安全策略迁移
 -- Admin表新增字段
-ALTER TABLE `yxshop_group_buys`
-  ADD COLUMN `current_count` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前参团人数' AFTER `required_count`,
-  ADD COLUMN `group_status` tinyint(1) UNSIGNED NOT NULL DEFAULT 10 COMMENT '拼团状态：10=进行中 20=已成团 30=已失败' AFTER `current_count`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `locked_until` int unsigned NULL DEFAULT NULL COMMENT '锁定截止时间戳' AFTER `login_fail_count`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `password_changed_at` int unsigned NULL DEFAULT NULL COMMENT '最后修改密码时间戳' AFTER `locked_until`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `force_password_change` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否强制修改密码' AFTER `password_changed_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_group_buys`
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `current_count` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前参团人数' AFTER `required_count`,
+-- [DISABLED-REDUNDANT-MIGRATION]   ADD COLUMN `group_status` tinyint(1) UNSIGNED NOT NULL DEFAULT 10 COMMENT '拼团状态：10=进行中 20=已成团 30=已失败' AFTER `current_count`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `locked_until` int unsigned NULL DEFAULT NULL COMMENT '锁定截止时间戳' AFTER `login_fail_count`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `password_changed_at` int unsigned NULL DEFAULT NULL COMMENT '最后修改密码时间戳' AFTER `locked_until`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `force_password_change` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否强制修改密码' AFTER `password_changed_at`;
 
 -- 密码历史表
 CREATE TABLE IF NOT EXISTS `yxshop_admin_password_histories` (
@@ -6708,11 +6045,11 @@ INSERT IGNORE INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `descript
 
 -- ---- 迁移: 2026_38_wechat_login.sql ----
 -- 微信扫码登录字段迁移
-ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_openid` varchar(64) DEFAULT NULL COMMENT '微信openid' AFTER `force_password_change`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_bound_at` int unsigned DEFAULT NULL COMMENT '微信绑定时间戳' AFTER `wechat_openid`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_nickname` varchar(128) DEFAULT NULL COMMENT '微信昵称' AFTER `wechat_bound_at`;
-ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_avatar` varchar(512) DEFAULT NULL COMMENT '微信头像URL' AFTER `wechat_nickname`;
-ALTER TABLE `yxshop_admins` ADD UNIQUE INDEX `uk_wechat_openid` (`wechat_openid`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_openid` varchar(64) DEFAULT NULL COMMENT '微信openid' AFTER `force_password_change`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_bound_at` int unsigned DEFAULT NULL COMMENT '微信绑定时间戳' AFTER `wechat_openid`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_nickname` varchar(128) DEFAULT NULL COMMENT '微信昵称' AFTER `wechat_bound_at`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD COLUMN `wechat_avatar` varchar(512) DEFAULT NULL COMMENT '微信头像URL' AFTER `wechat_nickname`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins` ADD UNIQUE INDEX `uk_wechat_openid` (`wechat_openid`);
 
 -- 微信应用配置
 INSERT IGNORE INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `app_id`) VALUES
@@ -6811,7 +6148,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_live_viewer_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='直播觀看記錄表';
 
 -- 插入直播管理菜單
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `icon`, `url`, `model`, `sort`, `is_show`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `icon`, `url`, `model`, `sort`, `is_show`, `app_id`, `created_at`, `updated_at`)
 SELECT
     UNIX_TIMESTAMP() * 1000 + 1,
     0,
@@ -6829,7 +6166,7 @@ WHERE NOT EXISTS (
 );
 
 -- 插入子菜單
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `icon`, `url`, `model`, `sort`, `is_show`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `icon`, `url`, `model`, `sort`, `is_show`, `app_id`, `created_at`, `updated_at`)
 SELECT
     UNIX_TIMESTAMP() * 1000 + 2,
     (SELECT `id` FROM `yxshop_admin_menus` WHERE `model` = 'live_stream' AND `app_id` = 10001 LIMIT 1),
@@ -6928,7 +6265,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_shop_settlements` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='店鋪結算記錄表';
 
 -- 插入默認店鋪等級
-INSERT INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
 SELECT
     UNIX_TIMESTAMP() * 1000 + 1,
     '基础版',
@@ -6943,7 +6280,7 @@ SELECT
     UNIX_TIMESTAMP()
 WHERE NOT EXISTS (SELECT 1 FROM `yxshop_shop_levels` WHERE `name` = '基础版' AND `app_id` = 10001);
 
-INSERT INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
 SELECT
     UNIX_TIMESTAMP() * 1000 + 2,
     '标准版',
@@ -6958,7 +6295,7 @@ SELECT
     UNIX_TIMESTAMP()
 WHERE NOT EXISTS (SELECT 1 FROM `yxshop_shop_levels` WHERE `name` = '标准版' AND `app_id` = 10001);
 
-INSERT INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
+INSERT IGNORE INTO `yxshop_shop_levels` (`id`, `name`, `commission_rate`, `max_products`, `max_storage`, `features`, `sort_order`, `status`, `app_id`, `created_at`, `updated_at`)
 SELECT
     UNIX_TIMESTAMP() * 1000 + 3,
     '旗舰版',
@@ -7156,23 +6493,23 @@ SET @NOW = UNIX_TIMESTAMP();
 -- 使用大于 81 的 ID 避免冲突
 
 -- 供应商评估
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (82, 74, '供应商评估', 'supply', '/supply/supplier-evaluation', 'icon-star', 80, 1, 'supplier-evaluation/index', 'GET', @APP_ID, @NOW, @NOW);
 
 -- 采购建议
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (83, 74, '采购建议', 'supply', '/supply/purchase-suggestion', 'icon-lightbulb', 90, 1, 'purchase-suggestion/index', 'GET', @APP_ID, @NOW, @NOW);
 
 -- 供应商门户
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (84, 74, '供应商门户', 'supply', '/supply/supplier-portal', 'icon-door-open', 100, 1, 'supplier-portal/index', 'GET', @APP_ID, @NOW, @NOW);
 
 -- 库存大盘
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (85, 74, '库存大盘', 'supply', '/supply/inventory-dashboard', 'icon-dashboard', 110, 1, 'inventory-dashboard/index', 'GET', @APP_ID, @NOW, @NOW);
 
 -- 供应商门户子菜单
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (86, 84, '门户账户', 'supply', '/supply/supplier-portal/accounts', 'icon-user', 10, 1, 'supplier-portal/accounts', 'GET', @APP_ID, @NOW, @NOW),
 (87, 84, '发货通知', 'supply', '/supply/supplier-portal/shipments', 'icon-truck', 20, 1, 'supplier-portal/shipments', 'GET', @APP_ID, @NOW, @NOW);
 
@@ -7248,7 +6585,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_currencies` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='货币表';
 
 -- 插入默认货币数据
-INSERT INTO `yxshop_currencies` (`id`, `name`, `code`, `symbol`, `exchange_rate`, `status`, `is_default`, `sort`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_currencies` (`id`, `name`, `code`, `symbol`, `exchange_rate`, `status`, `is_default`, `sort`, `created_at`, `updated_at`) VALUES
 (1, '人民币', 'CNY', '¥', 1.0000, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (2, '美元', 'USD', '$', 0.1400, 1, 0, 2, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (3, '欧元', 'EUR', '€', 0.1300, 1, 0, 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -7274,7 +6611,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_languages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='语言表';
 
 -- 插入默认语言数据
-INSERT INTO `yxshop_languages` (`id`, `name`, `code`, `flag`, `status`, `is_default`, `sort`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_languages` (`id`, `name`, `code`, `flag`, `status`, `is_default`, `sort`, `created_at`, `updated_at`) VALUES
 (1, '简体中文', 'zh-CN', 'cn', 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (2, 'English', 'en-US', 'us', 1, 0, 2, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (3, '繁體中文', 'zh-TW', 'tw', 1, 0, 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -7466,12 +6803,162 @@ CALL yxshop_add_index_if_missing('yxshop_articles',        'idx_deleted_at', '`d
 -- ------------------------------------------------------------
 -- 3. 修复 10 处 "??????" 乱码注释
 -- ------------------------------------------------------------
-ALTER TABLE `yxshop_admin_roles`     MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_admins`          MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_orders`          MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_items`           MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_coupons`         MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
-ALTER TABLE `yxshop_advertisements`  MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_roles`     MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admins`          MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders`          MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items`           MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupons`         MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_advertisements`  MODIFY COLUMN `deleted_at` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '软删除时间(0未删)';
+
+
+-- ============================================================
+-- 修复：签到表结构 + 全局主键类型（配合雪花 ID）
+-- BaseModel 使用 SnowflakeTrait 生成 19 位 ID，int 主键会报
+-- "Out of range value for column 'id'"，主键必须为 bigint unsigned。
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `yxshop_signs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `sign_date` date DEFAULT NULL COMMENT '签到日期',
+  `sign_points` int unsigned NOT NULL DEFAULT 0 COMMENT '本次获得积分',
+  `sign_continuous` int unsigned NOT NULL DEFAULT 0 COMMENT '连续签到天数',
+  `sign_total` int unsigned NOT NULL DEFAULT 0 COMMENT '累计签到天数',
+  `sign_reward` json DEFAULT NULL COMMENT '奖励内容',
+  `sign_status` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '1正常 2奖励 3额外',
+  `day` int DEFAULT NULL,
+  `note` mediumtext DEFAULT NULL,
+  `app_id` bigint DEFAULT NULL,
+  `created_at` int unsigned NOT NULL DEFAULT 0,
+  `updated_at` int unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_date` (`user_id`, `sign_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户签到记录';
+
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_date', "date DEFAULT NULL COMMENT '签到日期'");
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_points', "int unsigned NOT NULL DEFAULT 0 COMMENT '本次获得积分'");
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_continuous', "int unsigned NOT NULL DEFAULT 0 COMMENT '连续签到天数'");
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_total', "int unsigned NOT NULL DEFAULT 0 COMMENT '累计签到天数'");
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_reward', "json DEFAULT NULL COMMENT '奖励内容'");
+CALL yxshop_add_column_if_missing('yxshop_signs', 'sign_status', "tinyint unsigned NOT NULL DEFAULT 1 COMMENT '1正常 2奖励 3额外'");
+CALL yxshop_add_index_if_missing('yxshop_signs', 'idx_user_date', "`user_id`, `sign_date`");
+
+ALTER TABLE `yxshop_admin_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_agent_capitals` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_agent_withdraws` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_app_navbars` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_app_pages` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_app_prepay_ids` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_applies` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_coupon_goods` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_coupon_items` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_data_change_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_dealer_referees` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_delivery_rules` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_file_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_integral_log` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_integral_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_searches` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_spec_price_histories` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_spec_sales` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_spec_stock_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_stock_warnings` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_tag_relations` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_item_views` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_blacklists` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_queues` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_scene_templates` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_statistics` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_template_variables` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_notification_variables` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_order_agents` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_order_deliveries` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_point_tasks` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_profit_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_regions` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_schema_migrations` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_tenant_plans` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_user_money_log` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_user_money_logs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_user_point_tasks` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+ALTER TABLE `yxshop_user_withdraws` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+
+-- 签到表主键
+ALTER TABLE `yxshop_signs` MODIFY COLUMN `id` bigint unsigned NOT NULL AUTO_INCREMENT;
+
+
+-- ============================================================
+-- 修复：用户等级字段 + 外键列统一为 bigint（配合雪花 ID）
+-- yxshop_user_levels 原表只有 integral/agio/sort 等旧字段，
+-- 而模型/后台/小程序使用 level/experience/discount/status/is_default/description；
+-- users.level_id 原为 tinyint(2)，雪花等级 ID 无法写入（Out of range）。
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `yxshop_user_levels` (
+  `id` bigint unsigned NOT NULL,
+  `level` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '等级序号',
+  `experience` int unsigned NOT NULL DEFAULT 0 COMMENT '升级所需经验/积分',
+  `discount` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '折扣（10=不打折）',
+  `status` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '1启用 0禁用',
+  `is_default` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否默认等级',
+  `description` varchar(255) NOT NULL DEFAULT '' COMMENT '等级说明',
+  `integral` int unsigned NOT NULL DEFAULT 0,
+  `app_id` bigint unsigned NOT NULL DEFAULT 0,
+  `created_at` int unsigned NOT NULL DEFAULT 0,
+  `updated_at` int unsigned NOT NULL DEFAULT 0,
+  `key` varchar(100) NOT NULL DEFAULT '',
+  `values` varchar(100) DEFAULT NULL,
+  `agio` decimal(5,2) DEFAULT 10.00 COMMENT '折扣（旧字段，与 discount 同步）',
+  `name` varchar(100) DEFAULT NULL,
+  `sort` int DEFAULT NULL,
+  `desc` varchar(255) DEFAULT NULL,
+  `shop_money` int NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `idx_app_level` (`app_id`, `level`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='等级表';
+
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'level', "tinyint unsigned NOT NULL DEFAULT 1 COMMENT '等级序号'");
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'experience', "int unsigned NOT NULL DEFAULT 0 COMMENT '升级所需经验/积分'");
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'discount', "decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '折扣（10=不打折）'");
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'status', "tinyint unsigned NOT NULL DEFAULT 1 COMMENT '1启用 0禁用'");
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'is_default', "tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否默认等级'");
+CALL yxshop_add_column_if_missing('yxshop_user_levels', 'description', "varchar(255) NOT NULL DEFAULT '' COMMENT '等级说明'");
+CALL yxshop_add_index_if_missing('yxshop_user_levels', 'idx_app_level', "`app_id`, `level`");
+ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `key` varchar(100) NOT NULL DEFAULT '';
+ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `shop_money` int NOT NULL DEFAULT 0;
+
+-- 旧数据回填（只处理未配置过的行，避免覆盖后台已调整的数据）
+SET @lv := 0;
+UPDATE `yxshop_user_levels` SET `level` = (@lv := @lv + 1) WHERE `description` = '' ORDER BY `sort` DESC;
+UPDATE `yxshop_user_levels` SET `experience` = `integral` WHERE `experience` = 0 AND `integral` > 0;
+UPDATE `yxshop_user_levels` SET `discount` = `agio` WHERE `discount` = 10.00 AND `agio` IS NOT NULL AND `agio` <> 10.00;
+UPDATE `yxshop_user_levels` SET `description` = COALESCE(`desc`, '') WHERE `description` = '' AND `desc` IS NOT NULL AND `desc` <> '';
+UPDATE `yxshop_user_levels` SET `is_default` = 1 WHERE `level` = 1 AND `is_default` = 0;
+
+-- 外键列统一 bigint unsigned（雪花 ID 超出 int 范围）
+ALTER TABLE `yxshop_admins` MODIFY COLUMN `pid` bigint unsigned NULL DEFAULT 0;
+ALTER TABLE `yxshop_coupons` MODIFY COLUMN `member_level_id` bigint unsigned NOT NULL DEFAULT 1;
+ALTER TABLE `yxshop_item_attributes` MODIFY COLUMN `type_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `goods_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_item_attrs` MODIFY COLUMN `attr_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_items` MODIFY COLUMN `type_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_items` MODIFY COLUMN `member_level_id` bigint unsigned NOT NULL DEFAULT 1;
+ALTER TABLE `yxshop_mini_page_templates` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_mini_page_versions` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_mini_pages` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_mini_tab_bars` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_mini_themes` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_point_tasks` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_regions` MODIFY COLUMN `pid` bigint unsigned NULL;
+ALTER TABLE `yxshop_tenant_subscriptions` MODIFY COLUMN `plan_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_tenants` MODIFY COLUMN `plan_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_tenants` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_user_coupons` MODIFY COLUMN `level_id` bigint unsigned NOT NULL DEFAULT 1;
+ALTER TABLE `yxshop_user_point_tasks` MODIFY COLUMN `user_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_user_point_tasks` MODIFY COLUMN `task_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_user_point_tasks` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_user_withdraws` MODIFY COLUMN `user_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_user_withdraws` MODIFY COLUMN `app_id` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_users` MODIFY COLUMN `pid` bigint unsigned NOT NULL DEFAULT 0;
+ALTER TABLE `yxshop_users` MODIFY COLUMN `level_id` bigint unsigned NULL DEFAULT 1;
 
 -- 清理工具存储过程
 DROP PROCEDURE IF EXISTS `yxshop_add_column_if_missing`;
@@ -7513,11 +7000,11 @@ CALL yxshop_add_column_if_missing('yxshop_users', 'unionid', "varchar(128) NOT N
 CALL yxshop_add_column_if_missing('yxshop_users', 'email', "varchar(128) NULL DEFAULT NULL COMMENT '邮箱' AFTER `phone`");
 
 -- password_hash 输出 60 字符，原 varchar(32) 不够；改 varchar(255) 兼容未来更长 hash
-ALTER TABLE `yxshop_users` MODIFY COLUMN `password` VARCHAR(255) NULL DEFAULT NULL COMMENT '密码哈希(bcrypt/argon2)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `password` VARCHAR(255) NULL DEFAULT NULL COMMENT '密码哈希(bcrypt/argon2)';
 
 -- openid 改为允许 NULL：账号密码注册用户没有微信 openid，原 NOT NULL DEFAULT ''
 -- 导致第二个本地用户因唯一索引冲突无法注册
-ALTER TABLE `yxshop_users` MODIFY COLUMN `openid` VARCHAR(128) NULL DEFAULT NULL COMMENT '微信openid(账号密码注册用户为NULL)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `openid` VARCHAR(128) NULL DEFAULT NULL COMMENT '微信openid(账号密码注册用户为NULL)';
 
 -- yxshop_item_favorites / notification_sends 补 updated_at（BaseModel timestamps=true 默认会写这个字段）
 CALL yxshop_add_column_if_missing('yxshop_item_favorites', 'updated_at', "int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间' AFTER `created_at`");
@@ -7563,7 +7050,7 @@ CALL yxshop_add_index_if_missing('yxshop_user_coupons', 'idx_order_id', '`order_
 --    代码 IntegralService 写 give_integral —— 改代码对齐表（见 app/service/IntegralService.php）
 --    表侧：amount 类型统一为 int（积分通常整数），加 note 索引
 -- ------------------------------------------------------------
-ALTER TABLE `yxshop_integral_log` MODIFY COLUMN `amount` int(11) NOT NULL DEFAULT 0 COMMENT '积分变动数量(正获得负消费)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_integral_log` MODIFY COLUMN `amount` int(11) NOT NULL DEFAULT 0 COMMENT '积分变动数量(正获得负消费)';
 CALL yxshop_add_index_if_missing('yxshop_integral_log', 'idx_user_type', '`user_id`, `type`');
 
 -- ------------------------------------------------------------
@@ -7580,11 +7067,11 @@ CALL yxshop_add_index_if_missing('yxshop_orders', 'idx_refund_status', '`refund_
 -- ------------------------------------------------------------
 
 -- yxshop_orders 历史营销字段原本 NOT NULL 无默认，普通下单不传会 1364 报错
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_type` INT(2) NOT NULL DEFAULT 0 COMMENT '订单分类：0普通 1拼团 2秒杀 3抢购';
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_num` INT(2) NOT NULL DEFAULT 0 COMMENT '参团人数';
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_statis` INT(2) NOT NULL DEFAULT 0 COMMENT '拼团状态';
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_time` INT(3) NOT NULL DEFAULT 0 COMMENT '拼团限时';
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `item_id` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '兼容字段(多商品订单不用)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_type` INT(2) NOT NULL DEFAULT 0 COMMENT '订单分类：0普通 1拼团 2秒杀 3抢购';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_num` INT(2) NOT NULL DEFAULT 0 COMMENT '参团人数';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_statis` INT(2) NOT NULL DEFAULT 0 COMMENT '拼团状态';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `prom_time` INT(3) NOT NULL DEFAULT 0 COMMENT '拼团限时';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `item_id` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '兼容字段(多商品订单不用)';
 
 DROP PROCEDURE IF EXISTS `yxshop_add_column_if_missing`;
 DROP PROCEDURE IF EXISTS `yxshop_add_index_if_missing`;
@@ -7951,16 +7438,16 @@ CALL yxshop_add_index_if_missing('yxshop_user_money_log', 'idx_app_user', '`app_
 -- ------------------------------------------------------------
 -- 2. float 资金字段改 decimal（精度安全）
 -- ------------------------------------------------------------
-ALTER TABLE `yxshop_items` MODIFY COLUMN `discount` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '折扣';
-ALTER TABLE `yxshop_orders` MODIFY COLUMN `rebate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '折扣';
-ALTER TABLE `yxshop_order_agents` MODIFY COLUMN `profit_money` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '分成收益';
-ALTER TABLE `yxshop_profit_logs` MODIFY COLUMN `profit_money` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '分成收益';
-ALTER TABLE `yxshop_prom_orders` MODIFY COLUMN `money` decimal(10,2) NULL DEFAULT 0.00 COMMENT '最小金额';
-ALTER TABLE `yxshop_users` MODIFY COLUMN `agio` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '折扣';
-ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `agio` decimal(5,2) NULL DEFAULT 10.00 COMMENT '扣折';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `discount` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '折扣';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` MODIFY COLUMN `rebate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '折扣';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_agents` MODIFY COLUMN `profit_money` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '分成收益';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_profit_logs` MODIFY COLUMN `profit_money` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '分成收益';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_orders` MODIFY COLUMN `money` decimal(10,2) NULL DEFAULT 0.00 COMMENT '最小金额';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `agio` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '折扣';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_levels` MODIFY COLUMN `agio` decimal(5,2) NULL DEFAULT 10.00 COMMENT '扣折';
 -- users.integral 类型统一为 int（积分通常整数，与 integral_log 对齐）
-ALTER TABLE `yxshop_users` MODIFY COLUMN `integral` int(11) NOT NULL DEFAULT 0 COMMENT '用户积分(余额见 user_integral_accounts)';
-ALTER TABLE `yxshop_users` MODIFY COLUMN `freeze_integral` int(11) NOT NULL DEFAULT 0 COMMENT '冻结积分';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `integral` int(11) NOT NULL DEFAULT 0 COMMENT '用户积分(余额见 user_integral_accounts)';
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `freeze_integral` int(11) NOT NULL DEFAULT 0 COMMENT '冻结积分';
 
 -- ------------------------------------------------------------
 -- 3. 日志类表主键改 AUTO_INCREMENT（原 Snowflake bigint 无必要，增加复杂度）
@@ -7973,11 +7460,11 @@ ALTER TABLE `yxshop_users` MODIFY COLUMN `freeze_integral` int(11) NOT NULL DEFA
 -- yxshop_order_logs 已是 AUTO_INCREMENT，跳过
 -- yxshop_payment_logs 已是 AUTO_INCREMENT，跳过
 -- yxshop_login_logs / sms_logs / email_logs / system_logs / data_change_logs 检查并改：
-ALTER TABLE `yxshop_login_logs` MODIFY COLUMN `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `yxshop_sms_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `yxshop_email_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `yxshop_system_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `yxshop_data_change_logs` MODIFY COLUMN `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_login_logs` MODIFY COLUMN `log_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_sms_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_email_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_system_logs` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_data_change_logs` MODIFY COLUMN `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 DROP PROCEDURE IF EXISTS `yxshop_add_index_if_missing`;
 
@@ -8141,7 +7628,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_ai_chat_sessions` (
 -- ----------------------------
 -- 插入 AI 默认配置到 yxshop_settings
 -- ----------------------------
-INSERT INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `is_encrypted`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `is_encrypted`, `app_id`, `created_at`, `updated_at`) VALUES
 ('ai_enabled', '1', 'boolean', 'ai', 'AI功能总开关', 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 ('ai_default_provider', 'openai', 'string', 'ai', '默认AI服务商(openai/anthropic)', 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 ('ai_openai_api_key', '', 'string', 'ai', 'OpenAI API Key', 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -8162,20 +7649,20 @@ ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 -- =====================================================
 
 -- 1. 购物车表增加选中状态字段
-ALTER TABLE `yxshop_carts` ADD COLUMN `is_selected` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否选中 0否 1是' AFTER `quantity`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_carts` ADD COLUMN `is_selected` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否选中 0否 1是' AFTER `quantity`;
 
 -- 2. 购物车表增加店铺分组字段（多商户/多店铺场景）
-ALTER TABLE `yxshop_carts` ADD COLUMN `store_id` bigint unsigned NOT NULL DEFAULT 0 COMMENT '店铺ID(0=自营)' AFTER `app_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_carts` ADD COLUMN `store_id` bigint unsigned NOT NULL DEFAULT 0 COMMENT '店铺ID(0=自营)' AFTER `app_id`;
 
 -- 3. 商品浏览记录表增加浏览次数字段（同商品去重累计）
-ALTER TABLE `yxshop_item_views` ADD COLUMN `view_count` int NOT NULL DEFAULT 1 COMMENT '浏览次数' AFTER `item_id`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_views` ADD COLUMN `view_count` int NOT NULL DEFAULT 1 COMMENT '浏览次数' AFTER `item_id`;
 
 -- ---- 迁移: p1_user_center.sql ----
 -- P1: 用户中心增强 — 数据库变更
 -- 执行方式：手动在数据库中运行，或通过 admin 后台 SQL 工具执行
 
 -- D1: 订单表增加 deleted_at 字段（软删除，C端用户删除订单）
-ALTER TABLE `yxshop_orders` ADD COLUMN `deleted_at` int UNSIGNED DEFAULT 0 COMMENT '软删除时间 0=未删除' AFTER `auto_confirm_time`;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_orders` ADD COLUMN `deleted_at` int UNSIGNED DEFAULT 0 COMMENT '软删除时间 0=未删除' AFTER `auto_confirm_time`;
 
 -- D2: 商品浏览记录表已有 view_count 字段，确认存在（如果不存在则添加）
 -- ALTER TABLE `yxshop_item_views` ADD COLUMN `view_count` int UNSIGNED DEFAULT 1 COMMENT '浏览次数' AFTER `item_id`;
@@ -8240,7 +7727,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_point_tasks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='积分任务表';
 
 -- 初始化默认任务数据
-INSERT INTO `yxshop_point_tasks` (`name`, `code`, `type`, `reward_points`, `condition_desc`, `icon`, `sort`, `status`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_point_tasks` (`name`, `code`, `type`, `reward_points`, `condition_desc`, `icon`, `sort`, `status`, `app_id`, `created_at`, `updated_at`) VALUES
 ('每日签到', 'sign', 1, 1, '每天签到获取积分', 'sign-in-alt', 100, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 ('完善资料', 'complete_profile', 2, 10, '完善昵称、头像、手机号', 'user-edit', 90, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 ('首次下单', 'first_order', 2, 20, '完成首次购物', 'shopping-bag', 80, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -8300,128 +7787,128 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 第一步：修改主键字段
 -- ============================================================
 
-ALTER TABLE `yxshop_users` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_order` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_category` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_brand` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_coupon` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_app` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_payment` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_express` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_notification_template` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_dealer` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_service` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_prom_order` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_upload_file` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_user_address` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_integral` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_order_address` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_admin` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_role` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
-ALTER TABLE `yxshop_permission` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_users` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_category` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_brand` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_coupon` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_app` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_express` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_template` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_dealer` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_order` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_file` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_address` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_integral` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_address` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_role` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_permission` MODIFY COLUMN `id` bigint(20) UNSIGNED NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
 
 -- ============================================================
 -- 第二步：修改外键字段
 -- ============================================================
 
 -- yxshop_order
-ALTER TABLE `yxshop_order` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_payment
-ALTER TABLE `yxshop_payment` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_payment` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_payment` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_payment` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_user_address
-ALTER TABLE `yxshop_user_address` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_user_address` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_address` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_address` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_user_coupon
-ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `coupon_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_coupon` MODIFY COLUMN `coupon_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_integral
-ALTER TABLE `yxshop_integral` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_integral` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_integral` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_integral` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_item_favorite
-ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_favorite` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_item_view
-ALTER TABLE `yxshop_item_view` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_item_view` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_view` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_view` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_item_search
-ALTER TABLE `yxshop_item_search` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_item_search` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_dealer
-ALTER TABLE `yxshop_dealer` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_dealer` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_dealer` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_dealer` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_after_sales
-ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_after_sales` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_notification_send
-ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_notification_send` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_comment
-ALTER TABLE `yxshop_comment` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_comment` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_comment` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comment` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comment` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_comment` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_user_money_log
-ALTER TABLE `yxshop_user_money_log` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_user_money_log` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_cart
-ALTER TABLE `yxshop_cart` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_cart` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_cart` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cart` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cart` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_cart` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_items
-ALTER TABLE `yxshop_items` MODIFY COLUMN `category_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_items` MODIFY COLUMN `brand_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_items` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `category_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `brand_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_items` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_order_goods
-ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_goods` MODIFY COLUMN `item_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_order_address
-ALTER TABLE `yxshop_order_address` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_order_address` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_prom_order
-ALTER TABLE `yxshop_prom_order` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_prom_order` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_upload_file
-ALTER TABLE `yxshop_upload_file` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_upload_file` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_service
-ALTER TABLE `yxshop_service` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_service` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_service` MODIFY COLUMN `app_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_express
-ALTER TABLE `yxshop_express` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_express` MODIFY COLUMN `order_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_admin_role
-ALTER TABLE `yxshop_admin_role` MODIFY COLUMN `admin_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_admin_role` MODIFY COLUMN `role_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_role` MODIFY COLUMN `admin_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_admin_role` MODIFY COLUMN `role_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_role_permission
-ALTER TABLE `yxshop_role_permission` MODIFY COLUMN `role_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `yxshop_role_permission` MODIFY COLUMN `permission_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_role_permission` MODIFY COLUMN `role_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_role_permission` MODIFY COLUMN `permission_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 -- yxshop_login_log
-ALTER TABLE `yxshop_login_log` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
+-- [DISABLED-REDUNDANT-MIGRATION] ALTER TABLE `yxshop_login_log` MODIFY COLUMN `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -8432,20 +7919,20 @@ SET FOREIGN_KEY_CHECKS = 1;
 SET @NOW := UNIX_TIMESTAMP();
 SET @APP_ID := 0;
 
--- 默认超级管理员（密码: admin123，请在首次登录后立即修改）
-INSERT INTO `yxshop_admins` (`id`, `username`, `password`, `app_id`, `nickname`, `is_super_admin`, `role_id`, `status`, `password_changed_at`, `force_password_change`, `created_at`, `updated_at`) VALUES
-(7100000000001, 'admin', '$2y$10$N9zK9xQ5vV5mZ2vD6sJ3vOZQ8jG5pHr5WZcY5e1m5bN5cX9m2vW5K', 0, '超级管理员', 1, 0, 1, 0, 1, @NOW, @NOW)
-ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
+-- 默认超级管理员（初始密码由部署者在 .env/部署记录中保管，首次登录后请立即修改）
+INSERT IGNORE INTO `yxshop_admins` (`id`, `username`, `password`, `app_id`, `nickname`, `is_super_admin`, `role_id`, `status`, `password_changed_at`, `force_password_change`, `created_at`, `updated_at`) VALUES
+(7100000000001, 'admin', '$2y$12$s1VYr75YJ3ZA689DwYW8HODIkrbVy15Q4pXLVV7Dr.suwPVhhX9XW', 0, '超级管理员', 1, 0, 1, @NOW, 0, @NOW, @NOW)
+ON DUPLICATE KEY UPDATE `password` = VALUES(`password`), `password_changed_at` = VALUES(`password_changed_at`), `force_password_change` = 0, `status` = 1, `updated_at` = @NOW;
 
 -- 默认角色
-INSERT INTO `yxshop_admin_roles` (`id`, `role_name`, `role_desc`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_roles` (`id`, `role_name`, `role_desc`, `app_id`, `created_at`, `updated_at`) VALUES
 (1, '超级管理员', '拥有所有权限', 0, @NOW, @NOW),
 (2, '运营', '商品和订单管理', 0, @NOW, @NOW),
 (3, '客服', '仅查看订单和用户', 0, @NOW, @NOW)
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 
 -- 默认会员等级
-INSERT INTO `yxshop_user_levels` (`id`, `key`, `name`, `agio`, `integral`, `shop_money`, `sort`, `desc`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_user_levels` (`id`, `key`, `name`, `agio`, `integral`, `shop_money`, `sort`, `desc`, `app_id`, `created_at`, `updated_at`) VALUES
 (7100000000001, 'one', '普通会员', 10.00, 0, 0, 100, '注册即成为普通会员', @APP_ID, @NOW, @NOW),
 (7100000000002, 'two', '白银会员', 9.50, 1000, 99, 80, '累计消费满1000元', @APP_ID, @NOW, @NOW),
 (7100000000003, 'three', '黄金会员', 9.00, 5000, 299, 60, '累计消费满5000元', @APP_ID, @NOW, @NOW),
@@ -8454,7 +7941,7 @@ INSERT INTO `yxshop_user_levels` (`id`, `key`, `name`, `agio`, `integral`, `shop
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 
 -- 默认商品分类
-INSERT INTO `yxshop_categories` (`id`, `name`, `parent_id`, `sort`, `is_visible`, `level`, `status`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_categories` (`id`, `name`, `parent_id`, `sort`, `is_visible`, `level`, `status`, `app_id`, `created_at`, `updated_at`) VALUES
 (7200000000001, '手机数码', 0, 100, 1, '1', 1, @APP_ID, @NOW, @NOW),
 (7200000000002, '家用电器', 0, 90, 1, '1', 1, @APP_ID, @NOW, @NOW),
 (7200000000003, '服饰鞋包', 0, 80, 1, '1', 1, @APP_ID, @NOW, @NOW),
@@ -8463,7 +7950,7 @@ INSERT INTO `yxshop_categories` (`id`, `name`, `parent_id`, `sort`, `is_visible`
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 
 -- 默认系统设置
-INSERT INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `app_id`, `created_at`, `updated_at`) VALUES
 ('site_name', 'YXShop商城', 'string', 'general', '站点名称', 0, @NOW, @NOW),
 ('site_logo', '', 'string', 'general', '站点Logo', 0, @NOW, @NOW),
 ('site_description', 'YXShop开源商城系统', 'string', 'general', '站点描述', 0, @NOW, @NOW),
@@ -8491,7 +7978,7 @@ INSERT INTO `yxshop_settings` (`key`, `value`, `type`, `group`, `description`, `
 ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 
 -- 默认后台菜单
-INSERT INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_admin_menus` (`id`, `parent_id`, `name`, `model`, `url`, `icon`, `sort`, `is_show`, `permission`, `method`, `app_id`, `created_at`, `updated_at`) VALUES
 (7300000000001, 0, '仪表盘', 'dashboard', '/admin/dashboard', 'fas fa-tachometer-alt', 10, 1, 'admin/dashboard', 'GET', 0, @NOW, @NOW),
 (7300000000002, 0, '商品管理', 'item', NULL, 'fas fa-cubes text-primary', 20, 1, '', 'GET', 0, @NOW, @NOW),
 (7300000000003, 7300000000002, '商品列表', 'item', '/admin/item', 'fas fa-boxes', 10, 1, 'admin/item', 'GET', 0, @NOW, @NOW),
@@ -8533,75 +8020,75 @@ CREATE TABLE IF NOT EXISTS `yxshop_schema_migrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='迁移记录表';
 
 -- 标记所有迁移为已执行
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_01_drop_non_prefixed_tables', '2026_01_drop_non_prefixed_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_02_unify_time_fields', '2026_02_unify_time_fields', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_03_unify_primary_keys', '2026_03_unify_primary_keys', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_04_unify_foreign_keys', '2026_04_unify_foreign_keys', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_06_fix_brands_table', '2026_06_fix_brands_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000001_create_mini_page_tables', '2026_07_03_000001_create_mini_page_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000002_mini_page_menus', '2026_07_03_000002_mini_page_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000003_mini_theme_nav_text_color_hex', '2026_07_03_000003_mini_theme_nav_text_color_hex', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000004_user_list_menu', '2026_07_03_000004_user_list_menu', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000005_user_levels_add_columns', '2026_07_03_000005_user_levels_add_columns', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_fix_expresses_table', '2026_07_fix_expresses_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_08_fix_comments_table', '2026_08_fix_comments_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_09_table_comments', '2026_09_table_comments', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_10_add_indexes_and_charset', '2026_10_add_indexes_and_charset', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_11_create_role_auths_pivot', '2026_11_create_role_auths_pivot', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_12_rebuild_menus_tree', '2026_12_rebuild_menus_tree', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_13_fix_menu_permissions', '2026_13_fix_menu_permissions', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_14_create_missing_tables', '2026_14_create_missing_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_15_fix_upload_tables', '2026_15_fix_upload_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_16_normalize_all_tables', '2026_16_normalize_all_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_17_enterprise_refactor', '2026_17_enterprise_refactor', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_18_enterprise_menus', '2026_18_enterprise_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_18_fix_schema_review', '2026_18_fix_schema_review', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_19_drop_admin_auths_merge_app_helps', '2026_19_drop_admin_auths_merge_app_helps', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_20_rename_goods_to_item', '2026_20_rename_goods_to_item', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_21_rename_remaining_goods_fields', '2026_21_rename_remaining_goods_fields', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_22_supply_chain_enterprise', '2026_22_supply_chain_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_23_after_sales_enterprise', '2026_23_after_sales_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_24_article_enterprise', '2026_24_article_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_25_file_enterprise', '2026_25_file_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_26_coupon_finance', '2026_26_coupon_finance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_27_user_risk_tag', '2026_27_user_risk_tag', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_28_card_recharge', '2026_28_card_recharge', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_29_finance_account', '2026_29_finance_account', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_30_dealer_enterprise', '2026_30_dealer_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_31_warehouse_supplier_enterprise', '2026_31_warehouse_supplier_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_32_add_sort_to_item_types', '2026_32_add_sort_to_item_types', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_33_order_enhance', '2026_33_order_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_community_elderly', '2026_34_community_elderly', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_create_care_reviews_table', '2026_34_create_care_reviews_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_setting_encrypt', '2026_34_setting_encrypt', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_community_service_refactor', '2026_35_community_service_refactor', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_data_change_log_enhance', '2026_35_data_change_log_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_referral_system_fix', '2026_35_referral_system_fix', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_distribution_tasks', '2026_36_distribution_tasks', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_order_agent_menu', '2026_36_order_agent_menu', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_promotion_enhance', '2026_36_promotion_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_37_login_security', '2026_37_login_security', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_38_wechat_login', '2026_38_wechat_login', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_39_live_stream', '2026_39_live_stream', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_40_multi_shop', '2026_40_multi_shop', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_supply_chain_enhance', '2026_41_supply_chain_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_supply_chain_menus', '2026_41_supply_chain_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_42_audit_trail_enhance', '2026_42_audit_trail_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_43_phase44_45_46_enterprise', '2026_43_phase44_45_46_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_44_phase47_agent_profit', '2026_44_phase47_agent_profit', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_currencies_table', 'create_currencies_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_languages_table', 'create_languages_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_user_contracts', 'create_user_contracts', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_01_charset_softdelete', 'migration_01_charset_softdelete', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_02_field_alignment', 'migration_02_field_alignment', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_03_missing_tables', 'migration_03_missing_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_04_indexes_types_cleanup', 'migration_04_indexes_types_cleanup', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_05_add_missing_app_id', 'migration_05_add_missing_app_id', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_20260822_01_ai_module', 'migration_20260822_01_ai_module', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p0_core_trade', 'p0_core_trade', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p1_user_center', 'p1_user_center', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p2_marketing', 'p2_marketing', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p3_system_optimization', 'p3_system_optimization', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_01_drop_non_prefixed_tables', '2026_01_drop_non_prefixed_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_02_unify_time_fields', '2026_02_unify_time_fields', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_03_unify_primary_keys', '2026_03_unify_primary_keys', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_04_unify_foreign_keys', '2026_04_unify_foreign_keys', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_06_fix_brands_table', '2026_06_fix_brands_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000001_create_mini_page_tables', '2026_07_03_000001_create_mini_page_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000002_mini_page_menus', '2026_07_03_000002_mini_page_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000003_mini_theme_nav_text_color_hex', '2026_07_03_000003_mini_theme_nav_text_color_hex', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000004_user_list_menu', '2026_07_03_000004_user_list_menu', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_03_000005_user_levels_add_columns', '2026_07_03_000005_user_levels_add_columns', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_07_fix_expresses_table', '2026_07_fix_expresses_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_08_fix_comments_table', '2026_08_fix_comments_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_09_table_comments', '2026_09_table_comments', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_10_add_indexes_and_charset', '2026_10_add_indexes_and_charset', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_11_create_role_auths_pivot', '2026_11_create_role_auths_pivot', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_12_rebuild_menus_tree', '2026_12_rebuild_menus_tree', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_13_fix_menu_permissions', '2026_13_fix_menu_permissions', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_14_create_missing_tables', '2026_14_create_missing_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_15_fix_upload_tables', '2026_15_fix_upload_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_16_normalize_all_tables', '2026_16_normalize_all_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_17_enterprise_refactor', '2026_17_enterprise_refactor', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_18_enterprise_menus', '2026_18_enterprise_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_18_fix_schema_review', '2026_18_fix_schema_review', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_19_drop_admin_auths_merge_app_helps', '2026_19_drop_admin_auths_merge_app_helps', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_20_rename_goods_to_item', '2026_20_rename_goods_to_item', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_21_rename_remaining_goods_fields', '2026_21_rename_remaining_goods_fields', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_22_supply_chain_enterprise', '2026_22_supply_chain_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_23_after_sales_enterprise', '2026_23_after_sales_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_24_article_enterprise', '2026_24_article_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_25_file_enterprise', '2026_25_file_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_26_coupon_finance', '2026_26_coupon_finance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_27_user_risk_tag', '2026_27_user_risk_tag', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_28_card_recharge', '2026_28_card_recharge', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_29_finance_account', '2026_29_finance_account', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_30_dealer_enterprise', '2026_30_dealer_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_31_warehouse_supplier_enterprise', '2026_31_warehouse_supplier_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_32_add_sort_to_item_types', '2026_32_add_sort_to_item_types', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_33_order_enhance', '2026_33_order_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_community_elderly', '2026_34_community_elderly', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_create_care_reviews_table', '2026_34_create_care_reviews_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_34_setting_encrypt', '2026_34_setting_encrypt', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_community_service_refactor', '2026_35_community_service_refactor', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_data_change_log_enhance', '2026_35_data_change_log_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_35_referral_system_fix', '2026_35_referral_system_fix', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_distribution_tasks', '2026_36_distribution_tasks', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_order_agent_menu', '2026_36_order_agent_menu', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_36_promotion_enhance', '2026_36_promotion_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_37_login_security', '2026_37_login_security', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_38_wechat_login', '2026_38_wechat_login', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_39_live_stream', '2026_39_live_stream', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_40_multi_shop', '2026_40_multi_shop', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_supply_chain_enhance', '2026_41_supply_chain_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_supply_chain_menus', '2026_41_supply_chain_menus', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_42_audit_trail_enhance', '2026_42_audit_trail_enhance', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_43_phase44_45_46_enterprise', '2026_43_phase44_45_46_enterprise', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_44_phase47_agent_profit', '2026_44_phase47_agent_profit', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_currencies_table', 'create_currencies_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_languages_table', 'create_languages_table', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('create_user_contracts', 'create_user_contracts', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_01_charset_softdelete', 'migration_01_charset_softdelete', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_02_field_alignment', 'migration_02_field_alignment', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_03_missing_tables', 'migration_03_missing_tables', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_04_indexes_types_cleanup', 'migration_04_indexes_types_cleanup', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_05_add_missing_app_id', 'migration_05_add_missing_app_id', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('migration_20260822_01_ai_module', 'migration_20260822_01_ai_module', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p0_core_trade', 'p0_core_trade', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p1_user_center', 'p1_user_center', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p2_marketing', 'p2_marketing', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('p3_system_optimization', 'p3_system_optimization', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
 -- ============================================================
 -- Phase 5: SaaS 托管平台 - 多租户架构表结构
 -- ============================================================
@@ -8776,7 +8263,7 @@ CREATE TABLE IF NOT EXISTS `yxshop_tenant_operation_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='租户操作日志表';
 
 -- 默认套餐数据
-INSERT INTO `yxshop_tenant_plans` (`plan_code`, `plan_name`, `description`, `edition`, `price_monthly`, `price_yearly`, `trial_days`, `max_admins`, `max_users`, `max_items`, `max_orders`, `max_storage_mb`, `max_bandwidth_mb`, `features`, `sort`, `status`, `is_recommended`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `yxshop_tenant_plans` (`plan_code`, `plan_name`, `description`, `edition`, `price_monthly`, `price_yearly`, `trial_days`, `max_admins`, `max_users`, `max_items`, `max_orders`, `max_storage_mb`, `max_bandwidth_mb`, `features`, `sort`, `status`, `is_recommended`, `created_at`, `updated_at`) VALUES
 ('trial', '体验版', '免费体验14天，适合个人和小团队试用', 'commercial', 0.00, 0.00, 14, 1, 100, 20, 50, 100, 1000, JSON_ARRAY('distribution','seckill_pro'), 100, 1, 0, @NOW, @NOW),
 ('standard', '标准版', '适合中小商家，包含核心商业版功能', 'commercial', 99.00, 999.00, 0, 3, 5000, 500, 5000, 1000, 10000, JSON_ARRAY('distribution','seckill_pro','membership_card','group_buy','gift_activity'), 80, 1, 1, @NOW, @NOW),
 ('pro', '专业版', '适合成长型企业，包含全部商业版+部分企业版功能', 'enterprise', 299.00, 2999.00, 0, 10, 50000, 5000, 0, 5000, 0, JSON_ARRAY('distribution','seckill_pro','membership_card','group_buy','gift_activity','live_stream','community_care','multi_shop'), 60, 1, 0, @NOW, @NOW),
@@ -8787,23 +8274,23 @@ ON DUPLICATE KEY UPDATE `updated_at` = @NOW;
 -- 迁移记录
 -- ============================================================
 
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('snowflake_id_migration', 'snowflake_id_migration', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('snowflake_id_migration', 'snowflake_id_migration', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
 
 -- Phase 4 企业版迁移记录
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_40_phase4_enterprise_base', '2026_40_phase4_enterprise_base', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_phase4_supply_chain', '2026_41_phase4_supply_chain', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_42_phase4_audit_trail', '2026_42_phase4_audit_trail', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_43_phase4_fine_grained_auth', '2026_43_phase4_fine_grained_auth', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_44_phase4_analytics', '2026_44_phase4_analytics', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_40_phase4_enterprise_base', '2026_40_phase4_enterprise_base', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_41_phase4_supply_chain', '2026_41_phase4_supply_chain', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_42_phase4_audit_trail', '2026_42_phase4_audit_trail', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_43_phase4_fine_grained_auth', '2026_43_phase4_fine_grained_auth', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_44_phase4_analytics', '2026_44_phase4_analytics', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
 
 -- Phase 4.7 代理分润迁移记录
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_441_agent_levels', '2026_441_agent_levels', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_442_agent_profit_rules', '2026_442_agent_profit_rules', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_443_agent_withdraw_audits', '2026_443_agent_withdraw_audits', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_444_agent_ranking_snapshots', '2026_444_agent_ranking_snapshots', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_441_agent_levels', '2026_441_agent_levels', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_442_agent_profit_rules', '2026_442_agent_profit_rules', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_443_agent_withdraw_audits', '2026_443_agent_withdraw_audits', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_444_agent_ranking_snapshots', '2026_444_agent_ranking_snapshots', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
 
 -- Phase 5 SaaS 托管平台迁移记录
-INSERT INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_45_phase5_saas_platform', '2026_45_phase5_saas_platform', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
+INSERT IGNORE INTO `yxshop_schema_migrations` (`version`, `name`, `executed_at`) VALUES ('2026_45_phase5_saas_platform', '2026_45_phase5_saas_platform', @NOW) ON DUPLICATE KEY UPDATE `executed_at` = @NOW;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -8817,3 +8304,119 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- 清理工具存储过程
 DROP PROCEDURE IF EXISTS `yxshop_add_column_if_missing`;
 DROP PROCEDURE IF EXISTS `yxshop_add_index_if_missing`;
+
+-- ============================================================
+-- 收尾：等级种子数据回填（种子 INSERT 在本文件后半段，故在此执行）
+-- ============================================================
+SET @lv := 0;
+UPDATE `yxshop_user_levels` SET `level` = (@lv := @lv + 1)
+ WHERE `description` = '' OR `description` IS NULL
+ ORDER BY `sort` DESC;
+UPDATE `yxshop_user_levels` SET `experience` = `integral`
+ WHERE `experience` = 0 AND `integral` > 0;
+UPDATE `yxshop_user_levels` SET `discount` = `agio`
+ WHERE `discount` = 10.00 AND `agio` IS NOT NULL AND `agio` <> 10.00;
+UPDATE `yxshop_user_levels` SET `description` = COALESCE(`desc`, '')
+ WHERE (`description` = '' OR `description` IS NULL) AND `desc` IS NOT NULL AND `desc` <> '';
+UPDATE `yxshop_user_levels` SET `is_default` = 1 WHERE `level` = 1 AND `is_default` = 0;
+
+-- ============================================================
+-- 收尾：地址省市名称快照 + 用户登录账号（2026-11-06）
+-- 说明：yxshop_regions 基础数据可能为空，仅靠 region_id 会让收货地址只剩门牌号，
+--       故地址表额外保存省/市/区名称；users 增加 username 以支持账号密码注册登录。
+-- ============================================================
+SET @sql := IF(
+  (SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE() AND table_name = 'yxshop_user_addresses' AND column_name = 'province') = 0,
+  'ALTER TABLE `yxshop_user_addresses`
+     ADD COLUMN `province` varchar(50) NOT NULL DEFAULT '''' COMMENT ''省名称'' AFTER `district_id`,
+     ADD COLUMN `city` varchar(50) NOT NULL DEFAULT '''' COMMENT ''市名称'' AFTER `province`,
+     ADD COLUMN `district` varchar(50) NOT NULL DEFAULT '''' COMMENT ''区县名称'' AFTER `city`',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+  (SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE() AND table_name = 'yxshop_order_addresses' AND column_name = 'province') = 0,
+  'ALTER TABLE `yxshop_order_addresses`
+     ADD COLUMN `province` varchar(50) NOT NULL DEFAULT '''' COMMENT ''省名称'' AFTER `city_id`,
+     ADD COLUMN `city` varchar(50) NOT NULL DEFAULT '''' COMMENT ''市名称'' AFTER `province`,
+     ADD COLUMN `district` varchar(50) NOT NULL DEFAULT '''' COMMENT ''区县名称'' AFTER `city`',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+  (SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE() AND table_name = 'yxshop_users' AND column_name = 'username') = 0,
+  'ALTER TABLE `yxshop_users` ADD COLUMN `username` varchar(64) NULL COMMENT ''登录账号'' AFTER `id`,
+     ADD UNIQUE KEY `uk_username` (`username`)',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- 单租户商城统一 app_id = 0
+UPDATE `yxshop_users` SET `app_id` = 0 WHERE `app_id` <> 0;
+
+-- ============================================================
+-- 收尾：订单表补配送模板列（2026-11-06）
+-- 说明：结算页让用户选择配送方式（对应管理端「物流配送 → 配送模板」），
+--       下单时需要把所选模板记到订单上，并据此按计费规则算运费。
+-- ============================================================
+SET @sql := IF(
+  (SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE() AND table_name = 'yxshop_orders' AND column_name = 'delivery_id') = 0,
+  'ALTER TABLE `yxshop_orders`
+     ADD COLUMN `delivery_id` bigint NOT NULL DEFAULT 0 COMMENT ''配送模板ID(0=默认)'' AFTER `express_price`',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- ============================================================
+-- 收尾：促销商品表补列（2026-11-06）
+-- 说明：PromItem 模型 / PromItemRepository / 管理端「商品促销」页都依赖
+--       prom_id、prom_price、prom_stock、prom_sales、prom_status、sort 等列，
+--       但基线建表（沿用早期 yxshop_prom_goods 结构）里没有这些列，
+--       导致商品促销相关接口直接 500（Unknown column 'prom_status'）。
+-- ============================================================
+SET @sql := IF(
+  (SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE() AND table_name = 'yxshop_prom_items' AND column_name = 'prom_id') = 0,
+  'ALTER TABLE `yxshop_prom_items`
+     ADD COLUMN `prom_id` bigint NOT NULL DEFAULT 0 COMMENT ''所属促销活动ID'' AFTER `id`,
+     ADD COLUMN `prom_price` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT ''促销价'' AFTER `prom_id`,
+     ADD COLUMN `prom_stock` int NOT NULL DEFAULT 0 COMMENT ''促销库存'' AFTER `prom_price`,
+     ADD COLUMN `prom_sales` int NOT NULL DEFAULT 0 COMMENT ''促销销量'' AFTER `prom_stock`,
+     ADD COLUMN `prom_status` tinyint NOT NULL DEFAULT 1 COMMENT ''状态 0禁用 1启用 2售罄'' AFTER `prom_sales`,
+     ADD COLUMN `sort` int NOT NULL DEFAULT 0 COMMENT ''排序'' AFTER `prom_status`,
+     ADD COLUMN `created_at` int NOT NULL DEFAULT 0 COMMENT ''创建时间'' AFTER `sort`,
+     ADD COLUMN `updated_at` int NOT NULL DEFAULT 0 COMMENT ''更新时间'' AFTER `created_at`,
+     ADD KEY `idx_prom_id` (`prom_id`),
+     ADD KEY `idx_item_id` (`item_id`)',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- ============================================================
+-- 收尾：后台菜单图标规范化（2026-11-06）
+-- 菜单 icon 会被前端当作 Vue 组件名解析，拼写错误会渲染成空白标签。
+-- ============================================================
+UPDATE `yxshop_admin_menus` SET `icon`='icon-thunderbolt'   WHERE `icon`='icon-thunder';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-file'          WHERE `icon`='icon-file-text';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-trophy'        WHERE `icon`='icon-crown';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-gift'          WHERE `icon`='icon-percentage';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-bar-chart'     WHERE `icon`='icon-money-collect';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-idcard'        WHERE `icon`='icon-credit-card';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-alipay-circle' WHERE `icon`='icon-pay-circle';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-email'         WHERE `icon`='icon-mail';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-settings'      WHERE `icon`='icon-setting';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-launch'        WHERE `icon`='icon-rocket';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-nav'           WHERE `icon`='icon-deliver';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-public'        WHERE `icon`='icon-dollar';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-location'      WHERE `icon`='icon-global';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-clock-circle'  WHERE `icon`='icon-clock';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-safe'          WHERE `icon`='icon-wallet';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-user-group'    WHERE `icon`='icon-team';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-import'        WHERE `icon`='icon-login';
+-- 单个菜单用更贴切的图标
+UPDATE `yxshop_admin_menus` SET `icon`='icon-file-pdf' WHERE `id`=81 AND `name`='发票管理';
+UPDATE `yxshop_admin_menus` SET `icon`='icon-search'   WHERE `id`=91 AND `name`='页面SEO';
+-- 仪表盘由前端静态路由提供，删除数据库里的重复项
+DELETE FROM `yxshop_admin_role_auths` WHERE `auth_id` IN (SELECT `id` FROM `yxshop_admin_menus` WHERE `url`='/dashboard');
+DELETE FROM `yxshop_admin_menus` WHERE `url`='/dashboard';

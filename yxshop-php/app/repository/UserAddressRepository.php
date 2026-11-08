@@ -23,7 +23,7 @@ class UserAddressRepository extends BaseRepository
     {
         $query = $this->query()
             ->where('user_id', $userId)
-            ->with(['province', 'city', 'district'])
+            ->with(['provinceRegion', 'cityRegion', 'districtRegion'])
             ->orderBy('is_default', 'desc')
             ->orderBy('created_at', 'desc');
 
@@ -44,7 +44,7 @@ class UserAddressRepository extends BaseRepository
         $query = $this->query()
             ->where('user_id', $userId)
             ->where('is_default', 1)
-            ->with(['province', 'city', 'district']);
+            ->with(['provinceRegion', 'cityRegion', 'districtRegion']);
         if ($appId > 0) {
             $query->where('app_id', $appId);
         }
@@ -56,7 +56,7 @@ class UserAddressRepository extends BaseRepository
             return $default;
         }
         // 兜底：找任一未删的
-        $fallback = $this->query()->where('user_id', $userId)->with(['province', 'city', 'district']);
+        $fallback = $this->query()->where('user_id', $userId)->with(['provinceRegion', 'cityRegion', 'districtRegion']);
         if ($appId > 0) {
             $fallback->where('app_id', $appId);
         }
@@ -109,7 +109,7 @@ class UserAddressRepository extends BaseRepository
     /**
      * 用户地址统计（每项 clone 防累加 bug）
      */
-    public function getUserAddressStats($userId, $appId = 0)
+    public function getUserAddressStats($userId, $appId = 0): array
     {
         $base = $this->query()->where('user_id', $userId);
         if ($appId > 0) {

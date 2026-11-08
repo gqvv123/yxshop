@@ -2,8 +2,6 @@
 
 namespace app\command;
 
-use support\Db;
-use Illuminate\Database\Schema\Blueprint;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,7 +12,7 @@ class MigrateCommand extends Command
     protected static $defaultName = 'migrate';
     protected static $defaultDescription = '执行数据库迁移';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('执行数据库迁移')
             ->addOption('rollback', 'r', InputOption::VALUE_NONE, '回滚迁移');
@@ -33,10 +31,10 @@ class MigrateCommand extends Command
                 foreach ($files as $file) {
                     $className = $this->getClassNameFromFile($file);
                     require_once $file;
-                    
+
                     $migration = new $className();
                     $output->writeln("<info>回滚迁移: {$className}</info>");
-                    
+
                     $migration->down();
                     $output->writeln("<info>回滚完成: {$className}</info>");
                 }
@@ -46,10 +44,10 @@ class MigrateCommand extends Command
                 foreach ($files as $file) {
                     $className = $this->getClassNameFromFile($file);
                     require_once $file;
-                    
+
                     $migration = new $className();
                     $output->writeln("<info>执行迁移: {$className}</info>");
-                    
+
                     $migration->up();
                     $output->writeln("<info>迁移完成: {$className}</info>");
                 }
@@ -77,4 +75,4 @@ class MigrateCommand extends Command
         }
         throw new \Exception("无法从文件 {$file} 中获取类名");
     }
-} 
+}

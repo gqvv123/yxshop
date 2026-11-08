@@ -140,7 +140,7 @@ class AdminService extends BaseService
     /**
      * 删除管理员
      */
-    public function deleteAdmin($id)
+    public function deleteAdmin($id): bool
     {
         try {
             $this->logInfo('删除管理员开始', ['id' => $id]);
@@ -247,7 +247,54 @@ class AdminService extends BaseService
             $menuIds = $roleRepo->getAuthIds($admin->role_id ?? 0);
         }
 
-        return $menuRepo->getAdminMenuTree($menuIds, !empty($admin->is_super_admin));
+        // 仪表盘是前端静态路由（routes 里写死），后端菜单里若还残留 dashboard 项，
+        // 侧边栏会同时渲染「前端仪表盘 + 数据库仪表盘」两个入口，其中一个还点不动。
+        // 这里递归剔除，保证后端返回的菜单树里不再有第二个仪表盘。
+        return $this->normalizeMenuIcons(
+            $this->stripBuiltinDashboard(
+                $menuRepo->getAdminMenuTree($menuIds, !empty($admin->is_super_admin))
+            )
+        );
+    }
+
+    /**
+     * 图标兜底：菜单表里如果填了图标库里不存在的 icon 名，
+     * 前端会渲染成空的自定义标签（看起来就是「这个菜单没有图标」）。
+     * 下发前统一替换成通用图标，避免以后新增菜单再出现空白。
+     */
+    private function normalizeMenuIcons(array $menus): array
+    {
+        foreach ($menus as &$menu) {
+            if (isset($menu['meta']) && is_array($menu['meta'])) {
+                $menu['meta']['icon'] = \app\common\AdminIcons::normalize($menu['meta']['icon'] ?? '');
+            }
+            if (!empty($menu['children']) && is_array($menu['children'])) {
+                $menu['children'] = $this->normalizeMenuIcons($menu['children']);
+            }
+        }
+        unset($menu);
+        return $menus;
+    }
+
+    /**
+     * 递归移除前端内置仪表盘（/dashboard）菜单项
+     */
+    private function stripBuiltinDashboard(array $menus): array
+    {
+        $result = [];
+        foreach ($menus as $menu) {
+            $path = (string) ($menu['path'] ?? '');
+            $name = (string) ($menu['name'] ?? '');
+            if (in_array($path, ['/dashboard', 'dashboard'], true)
+                || in_array($name, ['dashboard', 'dashboard_index_1'], true)) {
+                continue;
+            }
+            if (!empty($menu['children']) && is_array($menu['children'])) {
+                $menu['children'] = $this->stripBuiltinDashboard($menu['children']);
+            }
+            $result[] = $menu;
+        }
+        return array_values($result);
     }
 
     /**

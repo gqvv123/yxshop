@@ -14,7 +14,7 @@ return [
     'miniprogram' => $miniProgram,
     // 兼容旧引用
     'mini_program' => $miniProgram,
-    
+
     // 支付配置
     'pay' => [
         'app_id' => env('wechat.pay.app_id'),
@@ -24,7 +24,7 @@ return [
         'key_path' => env('wechat.pay.key_path'),
         'notify_url' => env('wechat.pay.notify_url'),
     ],
-    
+
     // 公众号配置
     'official_account' => [
         'app_id' => env('wechat.official_account.app_id'),
@@ -32,7 +32,7 @@ return [
         'token' => env('wechat.official_account.token'),
         'aes_key' => env('wechat.official_account.aes_key'),
     ],
-    
+
     // 开放平台配置
     'open_platform' => [
         'app_id' => env('wechat.open_platform.app_id'),
@@ -40,7 +40,7 @@ return [
         'token' => env('wechat.open_platform.token'),
         'aes_key' => env('wechat.open_platform.aes_key'),
     ],
-    
+
     // 企业微信配置
     'work' => [
         'corp_id' => env('wechat.work.corp_id'),
@@ -49,23 +49,23 @@ return [
         'token' => env('wechat.work.token'),
         'aes_key' => env('wechat.work.aes_key'),
     ],
-    
+
     // 日志配置
     'log' => [
         'level' => env('wechat.log.level', 'debug'),
         'file' => runtime_path() . '/logs/wechat.log',
     ],
-    
+
     // 缓存配置
     'cache' => [
         'driver' => env('wechat.cache.driver', 'redis'),
         'prefix' => env('wechat.cache.prefix', 'wechat_'),
     ],
-    
+
     // HTTP 配置
     'http' => [
         'timeout' => env('wechat.http.timeout', 5.0),
         'retry' => env('wechat.http.retry', 1),
         'retry_delay' => env('wechat.http.retry_delay', 500),
     ],
-]; 
+];

@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\UserMoneyLogService;
 
+/**
+ * 管理端控制器：User Money Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class UserMoneyLogController extends BaseController
 {
     protected $userMoneyLogService;

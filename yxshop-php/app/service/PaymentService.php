@@ -5,7 +5,6 @@ namespace app\service;
 use app\repository\PaymentRepository;
 use app\repository\OrderRepository;
 use app\repository\UserRepository;
-use app\model\Order;
 use app\model\Payment;
 use app\exception\BusinessException;
 use Exception;
@@ -21,7 +20,7 @@ class PaymentService extends BaseService
     protected $orderRepository;
     protected $userRepository;
 
-    public function __construct(PaymentRepository $repository = null)
+    public function __construct(?PaymentRepository $repository = null)
     {
         $repository = $repository ?? new PaymentRepository();
         parent::__construct($repository);
@@ -48,7 +47,7 @@ class PaymentService extends BaseService
             ]);
 
             $order = $this->orderService->findOrFail($orderId);
-            
+
             if ($order->user_id != $userId) {
                 throw new BusinessException('订单不属于当前用户');
             }
@@ -251,7 +250,7 @@ class PaymentService extends BaseService
     /**
      * 创建支付宝支付
      */
-    private function createAlipayPayment($payment)
+    private function createAlipayPayment($payment): array
     {
         // 这里集成支付宝SDK
         // 简化处理，返回模拟数据
@@ -264,7 +263,7 @@ class PaymentService extends BaseService
     /**
      * 处理微信支付回调
      */
-    private function handleWechatCallback($data)
+    private function handleWechatCallback($data): string
     {
         // 验证微信支付回调签名
         // 更新支付状态
@@ -272,7 +271,7 @@ class PaymentService extends BaseService
         return 'SUCCESS';
     }
 
-    private function handleAlipayCallback($data)
+    private function handleAlipayCallback($data): string
     {
         $this->updatePaymentStatus($data['out_trade_no'], Payment::STATUS_SUCCESS);
         return 'success';
@@ -343,7 +342,7 @@ class PaymentService extends BaseService
     /**
      * 处理支付宝退款
      */
-    private function processAlipayRefund($refund)
+    private function processAlipayRefund($refund): array
     {
         return ['refund_id' => $refund->id, 'status' => 'processing'];
     }

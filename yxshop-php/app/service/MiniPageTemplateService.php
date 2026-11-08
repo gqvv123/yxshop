@@ -22,9 +22,15 @@ class MiniPageTemplateService extends BaseService
 
     public function createTemplate(array $data)
     {
-        $appId = $data['app_id'] ?? 0;
+        $appId = (int) ($data['app_id'] ?? 0);
+        $templateName = trim((string) ($data['template_name'] ?? ''));
+        if ($templateName === '') {
+            throw new BusinessException('请填写模板名称');
+        }
+        $data['template_name'] = $templateName;
+        $data['app_id'] = $appId;
 
-        if ($this->repository->checkNameExists($appId, $data['template_name'])) {
+        if ($this->repository->checkNameExists($appId, $templateName)) {
             throw new BusinessException('模板名称已存在');
         }
 
@@ -148,7 +154,7 @@ class MiniPageTemplateService extends BaseService
     /**
      * 直接从内置模板创建页面
      */
-    public function createPageFromBuiltinTemplate(string $templateId, int $appId, string $pageName = '', int $pageType = null): array
+    public function createPageFromBuiltinTemplate(string $templateId, int $appId, string $pageName = '', ?int $pageType = null): array
     {
         $data = $this->getBuiltinTemplate($templateId);
         if (!$data) {

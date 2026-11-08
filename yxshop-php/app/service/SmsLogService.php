@@ -3,8 +3,12 @@
 namespace app\service;
 
 use app\repository\SmsLogRepository;
-use Exception;
 
+/**
+ * 业务服务：Sms Log Service。
+ *
+ * @package app\service
+ */
 class SmsLogService extends BaseService
 {
     public function __construct(?SmsLogRepository $repository = null)

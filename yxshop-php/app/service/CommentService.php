@@ -188,7 +188,7 @@ class CommentService extends BaseService
     /**
      * 更新商品评价数量
      */
-    private function updateItemCommentCount($itemId)
+    private function updateItemCommentCount($itemId): void
     {
         try {
             $count = $this->repository->countApprovedByItem((int) $itemId);

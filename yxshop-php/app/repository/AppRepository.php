@@ -26,15 +26,8 @@ class AppRepository extends BaseRepository
      */
     public function getApps(?int $userId = null)
     {
-        $query = $this->query()
-            ->with(['user'])
-            ->orderBy('created_at', 'desc');
-
-        if ($userId !== null) {
-            $query->where('user_id', $userId);
-        }
-
-        return $query->get();
+        // yxshop_apps 无 user_id 列（应用不属于某个后台用户），不做归属过滤
+        return $this->query()->orderBy('created_at', 'desc')->get();
     }
 
     /**

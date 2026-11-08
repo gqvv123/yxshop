@@ -61,7 +61,7 @@ class ItemSpecItemRepository extends BaseRepository
     /**
      * 获取规格项统计
      */
-    public function getItemStats($appId = 0)
+    public function getItemStats($appId = 0): array
     {
         $query = $this->query();
 

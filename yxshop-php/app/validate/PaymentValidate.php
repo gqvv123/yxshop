@@ -22,7 +22,7 @@ class PaymentValidate extends Validate
         'status' => 'require|in:10,20,30,40,50',
         'transaction_id' => 'max:64',
         'refund_reason' => 'max:255',
-        'app_id' => 'require|number|min:1',
+        'app_id' => 'number|min:0',
     ];
 
     /**
@@ -47,9 +47,8 @@ class PaymentValidate extends Validate
         'status.in' => '支付状态值必须是10,20,30,40,50其中之一',
         'transaction_id.max' => '第三方事务号最多不能超过64个字符',
         'refund_reason.max' => '退款原因最多不能超过255个字符',
-        'app_id.require' => '应用ID不能为空',
-        'app_id.number' => '应用ID必须是数字',
-        'app_id.min' => '应用ID不能小于1',
+                'app_id.number' => '应用ID必须是数字',
+        'app_id.min' => '应用ID不能小于0',
     ];
 
     /**

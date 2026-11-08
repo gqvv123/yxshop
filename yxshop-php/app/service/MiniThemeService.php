@@ -7,6 +7,11 @@ use app\repository\MiniPageRepository;
 use app\model\MiniPage;
 use app\exception\BusinessException;
 
+/**
+ * 业务服务：Mini Theme Service。
+ *
+ * @package app\service
+ */
 class MiniThemeService extends BaseService
 {
     protected $pageRepository;
@@ -69,7 +74,7 @@ class MiniThemeService extends BaseService
         return $page;
     }
 
-    protected function validateHexColors(array $data)
+    protected function validateHexColors(array $data): void
     {
         $hexFields = ['primary_color', 'secondary_color', 'nav_background_color', 'nav_text_color'];
 

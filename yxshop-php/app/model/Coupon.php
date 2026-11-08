@@ -74,7 +74,7 @@ class Coupon extends BaseModel
         return $this->hasMany(UserCoupon::class, 'coupon_id', 'id');
     }
 
-    public function canReceive()
+    public function canReceive(): bool
     {
         $now = time();
         if ($this->status != 1 || $this->deleted_at > 0) {

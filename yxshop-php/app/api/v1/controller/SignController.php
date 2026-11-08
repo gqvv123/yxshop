@@ -57,7 +57,7 @@ class SignController extends BaseController
         return $this->success([
             'signed_today'    => $signedToday,
             'continuous_days' => $continuousDays,
-            'total_signs'     => $totalSigns['total_signs'] ?? 0,
+            'total_signs'     => $totalSigns['total_count'] ?? 0,
             'total_points'    => $totalSigns['total_points'] ?? 0,
             'integral_balance'=> (float) ($user->integral ?? 0),
             'rules'           => $rules,

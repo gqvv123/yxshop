@@ -53,7 +53,7 @@ class LanguageRepository extends BaseRepository
         try {
             // 取消所有语言的默认状态
             $this->query()->where('is_default', 1)->update(['is_default' => 0]);
-            
+
             // 设置指定语言为默认
             $language = $this->find($id);
             if ($language) {
@@ -61,7 +61,7 @@ class LanguageRepository extends BaseRepository
                 $language->status = 1;
                 return $language->save();
             }
-            
+
             return false;
         } catch (\Exception $e) {
             return false;
@@ -74,9 +74,33 @@ class LanguageRepository extends BaseRepository
     public function updateSort(array $data): bool
     {
         try {
-            foreach ($data as $id => $sort) {
-                $this->query()->where('id', $id)->update(['sort' => $sort]);
+            if (!$data) {
+                return true;
             }
+            // 一次性用 CASE WHEN 更新，避免逐条 update 造成 N+1。
+            // 注意：Db::raw() 内的 ? 不会被参数绑定，因此这里必须用已 (int) 强转的字面量。
+            $cases = [];
+            $ids = [];
+            foreach ($data as $id => $sort) {
+                $id = (int) $id;
+                if ($id <= 0) {
+                    continue;
+                }
+                $cases[] = 'WHEN ' . $id . ' THEN ' . (int) $sort;
+                $ids[] = $id;
+            }
+            if (!$ids) {
+                return true;
+            }
+
+            $this->query()
+                ->whereIn('id', $ids)
+                ->update([
+                    'sort' => \support\Db::raw(
+                        'CASE id ' . implode(' ', $cases) . ' ELSE sort END'
+                    ),
+                    'updated_at' => time(),
+                ]);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -91,11 +115,11 @@ class LanguageRepository extends BaseRepository
         $query = $this->query()
             ->where('code', $code)
             ->where('status', 1);
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
+
         return $query->exists();
     }
 }

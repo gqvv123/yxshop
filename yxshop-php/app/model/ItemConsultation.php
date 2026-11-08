@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Item Consultation。
+ *
+ * @package app\model
+ */
 class ItemConsultation extends BaseModel
 {
     protected $table = 'yxshop_item_consultations';

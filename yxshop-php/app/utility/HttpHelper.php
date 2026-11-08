@@ -162,6 +162,7 @@ class HttpHelper
                 ];
             }
         } catch (\Throwable $e) {
+            // 第三方 IP 库异常时回落到空信息
         }
         return ['ip' => $ip, 'country' => '', 'city' => ''];
     }

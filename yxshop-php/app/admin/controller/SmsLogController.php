@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\SmsLogService;
 
+/**
+ * 管理端控制器：Sms Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class SmsLogController extends BaseController
 {
     protected $smsLogService;

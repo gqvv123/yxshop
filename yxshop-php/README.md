@@ -182,8 +182,10 @@ yxshop-php/
 3. **导入数据库**
 
    ```bash
-   mysql -u root -p yxshop_free < database/yxshop_open_source_default.sql
+   mysql -u <DB_USERNAME> -p <DB_DATABASE> < database/yxshop_open_source_default.sql
    ```
+
+   库名以 `.env` 的 `DB_DATABASE` 为准。⚠️ 脚本会 `DROP TABLE IF EXISTS` 重建表，**导入前务必先备份现有库**。
 
 4. **启动服务**
 
@@ -192,26 +194,19 @@ yxshop-php/
    php start.php start
 
    # Windows
-   start.bat
+   windows.bat
    ```
 
-   默认端口 `8777`，WebSocket 端口 `3131`，API 端口 `3232`。
+   默认端口 `8777`，WebSocket 端口 `3131`，API 端口 `3232`。需安装 PHP `redis` 扩展，否则缓存/队列/验证码会失效。
 
-### 前端部署
+### 管理后台前端
 
-```bash
-cd yxshop-admin
-npm install
-npm run dev    # 开发模式
-npm run build  # 生产构建
-```
-
-开发模式默认运行在 `http://localhost:5173`。
+开源仓库**不含** `yxshop-admin` 源码，只提供已构建产物 `public/yxadmin/`（388 个静态文件）。后端启动后直接访问 `http://127.0.0.1:8777/yxadmin/` 即可，无需 npm 构建。
 
 ### 默认账号
 
-- 管理后台：`admin` / `Yxsh0p@2024!Adm1n`
-- ⚠️ **部署后请立即修改默认密码**
+- 管理后台用户名：`admin`；初始密码由部署者在初始化时设置（见 `database/yxshop_open_source_default.sql` 中的 bcrypt 哈希），不写死在文档里
+- ⚠️ **部署后请立即修改初始密码**；忘记密码可用 `php -r 'echo password_hash("新密码", PASSWORD_DEFAULT);'` 生成哈希后更新 `yxshop_admins.password`
 
 ## 核心配置
 
@@ -280,7 +275,7 @@ AI_OPENAI_MODEL=gpt-4o
 | 商业版 | 增值营销模块 | 品牌商家、成长型电商 |
 | 企业版 | 多租户 SaaS + 供应链 | 大型企业、平台运营商 |
 
-开源版基于 Apache 2.0 协议开源。商业版和企业版通过条件加载目录扩展，升级时复制对应目录即可激活，无需修改开源代码。
+开源版基于 MIT 协议开源。商业版和企业版通过条件加载目录扩展，升级时复制对应目录即可激活，无需修改开源代码。
 
 ### 商业版模块（增值功能）
 
@@ -289,7 +284,6 @@ AI_OPENAI_MODEL=gpt-4o
 | 分销裂变 | 多层级分销、推荐返佣、佣金结算 |
 | 限时秒杀 Pro | 秒杀场次、Redis 队列预扣防超卖 |
 | 高级会员卡 | 会员卡管理、充值规则、权益配置 |
-| 社区养老 | 服务对象、食堂订餐、健康档案 |
 | 赠品活动 | 赠品管理、赠品商品配置 |
 | 拼团 | 拼团活动、成员管理 |
 | 营销游戏 | 营销游戏、奖品配置 |
@@ -311,11 +305,12 @@ AI_OPENAI_MODEL=gpt-4o
 ## 目录说明
 
 ```
-yxshop/                         # 项目根目录
-├── yxshop-php/                 # 后端 (PHP / Webman)
-├── yxshop-admin/               # 管理后台前端 (Vue 3 + Arco Design)
-├── COMMERCIAL_VS_OPENSOURCE_DIFF.md  # 商业版与开源版差异对比
-└── .env                        # 环境配置
+yxshop-php/                    # 本仓库：后端 (PHP / Webman) + 已构建后台 dist
+├── app/                       # 控制器 / 服务 / 仓储 / 模型
+├── config/                    # 路由、中间件、授权等配置
+├── database/                  # 初始化 SQL
+├── public/yxadmin/            # 管理后台构建产物（无源码）
+└── .env                       # 环境配置
 ```
 
 ## 技术特性
@@ -332,6 +327,6 @@ yxshop/                         # 项目根目录
 
 ## 许可证
 
-[Apache License 2.0](LICENSE)
+[MIT License](LICENSE)
 
 Copyright 2024 YXShop

@@ -2,6 +2,11 @@
 
 namespace app\utility;
 
+/**
+ * 组件：File Helper。
+ *
+ * @package app\utility
+ */
 class FileHelper
 {
     public static function storeFile($file, string $location, ?string $size = null, ?string $removeFile = null): string
@@ -31,7 +36,7 @@ class FileHelper
             throw new \Exception('File could not been created.');
         }
         if ($old && file_exists($location . '/' . $old) && is_file($location . '/' . $old)) {
-            @unlink($location . '/' . $old);
+            \app\common\SafeHelper::unlink($location . '/' . $old);
         }
         $filename = uniqid() . time() . '.' . $file->getClientOriginalExtension();
         $file->move($location, $filename);
@@ -41,7 +46,7 @@ class FileHelper
     public static function removeFile(string $location, string $removeFile): void
     {
         if (file_exists($location . '/' . $removeFile) && is_file($location . '/' . $removeFile)) {
-            @unlink($location . '/' . $removeFile);
+            \app\common\SafeHelper::unlink($location . '/' . $removeFile);
         }
     }
 

@@ -55,7 +55,7 @@ class LicenseController extends BaseController
         // 版本信息
         $editions = [
             'open_source' => ['name' => '开源版', 'price' => '免費', 'features' => '基礎电商功能'],
-            'commercial'  => ['name' => '商业版', 'price' => '¥2,980/年', 'features' => '分銷、秒杀、会员卡、社区养老等'],
+            'commercial'  => ['name' => '商业版', 'price' => '¥2,980/年', 'features' => '分销、秒杀、会员卡、拼团等'],
             'enterprise'  => ['name' => '企业版', 'price' => '¥9,800/年', 'features' => '多店铺、供应鏈、审计追踪等'],
             'saas'        => ['name' => 'SaaS 版', 'price' => '按需付費', 'features' => '託管服务、自动運維'],
         ];

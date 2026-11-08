@@ -3,15 +3,12 @@ namespace app\process;
 
 use Workerman\Crontab\Crontab;
 use Webman\RedisQueue\Client;
-use support\Db;
 use support\Log;
-use support\Redis;
 use app\common\Logger;
-use Exception;
 
 class LogCleanup
 {
-    public function onWorkerStart()
+    public function onWorkerStart(): void
     {
 
         // // 每秒钟执行一次
@@ -22,7 +19,7 @@ class LogCleanup
 
         // // 每5秒执行一次
         // new Crontab('*/5 * * * * *', function(){
-        //     echo date('Y-m-d H:i:s')."\n";   
+        //     echo date('Y-m-d H:i:s')."\n";
         //     $this->handle();
         // });
 
@@ -50,7 +47,7 @@ class LogCleanup
 
     }
 
-    public function handle()
+    public function handle(): void
     {
         try {
             // 发送清理任务到队列

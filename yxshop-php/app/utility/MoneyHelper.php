@@ -6,6 +6,11 @@ use app\common\StatusEnum;
 use app\service\cache\TieredCache;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * 组件：Money Helper。
+ *
+ * @package app\utility
+ */
 class MoneyHelper
 {
     public static function formatMoney(float $amount, int $decimal = 2): string
@@ -82,6 +87,7 @@ class MoneyHelper
             $exchangeRate = $baseCurrency->rate / ($currency ? $currency->rate : $baseCurrency->rate);
             $amount = 1 / $exchangeRate;
         } catch (\Throwable $th) {
+            // 汇率换算失败时回落到默认汇率
         }
         return round($amount);
     }
@@ -109,7 +115,7 @@ class MoneyHelper
     {
         $currency = TieredCache::remember('currency', 24 * 60 * 60, function () {
             return \app\model\Currency::where(function (Builder $query) {
-                return $query->where('id', @session()->get('web_currency')->id)
+                return $query->where('id', (int) (session()->get('web_currency')->id ?? 0))
                     ->orwhere('default', StatusEnum::true->status());
             })->first();
         });
@@ -120,7 +126,7 @@ class MoneyHelper
     {
         $currency = TieredCache::remember('currency_name', 24 * 60 * 60, function () {
             return \app\model\Currency::where(function (Builder $query) {
-                return $query->where('id', @session()->get('web_currency')->id)
+                return $query->where('id', (int) (session()->get('web_currency')->id ?? 0))
                     ->orwhere('default', StatusEnum::true->status());
             })->first();
         });
@@ -136,6 +142,6 @@ class MoneyHelper
 
     public static function showCurrency(): string
     {
-        return @session()->get('web_currency')->symbol ?? static::getCurrencySymbol();
+        return (string) (session()->get('web_currency')->symbol ?? static::getCurrencySymbol());
     }
 }

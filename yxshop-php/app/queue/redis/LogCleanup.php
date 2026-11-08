@@ -8,6 +8,7 @@ use support\Log;
 use support\Redis;
 use app\common\LogCleanupConfig;
 use app\common\Logger;
+use app\model\SystemLog;
 use Webman\RedisQueue\Client;
 
 class LogCleanup implements Consumer
@@ -59,12 +60,13 @@ class LogCleanup implements Consumer
                 'stats' => $stats
             ], Logger::TYPE_SYSTEM);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $stats['error'] = true;
+            // central=false：清理任务自身失败不再回投日志队列，避免队列自我触发
             Logger::error('日志清理失败', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], Logger::TYPE_SYSTEM);
+                'trace' => substr($e->getTraceAsString(), 0, 4000)
+            ], Logger::TYPE_SYSTEM, 0, false);
         }
 
         // 计算执行时间
@@ -79,7 +81,7 @@ class LogCleanup implements Consumer
      * 发送监控数据
      * @param array $stats
      */
-    private function sendMonitorData(array $stats)
+    private function sendMonitorData(array $stats): void
     {
         Client::send(
             'Log-Cleanup-Monitor',
@@ -111,17 +113,24 @@ class LogCleanup implements Consumer
 
     /**
      * 获取表大小（MB）
+     *
+     * 原实现写成 Db::table()->select("SELECT ...")，select() 返回的是 Query\Builder
+     * 而不是结果集，下面按数组取 $result[0] 会抛
+     * "Cannot use object of type Illuminate\Database\Query\Builder as array"，
+     * 而这个异常又会被写进不存在的日志表，最终演变成日志自激膨胀。
+     *
      * @return float
      */
     private function getTableSize(): float
     {
-        $result = Db::table('yxshop_system_log')
-            ->select("SELECT ROUND((data_length + index_length) / 1024 / 1024, 2) as size 
-                     FROM information_schema.TABLES 
-                     WHERE table_schema = DATABASE() 
-                     AND table_name = 'yxshop_system_log'");
-        
-        return $result[0]->size ?? 0;
+        $row = Db::selectOne(
+            'SELECT ROUND((data_length + index_length) / 1024 / 1024, 2) AS size
+             FROM information_schema.TABLES
+             WHERE table_schema = DATABASE() AND table_name = ?',
+            ['yxshop_system_logs']
+        );
+
+        return (float) ($row->size ?? 0);
     }
 
     /**
@@ -142,15 +151,31 @@ class LogCleanup implements Consumer
 
     /**
      * 按级别清理日志
+     *
+     * 注意：表里 log_level 是数字（10/20/30/40/50，见 SystemLog 常量），
+     * 配置里的 key 是字符串（error/warning/info/debug），必须映射后再查询，
+     * 否则 where('log_level', 'error') 永远匹配不到任何行。
+     *
      * @return int 删除的记录数
      */
     private function cleanupByLevel(): int
     {
+        $levelMap = [
+            Logger::LEVEL_ERROR   => SystemLog::LEVEL_ERROR,
+            Logger::LEVEL_WARNING => SystemLog::LEVEL_WARNING,
+            Logger::LEVEL_INFO    => SystemLog::LEVEL_INFO,
+            Logger::LEVEL_DEBUG   => SystemLog::LEVEL_DEBUG,
+        ];
+
         $deletedCount = 0;
         foreach (LogCleanupConfig::LEVEL_RETENTION as $level => $days) {
+            $numeric = $levelMap[$level] ?? null;
+            if ($numeric === null) {
+                continue;
+            }
             $deletedCount += $this->deleteOldLogs([
-                'level' => $level,
-                'days' => $days
+                'level' => $numeric,
+                'days'  => $days,
             ]);
         }
         return $deletedCount;
@@ -158,6 +183,9 @@ class LogCleanup implements Consumer
 
     /**
      * 删除旧日志
+     *
+     * 字段名对齐 yxshop_system_logs 真实 schema：log_type / log_level（不是 type / level）
+     *
      * @param array $params
      * @return int 删除的记录数
      */
@@ -166,30 +194,34 @@ class LogCleanup implements Consumer
         $deletedCount = 0;
         $archivedCount = 0;
 
-        $query = Db::table('yxshop_system_log')
-            ->where('created_at', '<', date('Y-m-d H:i:s', strtotime("-{$params['days']} days")));
+        $query = Db::table('yxshop_system_logs')
+            // created_at 是整型时间戳，必须与时间戳比较；
+            // 之前误用日期字符串比较，条件恒不成立，导致清理任务形同虚设
+            ->where('created_at', '<', time() - ((int) $params['days'] * 86400));
 
         if (isset($params['type'])) {
-            $query->where('type', $params['type']);
+            $query->where('log_type', $params['type']);
         }
         if (isset($params['level'])) {
-            $query->where('level', $params['level']);
+            $query->where('log_level', $params['level']);
         }
 
         // 分批删除
         $query->orderBy('id')->chunk(LogCleanupConfig::BATCH_SIZE, function ($logs) use (&$deletedCount, &$archivedCount) {
-            foreach ($logs as $log) {
-                // 如果是错误日志，先归档
-                if ($log->level === Logger::LEVEL_ERROR) {
-                    $this->archiveLog($log);
-                    $archivedCount++;
+            if (!$logs->isEmpty()) {
+                // 错误日志先归档（归档仍需逐条处理，量级小）
+                foreach ($logs as $log) {
+                    if ((int) $log->log_level === SystemLog::LEVEL_ERROR) {
+                        $this->archiveLog($log);
+                        $archivedCount++;
+                    }
                 }
-                // 删除日志
-                Db::connection('mysql_backend')
-                    ->table('system_logs')
-                    ->where('id', $log->id)
+
+                // 批量删除，避免逐条 delete 造成 N+1
+                $deleteIds = $logs->map(fn($log) => (int) $log->id)->all();
+                $deletedCount += (int) Db::table('yxshop_system_logs')
+                    ->whereIn('id', $deleteIds)
                     ->delete();
-                $deletedCount++;
             }
         });
 
@@ -204,24 +236,33 @@ class LogCleanup implements Consumer
     {
         $compressedCount = 0;
         $threshold = LogCleanupConfig::COMPRESSION_THRESHOLD;
-        $oldLogs = Db::table('yxshop_system_log')
-            ->where('created_at', '<', date('Y-m-d H:i:s', strtotime("-{$threshold} days")))
+        $oldLogs = Db::table('yxshop_system_logs')
+            ->where('created_at', '<', time() - ((int) $threshold * 86400))
             ->where('is_compressed', 0)
             ->get();
 
-        foreach ($oldLogs as $log) {
-            // 压缩日志内容
-            $compressed = gzcompress(json_encode($log));
-            
-            // 更新日志记录
-            Db::table('yxshop_system_log')
-                ->where('id', $log->id)
-                ->update([
-                    'message' => $compressed,
-                    'is_compressed' => 1,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            $compressedCount++;
+        if ($oldLogs->isNotEmpty()) {
+            $compressedCount = $oldLogs->count();
+            // 压缩内容是二进制，无法安全拼进 SQL 字面量，
+            // 因此用 INSERT ... ON DUPLICATE KEY UPDATE 一次批量写回（值全部走参数绑定）
+            $rows = [];
+            $bindings = [];
+            $now = time();   // updated_at 是整型时间戳
+            foreach ($oldLogs as $log) {
+                $rows[] = '(?, ?, 1, ?)';
+                $bindings[] = (int) $log->id;
+                // message 是 utf8mb4 字段，存不了 gzip 二进制，统一 base64 编码
+                $bindings[] = \app\common\LogPayload::encode(json_encode($log, JSON_UNESCAPED_UNICODE));
+                $bindings[] = $now;
+            }
+
+            Db::statement(
+                'INSERT INTO yxshop_system_logs (id, message, is_compressed, updated_at) VALUES '
+                . implode(', ', $rows)
+                . ' ON DUPLICATE KEY UPDATE message = VALUES(message), '
+                . 'is_compressed = VALUES(is_compressed), updated_at = VALUES(updated_at)',
+                $bindings
+            );
         }
 
         return $compressedCount;
@@ -231,33 +272,37 @@ class LogCleanup implements Consumer
      * 归档重要日志
      * @param object $log
      */
-    private function archiveLog($log)
+    private function archiveLog($log): void
     {
-        Db::table('yxshop_system_log_archive')
-            ->insert([
-                'level' => $log->level,
-                'type' => $log->type,
-                'message' => $log->message,
-                'error_code' => $log->error_code,
-                'context' => $log->context,
-                'server_host' => $log->server_host,
-                'server_ip' => $log->server_ip,
-                'server_env' => $log->server_env,
-                'trace' => $log->trace,
-                'created_at' => $log->created_at,
-                'archived_at' => date('Y-m-d H:i:s')
-            ]);
+        Db::table('yxshop_system_logs_archive')->insert([
+            'id'          => (int) $log->id,
+            'log_level'   => $log->log_level ?? null,
+            'log_type'    => $log->log_type ?? null,
+            'module'      => $log->module ?? null,
+            'action'      => $log->action ?? null,
+            'message'     => $log->message ?? null,
+            'context'     => $log->context ?? null,
+            'file'        => $log->file ?? null,
+            'line'        => $log->line ?? null,
+            'trace'       => $log->trace ?? null,
+            'ip'          => $log->ip ?? null,
+            'user_agent'  => $log->user_agent ?? null,
+            'app_id'      => $log->app_id ?? 0,
+            'created_at'  => $log->created_at ?? time(),
+            'archived_at' => time(),
+        ]);
     }
 
     /**
      * 消费失败回调
      */
-    public function onConsumeFailure(\Throwable $e, $package)
+    public function onConsumeFailure(\Throwable $e, $package): void
     {
+        // central=false：同上，避免失败消息回流日志队列形成自激
         Logger::error('日志清理任务失败', [
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'package' => $package
-        ], Logger::TYPE_SYSTEM);
+            'trace' => substr($e->getTraceAsString(), 0, 4000),
+            'package' => is_scalar($package) ? $package : json_encode($package, JSON_UNESCAPED_UNICODE)
+        ], Logger::TYPE_SYSTEM, 0, false);
     }
-} 
+}

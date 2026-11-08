@@ -98,7 +98,7 @@ class ItemSearchRepository extends BaseRepository
     /**
      * 获取搜索统计
      */
-    public function getSearchStats($appId = 0, $days = 30)
+    public function getSearchStats($appId = 0, $days = 30): array
     {
         $startTime = time() - ($days * 24 * 3600);
         $query = $this->query()->where('created_at', '>=', $startTime);
@@ -120,7 +120,7 @@ class ItemSearchRepository extends BaseRepository
     public function cleanExpiredSearches($days = 90)
     {
         $expiredTime = time() - ($days * 24 * 3600);
-        
+
         return $this->query()
             ->where('created_at', '<', $expiredTime)
             ->delete();

@@ -4,6 +4,11 @@ namespace app\service;
 
 use app\exception\BusinessException;
 
+/**
+ * 业务服务：Component Schema Service。
+ *
+ * @package app\service
+ */
 class ComponentSchemaService
 {
     public function getSchemas(string $edition = 'community'): array

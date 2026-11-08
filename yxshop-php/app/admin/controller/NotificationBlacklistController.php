@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationBlacklistService;
 
+/**
+ * 管理端控制器：Notification Blacklist Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationBlacklistController extends BaseController
 {
     protected $notificationBlacklistService;

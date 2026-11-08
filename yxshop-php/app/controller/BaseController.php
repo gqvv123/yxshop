@@ -6,6 +6,11 @@ use support\Request;
 use app\traits\ApiResponseTrait;
 use app\traits\BatchOperationTrait;
 
+/**
+ * 组件：Base Controller。
+ *
+ * @package app\controller
+ */
 class BaseController
 {
     use ApiResponseTrait;

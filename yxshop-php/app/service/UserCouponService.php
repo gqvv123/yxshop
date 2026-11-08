@@ -3,8 +3,12 @@
 namespace app\service;
 
 use app\repository\UserCouponRepository;
-use Exception;
 
+/**
+ * 业务服务：User Coupon Service。
+ *
+ * @package app\service
+ */
 class UserCouponService extends BaseService
 {
     public function __construct(?UserCouponRepository $repository = null)

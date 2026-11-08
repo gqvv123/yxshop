@@ -81,8 +81,8 @@ class AiController extends BaseController
                         . "商品描述：{$item['description']}\n"
                         . "商品分类：{$item['category_name']}\n";
                 } catch (\Exception $e) {
-                    // 忽略商品信息获取失败
-                }
+            // 忽略商品信息获取失败
+        }
             }
 
             // 构建系统提示词

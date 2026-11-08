@@ -4,6 +4,11 @@ namespace app\service;
 
 use support\Log;
 
+/**
+ * 业务服务：Setting Encrypt Service。
+ *
+ * @package app\service
+ */
 class SettingEncryptService
 {
     protected $encryptedFields = [

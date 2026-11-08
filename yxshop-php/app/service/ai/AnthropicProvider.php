@@ -31,11 +31,12 @@ class AnthropicProvider implements AiProviderInterface
 
     public function __construct()
     {
+        // 必须先初始化 settingService：getConfig() 内部会读取它
+        $this->settingService = new SettingService();
         $this->httpClient = new Client([
-            'timeout' => $this->getConfig('timeout', 60),
+            'timeout' => (int) $this->getConfig('timeout', 60),
             'connect_timeout' => 10,
         ]);
-        $this->settingService = new SettingService();
     }
 
     public function getName(): string

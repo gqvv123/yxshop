@@ -4,6 +4,11 @@ namespace app\utility;
 
 use support\Response;
 
+/**
+ * 组件：Api Json Response。
+ *
+ * @package app\utility
+ */
 class ApiJsonResponse
 {
     protected int $httpCode = 200;

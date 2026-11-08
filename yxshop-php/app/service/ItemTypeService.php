@@ -3,13 +3,12 @@
 namespace app\service;
 
 use app\repository\ItemTypeRepository;
-use app\model\ItemType;
 use app\exception\BusinessException;
 use Exception;
 
 /**
  * 商品类型服务类
- * 
+ *
  * @property ItemTypeRepository $repository
  */
 class ItemTypeService extends BaseService
@@ -96,7 +95,7 @@ class ItemTypeService extends BaseService
     /**
      * 删除商品类型
      */
-    public function deleteType($id)
+    public function deleteType($id): bool
     {
         try {
             $this->logInfo('删除商品类型开始', ['id' => $id]);

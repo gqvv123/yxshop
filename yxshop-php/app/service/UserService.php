@@ -5,7 +5,6 @@ namespace app\service;
 use app\repository\UserRepository;
 use app\repository\UserLevelRepository;
 use app\repository\OrderRepository;
-use app\model\User;
 use app\exception\BusinessException;
 use app\validate\UserValidate;
 use Exception;
@@ -20,9 +19,16 @@ use Exception;
  */
 class UserService extends BaseService
 {
+    use UserFootprintTrait;
+
+    use UserStatisticsTrait;
+
+    use UserNotificationTrait;
+
     protected UserLevelRepository $levelRepository;
     protected UserMoneyService $moneyService;
     protected IntegralService $integralService;
+    protected OrderRepository $orderRepo;
 
     public function __construct(?UserRepository $repository = null)
     {
@@ -31,6 +37,7 @@ class UserService extends BaseService
         $this->levelRepository = new UserLevelRepository();
         $this->moneyService = new UserMoneyService();
         $this->integralService = new IntegralService();
+        $this->orderRepo = new OrderRepository();
     }
 
     // ============================================================
@@ -236,48 +243,6 @@ class UserService extends BaseService
     // ============================================================
 
     /**
-     * 用户综合统计（消费/推荐/收藏/浏览/搜索/评价/优惠券）
-     *
-     * 多源聚合，无法纯下沉到单一 Repository，仍在 Service 层协调；
-     * 关联 count 走 User 模型已定义的 hasMany 关系（Eloquent 默认走索引）。
-     */
-    public function getUserStats($userId)
-    {
-        try {
-            $user = $this->findOrFail($userId);
-
-            return [
-                'user_info'       => $user->toArray(),
-                'consumption'     => $this->repository->getUserConsumptionStats($userId, $user->app_id),
-                'referral'        => $this->repository->getUserReferralStats($userId, $user->app_id),
-                'favorites_count' => $user->favorites()->count(),
-                'views_count'     => $user->views()->count(),
-                'searches_count'  => $user->searches()->count(),
-                'comments_count'  => $user->comments()->count(),
-                'coupons_count'   => $user->coupons()->count(),
-            ];
-        } catch (Exception $e) {
-            $this->logError('获取用户统计信息失败', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 推荐人下级列表（指定层级）
-     */
-    public function getReferralList($userId, $level = 1, $page = 1, $limit = 15)
-    {
-        try {
-            $this->findOrFail($userId);  // 校验推荐人存在
-            return $this->repository->getReferralsPaginated((int) $userId, (int) $level, (int) $page, (int) $limit);
-        } catch (Exception $e) {
-            $this->logError('获取用户推荐列表失败',
-                compact('userId', 'level', 'page', 'limit') + ['error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
      * 后台分页列表
      */
     public function getPaginatedList($appId, $pageSize = 20)
@@ -304,7 +269,15 @@ class UserService extends BaseService
     {
         try {
             $user = $this->findOrFail($userId);
-            return ['success' => true, 'data' => $user->toArray(), 'message' => 'ok'];
+            $data = $user->toArray();
+
+            // Eloquent 的访问器不会自动进入 toArray()，这里显式补上个人中心需要的派生字段。
+            // 之前缺 level_name 时，小程序 VIP 徽章会一直回退显示 "PRO"。
+            $data['level_name'] = $user->level_name;
+            $data['discount'] = (float) $user->discount;
+            $data['is_vip'] = (int) ($user->level_id ?? 0) > 1;
+
+            return ['success' => true, 'data' => $data, 'message' => 'ok'];
         } catch (Exception $e) {
             return ['success' => false, 'data' => null, 'message' => $e->getMessage()];
         }
@@ -393,374 +366,9 @@ class UserService extends BaseService
     // 私有 - 通知 / 审计
     // ============================================================
 
-    private function sendRegisterNotification(User $user): void
-    {
-        try {
-            // TODO: 接入 NotificationSendService 后调用真实通知
-            $this->logInfo('发送注册通知', ['user_id' => $user->id]);
-        } catch (Exception $e) {
-            $this->logError('发送注册通知失败', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-        }
-    }
-
-    private function sendLoginNotification(User $user): void
-    {
-        try {
-            $this->logInfo('发送登录通知', ['user_id' => $user->id]);
-        } catch (Exception $e) {
-            $this->logError('发送登录通知失败', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-        }
-    }
-
-    private function sendLevelChangeNotification(User $user, $level): void
-    {
-        try {
-            $this->logInfo('发送等级变更通知', ['user_id' => $user->id, 'level_id' => $level->id]);
-        } catch (Exception $e) {
-            $this->logError('发送等级变更通知失败', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-        }
-    }
-
-    private function sendDealerChangeNotification(User $user, $isDealer): void
-    {
-        try {
-            $this->logInfo('发送分销商变更通知', ['user_id' => $user->id, 'is_dealer' => $isDealer]);
-        } catch (Exception $e) {
-            $this->logError('发送分销商变更通知失败', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-        }
-    }
-
     // ============================================================
     // C 端 — 个人中心聚合
     // ============================================================
-
-    /**
-     * 用户综合信息（个人中心首页聚合）
-     *
-     * 聚合：基础信息 + 等级 + 余额 + 积分 + 优惠券数 + 订单各状态数 + 收藏数 + 足迹数
-     *
-     * @param int $userId
-     * @return array
-     */
-    public function getUserProfile(int $userId): array
-    {
-        try {
-            $user = $this->findOrFail($userId);
-
-            // 等级信息
-            $level = $user->level;
-            $levelInfo = $level ? [
-                'id'       => $level->id,
-                'name'     => $level->name,
-                'level'    => $level->level,
-                'discount' => (float) $level->discount,
-                'icon'     => '',  // icon 字段不存在，预留
-            ] : ['id' => 0, 'name' => '普通会员', 'level' => 0, 'discount' => 10.00, 'icon' => ''];
-
-            // 下一等级信息
-            $nextLevel = $this->levelRepository->getNextLevel($user->app_id, $level->level ?? 0);
-            $nextLevelInfo = $nextLevel ? [
-                'id'          => $nextLevel->id,
-                'name'        => $nextLevel->name,
-                'level'       => $nextLevel->level,
-                'experience'  => $nextLevel->experience,
-            ] : null;
-
-            // 订单各状态数量
-            $orderService = new OrderService();
-            $orderCounts = $orderService->getOrderStatusCounts($userId);
-
-            // 优惠券未使用数量
-            $userCouponRepo = new \app\repository\UserCouponRepository();
-            $unusedCouponCount = $userCouponRepo->countUnusedByUser($userId);
-
-            // 收藏数
-            $favoriteCount = $user->favorites()->count();
-
-            // 足迹数
-            $footprintCount = $user->views()->count();
-
-            return [
-                'id'              => $user->id,
-                'nickname'        => $user->nickname,
-                'avatar_url'      => $user->avatar_url,
-                'phone'           => $user->phone ? substr_replace($user->phone, '****', 3, 4) : '',
-                'gender'          => $user->gender,
-                'gender_text'     => [0 => '未知', 1 => '男', 2 => '女'][$user->gender] ?? '未知',
-                'birthday'        => $user->birthday,
-                'money'           => (float) $user->money,
-                'freeze_money'    => (float) $user->freeze_money,
-                'integral'        => (float) $user->integral,
-                'freeze_integral' => (float) $user->freeze_integral,
-                'total_spent'     => (float) $user->total_spent,
-                'level'           => $levelInfo,
-                'next_level'      => $nextLevelInfo,
-                'order_counts'    => $orderCounts,
-                'coupon_count'    => $unusedCouponCount,
-                'favorite_count'  => $favoriteCount,
-                'footprint_count' => $footprintCount,
-                'created_at'      => $user->created_at,
-            ];
-        } catch (Exception $e) {
-            $this->logError('获取用户综合信息失败', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 用户浏览足迹（分页）
-     *
-     * @param int $userId
-     * @param int $page
-     * @param int $pageSize
-     * @return array
-     */
-    public function getFootprint(int $userId, int $page = 1, int $pageSize = 20): array
-    {
-        try {
-            $page = max(1, $page);
-            $pageSize = min(50, max(1, $pageSize));
-
-            $viewRepo = new \app\repository\ItemViewRepository();
-            $paginator = $viewRepo->getPaginatedByUserWithItem($userId, $page, $pageSize);
-            $list = $paginator->getCollection()->map(function ($view) {
-                $item = $view->item;
-                if (!$item) {
-                    return null;
-                }
-                return [
-                    'view_id'      => $view->id,
-                    'view_count'   => (int) ($view->view_count ?? 1),
-                    'viewed_at'    => (int) $view->getRawOriginal('created_at'),
-                    'item'         => [
-                        'id'          => $item->id,
-                        'name'        => $item->name,
-                        'subtitle'    => $item->subtitle ?? '',
-                        'sale_price'  => $item->sale_price,
-                        'image'       => \app\model\BaseModel::resolveAssetUrl($item->getMainImageAttribute() ?: ''),
-                        'is_on_sale'  => (int) $item->is_on_sale,
-                    ],
-                ];
-            })->filter()->values();
-
-            return [
-                'list'      => $list,
-                'total'     => $paginator->total(),
-                'page'      => $page,
-                'page_size' => $pageSize,
-            ];
-        } catch (Exception $e) {
-            $this->logError('获取用户浏览足迹失败', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 清空浏览足迹
-     *
-     * @param int $userId
-     * @return bool
-     */
-    public function clearFootprint(int $userId): bool
-    {
-        try {
-            $viewRepo = new \app\repository\ItemViewRepository();
-            $viewRepo->deleteByUser($userId);
-            $this->logInfo('清空浏览足迹', ['user_id' => $userId]);
-            return true;
-        } catch (Exception $e) {
-            $this->logError('清空浏览足迹失败', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 删除单条浏览足迹
-     *
-     * @param int $viewId
-     * @param int $userId
-     * @return bool
-     */
-    public function removeFootprint(int $viewId, int $userId): bool
-    {
-        try {
-            $viewRepo = new \app\repository\ItemViewRepository();
-            $view = $viewRepo->findByIdAndUser($viewId, $userId);
-            if (!$view) {
-                throw new BusinessException('足迹记录不存在', 404);
-            }
-            $view->delete();
-            return true;
-        } catch (Exception $e) {
-            $this->logError('删除浏览足迹失败', ['view_id' => $viewId, 'user_id' => $userId, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    /**
-     * 用户报表（按日统计）
-     */
-    public function getUserReport($appId, $startTs = null, $endTs = null): array
-    {
-        $days = 30;
-        if ($startTs && $endTs) {
-            $days = min(365, max(1, intval(($endTs - $startTs) / 86400) + 1));
-        }
-
-        $base = $this->repository->query();
-        if ($appId > 0) {
-            $base->where('app_id', $appId);
-        }
-
-        $data = [];
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = date('Y-m-d', strtotime("-{$i} days"));
-            $dayStart = strtotime($date . ' 00:00:00');
-            $dayEnd = strtotime($date . ' 23:59:59');
-
-            $data[] = [
-                'date' => $date,
-                'new_users' => (clone $base)->whereBetween('created_at', [$dayStart, $dayEnd])->count(),
-                'active_users' => (clone $base)->whereBetween('last_login_at', [$dayStart, $dayEnd])->count(),
-                'order_users' => 0,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
-     * 最新注册用户
-     */
-    public function getLatestUsers($appId, $limit = 10)
-    {
-        $query = $this->repository->query();
-        if ($appId > 0) {
-            $query->where('app_id', $appId);
-        }
-        return $query->orderBy('id', 'desc')->limit($limit)->get();
-    }
-
-    /**
-     * 用户仪表板（真实数据）
-     */
-    public function getUserDashboard($appId): array
-    {
-        $base = $this->repository->query();
-        if ($appId > 0) {
-            $base->where('app_id', $appId);
-        }
-
-        $now = time();
-        $thisMonthStart = strtotime(date('Y-m-01') . ' 00:00:00');
-        $lastMonthStart = strtotime('first day of last month 00:00:00');
-        $lastMonthEnd = strtotime('last day of last month 23:59:59');
-        $thirtyDaysAgo = $now - 86400 * 30;
-        $ninetyDaysAgo = $now - 86400 * 90;
-
-        // --- Stats ---
-        $totalUsers = (clone $base)->count();
-        $totalUsersLastMonth = (clone $base)->where('created_at', '<', $thisMonthStart)->count();
-        $totalUsersTrend = $totalUsersLastMonth > 0 ? round(($totalUsers - $totalUsersLastMonth) / $totalUsersLastMonth * 100, 1) : 0;
-
-        $newUsers = (clone $base)->where('created_at', '>=', $thisMonthStart)->count();
-        $newUsersLastMonth = (clone $base)->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->count();
-        $newUsersTrend = $newUsersLastMonth > 0 ? round(($newUsers - $newUsersLastMonth) / $newUsersLastMonth * 100, 1) : 0;
-
-        $activeUsers = (clone $base)->where('last_login_at', '>=', $thirtyDaysAgo)->count();
-        $activeRate = $totalUsers > 0 ? round($activeUsers / $totalUsers, 4) : 0;
-        $activeUsersLastMonth = (clone $base)->where('last_login_at', '>=', $thirtyDaysAgo - 86400 * 30)->where('last_login_at', '<', $thirtyDaysAgo)->count();
-        $activeRateLastMonth = $totalUsers > 0 ? round($activeUsersLastMonth / $totalUsers, 4) : 0;
-        $activeRateTrend = $activeRateLastMonth > 0 ? round(($activeRate - $activeRateLastMonth) / $activeRateLastMonth * 100, 1) : 0;
-
-        // Avg order value
-        $orderBase = $this->orderRepo->query();
-        if ($appId > 0) {
-            $orderBase->where('app_id', $appId);
-        }
-        $avgOrderValue = (clone $orderBase)->where('pay_status', 1)->where('created_at', '>=', $thisMonthStart)->avg('pay_price') ?? 0;
-        $avgOrderValueLastMonth = (clone $orderBase)->where('pay_status', 1)->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->avg('pay_price') ?? 0;
-        $avgOrderValueTrend = $avgOrderValueLastMonth > 0 ? round(($avgOrderValue - $avgOrderValueLastMonth) / $avgOrderValueLastMonth * 100, 1) : 0;
-
-        // --- Chart (last 12 months new users) ---
-        $chart = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $monthStart = strtotime(date('Y-m-01', strtotime("-{$i} months")) . ' 00:00:00');
-            $monthEnd = strtotime('last day of ' . date('Y-m', $monthStart) . ' 23:59:59');
-            $count = (clone $base)->whereBetween('created_at', [$monthStart, $monthEnd])->count();
-            $chart[] = [
-                'label' => date('n', $monthStart) . '',
-                'value' => $count,
-            ];
-        }
-
-        // --- Segments ---
-        $newCount = (clone $base)->where('created_at', '>=', $thirtyDaysAgo)->count();
-        $vipCount = (clone $base)->where('level_id', '>', 1)->count();
-        $regularCount = (clone $base)->where('level_id', 1)->where('created_at', '<', $thirtyDaysAgo)->count();
-        $inactiveCount = (clone $base)->where(function ($q) use ($ninetyDaysAgo) {
-            $q->whereNull('last_login_at')->orWhere('last_login_at', '<', $ninetyDaysAgo);
-        })->count();
-
-        $segments = [];
-        foreach ([
-            ['key' => 'new', 'count' => $newCount],
-            ['key' => 'vip', 'count' => $vipCount],
-            ['key' => 'regular', 'count' => $regularCount],
-            ['key' => 'inactive', 'count' => $inactiveCount],
-        ] as $seg) {
-            $seg['percent'] = $totalUsers > 0 ? round($seg['count'] / $totalUsers * 100, 1) : 0;
-            $segments[] = $seg;
-        }
-
-        // --- Latest users ---
-        $latestUsers = (clone $base)->orderBy('id', 'desc')->limit(10)->get();
-        $orderRepo = new OrderRepository();
-        $users = [];
-        foreach ($latestUsers as $u) {
-            $orderCount = $orderRepo->query()->where('user_id', $u->id)->count();
-            $totalSpent = $orderRepo->query()->where('user_id', $u->id)->where('pay_status', 1)->sum('pay_price');
-            $users[] = [
-                'id' => $u->id,
-                'nickname' => $u->nickname,
-                'username' => $u->phone ?: '',
-                'registered_at' => $u->created_at ? date('Y-m-d', is_numeric($u->created_at) ? $u->created_at : strtotime($u->created_at)) : '-',
-                'created_at' => $u->created_at ? date('Y-m-d', is_numeric($u->created_at) ? $u->created_at : strtotime($u->created_at)) : '-',
-                'order_count' => $orderCount,
-                'total_spent' => round((float) $totalSpent, 2),
-                'status' => $u->deleted_at > 0 ? 'inactive' : 'active',
-            ];
-        }
-
-        return [
-            'stats' => [
-                'total_users' => $totalUsers,
-                'total_users_trend' => $totalUsersTrend,
-                'new_users' => $newUsers,
-                'new_users_trend' => $newUsersTrend,
-                'active_rate' => $activeRate,
-                'active_rate_trend' => $activeRateTrend,
-                'avg_order_value' => round((float) $avgOrderValue, 2),
-                'avg_order_value_trend' => $avgOrderValueTrend,
-            ],
-            'chart' => $chart,
-            'segments' => $segments,
-            'users' => $users,
-        ];
-    }
-
-    /**
-     * 数据变更审计日志
-     * @enterprise-only 接入 DataChangeLogService 后入库（现仅打 info 日志）
-     */
-    private function logDataChange($tableName, $recordId, $changeType, $oldValue, $newValue): void
-    {
-        $this->logInfo('记录数据变更日志', [
-            'table_name'  => $tableName,
-            'record_id'   => $recordId,
-            'change_type' => $changeType,
-        ]);
-    }
 
     /**
      * 注销账号（软删除）
@@ -780,124 +388,6 @@ class UserService extends BaseService
         $user->save();
 
         $this->logDataChange('yxshop_users', $userId, 'deactivate', null, null);
-    }
-
-    /**
-     * 获取账号安全信息
-     */
-    public function getSecurityInfo(int $userId): array
-    {
-        $user = $this->repository->find($userId);
-        if (!$user) {
-            throw new BusinessException('用户不存在');
-        }
-
-        $hasPassword  = !empty($user->password);
-        $hasPhone     = !empty($user->phone);
-        $hasWxBind    = !empty($user->openid);
-        $hasEmail     = !empty($user->email);
-
-        $score = 0;
-        if ($hasPassword) $score += 30;
-        if ($hasPhone)    $score += 30;
-        if ($hasWxBind)   $score += 20;
-        if ($hasEmail)    $score += 10;
-        if (($user->login_security_status ?? 0) > 0) $score += 10;
-        $score = min(100, $score);
-
-        $level = '低';
-        $levelColor = '#dc2626';
-        if ($score >= 80) {
-            $level = '高';
-            $levelColor = '#10b981';
-        } elseif ($score >= 60) {
-            $level = '中';
-            $levelColor = '#f59e0b';
-        }
-
-        $lastLoginAt = (int) ($user->last_login_at ?? 0);
-        $lastLoginText = '';
-        if ($lastLoginAt > 0) {
-            $lastLoginText = date('Y-m-d H:i:s', $lastLoginAt);
-        }
-
-        $loginCount = (int) ($user->login_count ?? 0);
-
-        $createdAt = $user->created_at;
-        $createdText = '';
-        if ($createdAt) {
-            if (is_numeric($createdAt)) {
-                $ts = (int) $createdAt;
-                if ($ts > 0) $createdText = date('Y-m-d', $ts);
-            } else {
-                $createdText = (string) $createdAt;
-                if (strlen($createdText) >= 10) {
-                    $createdText = substr($createdText, 0, 10);
-                }
-            }
-        }
-
-        $maskPhone = function (?string $phone): string {
-            if (!$phone) return '未绑定';
-            if (strlen($phone) >= 11) {
-                return substr($phone, 0, 3) . '****' . substr($phone, -4);
-            }
-            return $phone;
-        };
-
-        $maskEmail = function (?string $email): string {
-            if (!$email) return '未绑定';
-            $atPos = strpos($email, '@');
-            if ($atPos === false) return $email;
-            $name = substr($email, 0, $atPos);
-            $domain = substr($email, $atPos);
-            if (strlen($name) <= 2) {
-                return $name[0] . '*' . $domain;
-            }
-            return substr($name, 0, 2) . str_repeat('*', max(1, strlen($name) - 2)) . $domain;
-        };
-
-        $items = [
-            [
-                'key'    => 'password',
-                'title'  => '登录密码',
-                'desc'   => $hasPassword ? '已设置' : '未设置',
-                'bound'  => $hasPassword,
-                'action' => $hasPassword ? '修改' : '设置',
-            ],
-            [
-                'key'    => 'phone',
-                'title'  => '手机号码',
-                'desc'   => $hasPhone ? $maskPhone($user->phone) : '未绑定',
-                'bound'  => $hasPhone,
-                'action' => $hasPhone ? '更换' : '绑定',
-            ],
-            [
-                'key'    => 'wechat',
-                'title'  => '微信账号',
-                'desc'   => $hasWxBind ? '已绑定' : '未绑定',
-                'bound'  => $hasWxBind,
-                'action' => $hasWxBind ? '解绑' : '绑定',
-            ],
-            [
-                'key'    => 'email',
-                'title'  => '电子邮箱',
-                'desc'   => $hasEmail ? $maskEmail($user->email) : '未绑定',
-                'bound'  => $hasEmail,
-                'action' => $hasEmail ? '更换' : '绑定',
-            ],
-        ];
-
-        return [
-            'score'         => $score,
-            'level'         => $level,
-            'level_color'   => $levelColor,
-            'items'         => $items,
-            'last_login_at' => $lastLoginText,
-            'login_count'   => $loginCount,
-            'last_login_ip' => $user->last_login_ip ?: '',
-            'created_at'    => $createdText,
-        ];
     }
 
     /**

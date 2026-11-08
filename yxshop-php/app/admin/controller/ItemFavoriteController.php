@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\ItemFavoriteService;
 
+/**
+ * 管理端控制器：Item Favorite Controller。
+ *
+ * @package app\admin\controller
+ */
 class ItemFavoriteController extends BaseController
 {
     protected $itemFavoriteService;

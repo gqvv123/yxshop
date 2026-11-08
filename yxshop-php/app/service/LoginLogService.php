@@ -226,7 +226,7 @@ class LoginLogService extends BaseService
     /**
      * 清空指定天数前的登录日志
      */
-    public function clearOldLoginLogs($days = 30)
+    public function clearOldLoginLogs($days = 30): bool
     {
         try {
             $this->repository->cleanExpiredLogs($days);
@@ -243,7 +243,7 @@ class LoginLogService extends BaseService
     /**
      * 导出登录日志（占位实现：当前直接返回 true）
      */
-    public function exportLoginLogs($startDate = '', $endDate = '')
+    public function exportLoginLogs($startDate = '', $endDate = ''): bool
     {
         try {
             // 这里可以按需实现导出为 CSV/Excel

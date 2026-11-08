@@ -44,7 +44,7 @@ class UserFeedbackController extends BaseController
 
     public function reply(Request $request, $id)
     {
-        $replierId = $this->admin['id'] ?? 0;
+        $replierId = $this->getAdminId($request);
         $replyContent = $request->post('reply_content', '');
         $result = $this->service->reply($id, $replierId, $replyContent);
         return $this->success($result, '回复成功');
@@ -69,8 +69,8 @@ class UserFeedbackController extends BaseController
                 $this->service->delete($id);
                 $count++;
             } catch (\Throwable $e) {
-                // 跳过不存在的记录
-            }
+            // 跳过不存在的记录
+        }
         }
         return $this->success(['count' => $count], "成功删除{$count}条记录");
     }

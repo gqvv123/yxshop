@@ -8,6 +8,11 @@ use app\service\AdminLogService;
 use app\service\UserLogService;
 use app\service\SystemLogService;
 
+/**
+ * 管理端控制器：Log Controller。
+ *
+ * @package app\admin\controller
+ */
 class LogController extends BaseController
 {
     protected $loginLogService;

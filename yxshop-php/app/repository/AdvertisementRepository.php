@@ -75,7 +75,7 @@ class AdvertisementRepository extends BaseRepository
     /**
      * 获取广告统计
      */
-    public function getAdStats($appId = 0)
+    public function getAdStats($appId = 0): array
     {
         $query = $this->query();
         $now = time();

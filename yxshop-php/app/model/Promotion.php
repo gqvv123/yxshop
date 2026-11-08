@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Promotion。
+ *
+ * @package app\model
+ */
 class Promotion extends BaseModel
 {
     protected $table = 'yxshop_promotions';

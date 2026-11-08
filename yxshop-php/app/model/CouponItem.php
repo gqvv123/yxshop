@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Coupon Item。
+ *
+ * @package app\model
+ */
 class CouponItem extends BaseModel
 {
     protected $table = 'yxshop_coupon_items';

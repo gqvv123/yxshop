@@ -32,9 +32,15 @@ if (empty(Worker::$eventLoopClass)) {
 }
 
 set_error_handler(function ($level, $message, $file = '', $line = 0) {
+    // PHP 8.4/8.5 将大量历史 API 标记为 deprecated（含 vendor 代码）。
+    // 这类提示不应中断请求，否则会把 E_DEPRECATED 变成 500。
+    if ($level === E_DEPRECATED || $level === E_USER_DEPRECATED) {
+        return true;
+    }
     if (error_reporting() & $level) {
         throw new ErrorException($message, 0, $level, $file, $line);
     }
+    return false;
 });
 
 if ($worker) {

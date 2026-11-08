@@ -6,6 +6,11 @@ use support\Request;
 use support\Response;
 use app\service\cache\TieredCache;
 
+/**
+ * 管理端控制器：Common Controller。
+ *
+ * @package app\admin\controller
+ */
 class CommonController extends BaseController
 {
     public function clearCache(Request $request): Response

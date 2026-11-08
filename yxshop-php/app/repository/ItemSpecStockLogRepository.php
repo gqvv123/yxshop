@@ -65,7 +65,7 @@ class ItemSpecStockLogRepository extends BaseRepository
     /**
      * 获取标签统计
      */
-    public function getTagStats($appId = 0)
+    public function getTagStats($appId = 0): array
     {
         $query = $this->query();
 

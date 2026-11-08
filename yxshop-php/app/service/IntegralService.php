@@ -4,9 +4,7 @@ namespace app\service;
 
 use app\repository\IntegralRepository;
 use app\repository\UserRepository;
-use app\model\User;
 use app\exception\BusinessException;
-use Exception;
 
 /**
  * 积分服务
@@ -170,7 +168,7 @@ class IntegralService extends BaseService
     /**
      * 批量过期
      */
-    public function batchExpireIntegral($days = 365)
+    public function batchExpireIntegral($days = 365): array
     {
         $expireTime = time() - $days * 86400;
         $userIds = $this->repository->getUsersWithExpiredLogs($expireTime);

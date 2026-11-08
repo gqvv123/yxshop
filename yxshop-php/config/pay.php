@@ -16,4 +16,4 @@ return [
         'key_path' => env('wechat.key_path'),
     ],
     'pay_type' => env('pay.pay_type', 'alipay'),
-]; 
+];

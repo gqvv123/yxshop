@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\RegionService;
 
+/**
+ * 管理端控制器：Region Controller。
+ *
+ * @package app\admin\controller
+ */
 class RegionController extends BaseController
 {
     protected $regionService;

@@ -54,11 +54,11 @@ return [
     'cookie_path' => '/',
 
     'domain' => env('SESSION_DOMAIN', ''),
-    
+
     'http_only' => true,
 
     'secure' => env('APP_SECURE', true),
-    
+
     'same_site' => env('APP_SAME_SITE', 'lax'),
 
     'gc_probability' => [1, 1000],

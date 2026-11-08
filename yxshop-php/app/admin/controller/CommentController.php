@@ -7,6 +7,11 @@ use app\service\CommentService;
 use app\service\OrderService;
 use app\service\UserService;
 
+/**
+ * 管理端控制器：Comment Controller。
+ *
+ * @package app\admin\controller
+ */
 class CommentController extends BaseController
 {
     protected $commentService;

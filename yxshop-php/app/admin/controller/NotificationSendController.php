@@ -5,6 +5,11 @@ namespace app\admin\controller;
 use support\Request;
 use app\service\NotificationSendService;
 
+/**
+ * 管理端控制器：Notification Send Controller。
+ *
+ * @package app\admin\controller
+ */
 class NotificationSendController extends BaseController
 {
     protected $notificationSendService;

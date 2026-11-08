@@ -19,7 +19,7 @@ class TieredCache
 	{
 		$dir = runtime_path() . '/tiered_cache';
 		if (!is_dir($dir)) {
-			@mkdir($dir, 0775, true);
+			\app\common\SafeHelper::mkdir($dir);
 		}
 		return $dir;
 	}
@@ -45,9 +45,9 @@ class TieredCache
 		// L2: 文件
 		$path = self::fileCacheDir() . '/' . self::sanitizeKey($key) . '.cache';
 		if (is_file($path)) {
-			$raw = @file_get_contents($path);
-			if ($raw !== false) {
-				$data = @json_decode($raw, true);
+			$raw = \app\common\SafeHelper::read($path);
+			if ($raw !== null) {
+				$data = \app\common\SafeHelper::decodeJson($raw);
 				if (is_array($data) && isset($data['expire'])) {
 					if ($data['expire'] === 0 || $data['expire'] > $now) {
 						// 回填到 L1
@@ -60,13 +60,13 @@ class TieredCache
 				}
 			}
 			// 过期清理
-			@unlink($path);
+			\app\common\SafeHelper::unlink($path);
 		}
 
 		// L3: Redis
 		$value = Redis::get($key);
 		if ($value !== false && $value !== null) {
-			$decoded = @json_decode($value, true);
+			$decoded = \app\common\SafeHelper::decodeJson((string) $value);
 			if (is_array($decoded) && isset($decoded['expire'])) {
 				if ($decoded['expire'] === 0 || $decoded['expire'] > $now) {
 					// 回填到 L2 与 L1
@@ -104,7 +104,7 @@ class TieredCache
 
 		// L2
 		$path = self::fileCacheDir() . '/' . self::sanitizeKey($key) . '.cache';
-		@file_put_contents($path, json_encode(['expire' => $expireAt, 'value' => $value, 'key' => $key], JSON_UNESCAPED_UNICODE));
+		\app\common\SafeHelper::write($path, json_encode(['expire' => $expireAt, 'value' => $value, 'key' => $key], JSON_UNESCAPED_UNICODE));
 	}
 
 	public static function remember(string $key, int $ttl, callable $callback)
@@ -113,7 +113,7 @@ class TieredCache
 		if ($value !== null || self::isPlaceholderPresent($key)) {
 			return $value;
 		}
-		
+
 		// 击穿保护：短期互斥锁
 		$lockKey = 'lock:' . $key;
 		// 兼容 PhpRedis：使用 setnx + expire 实现互斥锁
@@ -132,7 +132,7 @@ class TieredCache
 				Redis::expire($lockKey, 5);
 			}
 		}
-		
+
 		try {
 			$result = $callback();
 			if ($result === null) {
@@ -158,7 +158,7 @@ class TieredCache
 		];
 		// L2
 		$path = self::fileCacheDir() . '/' . self::sanitizeKey($key) . '.cache';
-		@file_put_contents($path, json_encode(['expire' => $expireAt, 'key' => $key], JSON_UNESCAPED_UNICODE));
+		\app\common\SafeHelper::write($path, json_encode(['expire' => $expireAt, 'key' => $key], JSON_UNESCAPED_UNICODE));
 		// L3
 		Redis::setex($key, max(1, $ttl), json_encode(['expire' => $expireAt, 'key' => $key], JSON_UNESCAPED_UNICODE));
 	}
@@ -173,9 +173,9 @@ class TieredCache
 		// L2
 		$path = self::fileCacheDir() . '/' . self::sanitizeKey($key) . '.cache';
 		if (is_file($path)) {
-			$raw = @file_get_contents($path);
-			if ($raw !== false) {
-				$data = @json_decode($raw, true);
+			$raw = \app\common\SafeHelper::read($path);
+			if ($raw !== null) {
+				$data = \app\common\SafeHelper::decodeJson($raw);
 				if (is_array($data)) {
 					return isset($data['expire']) && !array_key_exists('value', $data) && ($data['expire'] === 0 || $data['expire'] > self::now());
 				}
@@ -184,7 +184,7 @@ class TieredCache
 		// L3
 		$value = Redis::get($key);
 		if ($value !== false && $value !== null) {
-			$decoded = @json_decode($value, true);
+			$decoded = \app\common\SafeHelper::decodeJson((string) $value);
 			if (is_array($decoded)) {
 				return isset($decoded['expire']) && !array_key_exists('value', $decoded) && ($decoded['expire'] === 0 || $decoded['expire'] > self::now());
 			}
@@ -197,7 +197,7 @@ class TieredCache
 		unset(self::$memoryCache[$key]);
 		$path = self::fileCacheDir() . '/' . self::sanitizeKey($key) . '.cache';
 		if (is_file($path)) {
-			@unlink($path);
+			\app\common\SafeHelper::unlink($path);
 		}
 		Redis::del($key);
 	}
@@ -212,18 +212,18 @@ class TieredCache
 		}
 		// L2 - 扫描文件读取原始 key 做匹配
 		$dir = self::fileCacheDir();
-		$files = @scandir($dir) ?: [];
+		$files = \app\common\SafeHelper::scandir($dir);
 		foreach ($files as $file) {
 			if ($file === '.' || $file === '..') continue;
 			$full = $dir . '/' . $file;
 			if (!is_file($full)) continue;
-			$raw = @file_get_contents($full);
+			$raw = \app\common\SafeHelper::read($full);
 			if ($raw === false) continue;
-			$data = @json_decode($raw, true);
+			$data = \app\common\SafeHelper::decodeJson($raw);
 			if (!is_array($data)) continue;
 			$orig = isset($data['key']) ? $data['key'] : null;
 			if (is_string($orig) && substr($orig, 0, strlen($prefix)) === $prefix) {
-				@unlink($full);
+				\app\common\SafeHelper::unlink($full);
 			}
 		}
 		// L3 - Redis：使用 SCAN 更安全
@@ -245,12 +245,12 @@ class TieredCache
 
 		// L2: 文件
 		$dir = self::fileCacheDir();
-		$files = @scandir($dir) ?: [];
+		$files = \app\common\SafeHelper::scandir($dir);
 		foreach ($files as $file) {
 			if ($file === '.' || $file === '..') continue;
 			$full = $dir . '/' . $file;
 			if (is_file($full)) {
-				@unlink($full);
+				\app\common\SafeHelper::unlink($full);
 			}
 		}
 
@@ -258,8 +258,8 @@ class TieredCache
 		try {
 			Redis::flushDB();
 		} catch (\Throwable $e) {
-			// ignore
-		}
+            // ignore
+        }
 	}
 
 	public static function buildKey(string $namespace, array $parts = []): string
@@ -284,5 +284,5 @@ class TieredCache
 		$prefix = substr(preg_replace('/[^a-zA-Z0-9:_\-]/', '_', $key), 0, 80);
 		return $prefix . '_' . md5($key);
 	}
- 
-} 
+
+}

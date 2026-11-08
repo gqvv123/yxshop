@@ -53,7 +53,7 @@ class CurrencyRepository extends BaseRepository
         try {
             // 取消所有货币的默认状态
             $this->query()->where('is_default', 1)->update(['is_default' => 0]);
-            
+
             // 设置指定货币为默认
             $currency = $this->find($id);
             if ($currency) {
@@ -61,7 +61,7 @@ class CurrencyRepository extends BaseRepository
                 $currency->status = 1;
                 return $currency->save();
             }
-            
+
             return false;
         } catch (\Exception $e) {
             return false;

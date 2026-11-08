@@ -2,6 +2,11 @@
 
 namespace app\model;
 
+/**
+ * 数据模型：Integral。
+ *
+ * @package app\model
+ */
 class Integral extends BaseModel
 {
     protected $table = 'yxshop_integral_logs';
